@@ -1,0 +1,16 @@
+#
+#   Makefile for eXtended Sector Remapper (TinyBML) driver on kernel 2.6
+#
+#   Copyright(C) 2004-2006, Samsung Electronics, Co., Ltd.
+#
+
+# tiny base module
+obj-$(CONFIG_RFS_TINYBML)			+= tiny.o
+
+# for tiny bml
+tiny-objs	:= tiny_base.o tbml_block.o tbml_blkdev.o
+
+# This objects came from tbml, It will be never modified.
+tiny-objs	+= TinyBML/tbml_interface.o TinyBML/gbbm.o TinyBML/onenand_lld.o
+tiny-objs	+= adapt/LinuxOAM.o adapt/onenand_interface.o
+

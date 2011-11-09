@@ -1,0 +1,174 @@
+# =====================================================================
+# L27.2 Eclair Hand-off
+# =====================================================================
+
+Author: Leed Aguilar
+Date: April 16st 2010
+Target Release: L27.2
+
+
+# =====================================================================
+# Configuration Settings
+# =====================================================================
+
+[KERNEL]
+Repo:   git://git.omapzoom.org/kernel/omap.git
+Branch: p-android-omap-2.6.32
+Tag: android-2.6.32-2.1-omap4.2
+Config: android_4430_defconfig
+
+[U-BOOT]
+Repo:   git://git.omapzoom.org/repo/u-boot.git
+Branch: omap4_dev
+Commit: acc8277454910392254f78b405b247382d3fabe2
+Config: omap4430sdp_config
+
+[X-LOADER]
+Repo:   git://git.omapzoom.org/repo/x-loader.git
+Branch: omap4_dev
+Commit: 72888f33f233f515976352b5027938002e69bc9c
+Config: omap4430sdp_config
+
+OS: Linux 2.6.32
+Platform: OMAP4430 4430SDP board
+Toolchain: Code Sourcery arm-2009q1
+
+# =====================================================================
+# Cloning information
+# =====================================================================
+
+Kernel:
+-------
+git clone git://git.omapzoom.org/kernel/omap.git
+cd omap/
+git checkout --track -b p-android-omap-2.6.32 origin/p-android-omap-2.6.32
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- android_4430_defconfig
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- uImage
+Output: uImage
+
+u-boot:
+-------
+git clone  git://git.omapzoom.org/repo/u-boot.git
+cd u-boot/
+git checkout --track -b omap4 L24.4
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- omap4430sdp_config
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi-
+Output: u-boot.bin
+
+x-loader:
+---------
+git clone git://git.omapzoom.org/repo/x-loader.git
+cd x-loader/
+git checkout --track -b omap4 L24.4
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- omap4430sdp_config
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi-
+make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- ift
+Output: MLO
+
+# =====================================================================
+# Known issues / Important Notes
+# =====================================================================
+
+* Console Change to ttyO: Sample bootargs for mmc boot:
+setenv bootargs 'console=ttyO2,115200n8 root=/dev/mmcblk0p2 rw rootdelay=2 init=/init omapfb.vram="0:4M"'
+setenv bootcmd 'mmcinit;fatload mmc 0 0x80000000 uImage;bootm 80000000'
+run bootcmd
+
+* This Release is intended to be used for Android Eclair 2.1:
+How obtain the Android source code:
+$repo init -u git://git.omapzoom.org/platform/omapmanifest.git -b eclair
+$cp vendor/ti/nextgen/buildspec.mk.default buildspec.mk
+$make
+Output:
+See filesystem in:
+      out/target/product/nextgen/...
+            * root/
+            * system/
+cp .rc file:
+$cp out/target/product/nextgen/root/init.omap4sdp.rc out/target/product/nextgen/root/init.rc
+
+For more information on how to compile the Android Filesystem visit:
+http://omappedia.org/wiki/Android_Getting_Started#Building_Android
+
+In this release we are providing the following information:
+
+
+[RELEASE CONTENT]
+
+- Release Notes
+- Unit Test Results
+- TestCase Specs
+- TestDesign Specs
+- Klocwork Report
+- UnixBench Report
+- LMbench Report
+- Config Specs for ClearCase
+- Compilation warnings List
+
+[HIGHLIGHTS]
+
+- MUSB gadget support
+- USB Android Gadget support
+  * ADB (Android Debug Bridge)
+  * Mass Storage support
+  * CDC Serial support
+  * RNDIS ethernet support
+- SYSLINK fixes
+- GPS character driver support
+- eMMC support
+- Pico DLP support
+- FM driver support
+- FM Klocwork fixes
+- Bluetooth AVRCP
+
+[ADB SUPPORT]
+
+To make ADB working on a linux PC you need to do the following:
+
+1. As a root user on your linux shell, create the following file:
+
+# su
+  <psswd>
+# mkdir ~/.android
+# vi ~/.android/adb_usb.ini
+# echo "TI USB VID 0x0451" > ~/.android/adb_usb.ini
+# cat /root/.android/adb_usb.ini
+  TI USB VID 0x0451
+
+
+# =====================================================================
+# Open Defects / Known issues
+# =====================================================================
+
+Release does not have:
+L2 cacheflushall() API
+USB: EHCI/OHCI
+Power management
+
+# =====================================================================
+# Gerrit IDs List and Changelist
+# =====================================================================
+
+2552 - drivers: misc: ST causes kernel lock up again
+2577 - omap4: sdp4430: defconfig update for BT avrcp
+2645 - drivers: misc: Adding FM driver sources
+2701 - OMAP4: 4430SDP: defconfig change for FM
+2711 - USB: ANDROID: setting android gadget as tristate
+2732 - keypad: map keys for blaze board
+2815 - USB: ANDROID: Register android composite gadget driver
+2882 - SYSLINK Messageq transport remove waiting for Ducati
+2883 - SYSLINK: notify-remove redunant check in notify send
+2761 - drivers: misc: FM: KlocWork fixes
+2769 - OMAP4: 4430SDP: defconfig change for GPS
+2737 - GPS: Add support for gps character driver
+
+# ======================================================================
+# Klocwork Results
+# ======================================================================
+
+https://klocwork.dal.design.ti.com:8096/klocwork/insight-review.html#permalink-G0FF77L4HUCXIFJE6W2A
+
+# ======================================================================
+
+Regards!
+BSP team

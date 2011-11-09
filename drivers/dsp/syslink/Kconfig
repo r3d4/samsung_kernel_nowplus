@@ -1,0 +1,53 @@
+
+
+menuconfig Sys_Link
+	bool "Sys_Link"
+	default y
+
+if Sys_Link
+
+config  SYSLINK_PROC
+        tristate "Syslink ProcMgr"
+        default y
+        help
+           Syslink Proc manager
+
+config  SYSLINK_PROC4430
+        tristate "Proc 4430"
+        depends on SYSLINK_PROC
+        default y
+        help
+           Ducati Proc implementation
+
+config MPU_BRIDGE_NOTIFY
+	tristate "OMAP Notify Module"
+	default y 
+	help
+          Notify Module
+
+
+config  NOTIFY_DUCATI  
+	tristate "OMAP Notify Ducati Module"
+	depends on MPU_BRIDGE_NOTIFY && SYSLINK_PROC4430
+	default y
+	help
+ 	   Notify Ducati Module 
+
+config MPU_SYSLINK_IPC
+        tristate "Syslink IPC Module"
+        depends on MPU_BRIDGE_NOTIFY && NOTIFY_DUCATI
+        default y
+        help
+          Syslink IPC Module
+
+config SYSLINK_USE_SYSMGR
+        bool "Enable SYS MGR setup"
+        depends on MPU_SYSLINK_IPC && SYSLINK_PROC
+        default y
+        help
+          This is the experimental option to enable SYS manager setup
+endif
+
+
+
+

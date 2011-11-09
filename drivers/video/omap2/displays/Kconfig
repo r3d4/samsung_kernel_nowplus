@@ -1,0 +1,65 @@
+menu "OMAP2/3 Display Device Drivers"
+        depends on OMAP2_DSS
+
+config PANEL_GENERIC
+        tristate "Generic Panel"
+        help
+	  Generic panel driver.
+	  Used for DVI output for Beagle and OMAP3 SDP.
+
+config PANEL_SAMSUNG_LTE430WQ_F0C
+        tristate "Samsung LTE430WQ-F0C LCD Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used on Overo Palo43
+
+config PANEL_SHARP_LS037V7DW01
+        tristate "Sharp LS037V7DW01 LCD Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used in TI's SDP3430 and EVM boards
+
+config PANEL_PICO_DLP
+	tristate "OMAP PICO DLP Panel"
+	depends on OMAP2_DSS
+	help
+	LCD Panel used in TI's SDP4430 and EVM boards
+
+config PANEL_TAAL
+        tristate "Taal DSI Panel"
+        depends on OMAP2_DSS_DSI
+        help
+          Taal DSI command mode panel from TPO.
+
+config PANEL_SHOLES
+        tristate "Sholes Panel"
+        help
+	  LCD Panel used in sholes
+
+config LCD_4430SDP
+        tristate "OMAP4 LCD Panel"
+        help
+          LCD Panel used in OMAP4
+
+config PANEL_4430SDP_TAAL
+	tristate "OMAP4 LCD TAAL Panel"
+	help
+		DSI LCD Panel used in OMAP4
+
+config PANEL_NEC
+	tristate "NEC Panel"
+	help
+		LCD Panel used in the Zoom board
+
+config PANEL_AMS
+        tristate "AMS Panel"
+        help
+                LCD Panel used in the Archer board
+
+config PANEL_TL2796
+        tristate "Samsung tl2796 Panel"
+        depends on OMAP2_DSS
+        help
+          Samsung tl2796 panel used on the NOWPLUS board
+
+endmenu

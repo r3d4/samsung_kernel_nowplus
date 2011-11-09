@@ -1,0 +1,49 @@
+/*
+ *  nameserver_remote.c
+ *
+ *
+ *  Copyright (C) 2008-2009 Texas Instruments, Inc.
+ *
+ *  This package is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  published by the Free Software Foundation.
+ *
+ *  THIS PACKAGE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ *  WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE.
+ */
+
+#include <linux/types.h>
+#include <linux/slab.h>
+
+#include <nameserver_remote.h>
+
+/*
+ * ======== nameserver_remote_get ========
+ *  Purpose:
+ *  This will get data from remote name server
+ */
+int nameserver_remote_get(const struct nameserver_remote_object *handle,
+				const char *instance_name, const char *name,
+				void *value, u32 value_len)
+{
+	s32 retval = 0;
+
+	if (handle == NULL) {
+		retval = -EINVAL;
+		goto exit;
+	}
+
+	if (WARN_ON((instance_name == NULL) || (name == NULL)
+		|| (value == NULL))) {
+		retval = -EINVAL;
+		goto exit;
+	}
+
+	retval = handle->get(handle, instance_name,
+						name, value, value_len, NULL);
+
+exit:
+	return retval;
+}

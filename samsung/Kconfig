@@ -1,0 +1,32 @@
+##
+# Copyright (C) 2010, Samsung Electronics Co., Ltd. All Rights Reserved.
+#  Written by System S/W Group, Open OS S/W R&D Team,
+#  Mobile Communication Division.
+##
+
+##
+# Project Name : Samsung Private Third-Party Device Drivers
+#
+# Project Description :
+#
+# Comments : tabstop = 8, shiftwidth = 8, noexpandtab
+##
+
+##
+# File Name : Kconfig
+#
+# File Description :
+#
+# Author : Joo, Young Jin (#4349, youngjin79.joo@samsung.com)
+# Dept : System S/W Group (Open OS S/W R&D Team)
+# Created Date : 09-Jul-2010
+# Version : Baby-Raccoon
+##
+
+menu "Samsung Private Third-Party Device Drviers"
+
+menu "RFS_3.0.0_b034-LinuStoreIII_1.2.0_b035-FSR_1.2.1p1_b129_RTM"
+source "samsung/tbml/Kconfig"
+endmenu
+
+endmenu

@@ -1,0 +1,273 @@
+comment "OMAP Core Type"
+	depends on ARCH_OMAP2
+
+config ARCH_OMAP24XX
+	bool "OMAP24xx Based System"
+	depends on ARCH_OMAP2
+
+config ARCH_OMAP2420
+	bool "OMAP2420 support"
+	depends on ARCH_OMAP24XX
+	select OMAP_DM_TIMER
+	select ARCH_OMAP_OTG
+
+config ARCH_OMAP2430
+	bool "OMAP2430 support"
+	depends on ARCH_OMAP24XX
+
+config ARCH_OMAP34XX
+	bool "OMAP34xx Based System"
+	depends on ARCH_OMAP3
+	select USB_ARCH_HAS_EHCI
+
+config ARCH_OMAP3430
+	bool "OMAP3430 support"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select ARCH_OMAP_OTG
+
+config OMAP_PACKAGE_CBC
+       bool
+
+config OMAP_PACKAGE_CBB
+       bool
+
+config OMAP_PACKAGE_CUS
+       bool
+
+config OMAP_PACKAGE_CBP
+       bool
+
+comment "OMAP Board Type"
+	depends on ARCH_OMAP2 || ARCH_OMAP3 || ARCH_OMAP4
+
+config MACH_OMAP_GENERIC
+	bool "Generic OMAP board"
+	depends on ARCH_OMAP2 && ARCH_OMAP24XX
+
+config MACH_OMAP2_TUSB6010
+	bool
+	depends on ARCH_OMAP2 && ARCH_OMAP2420
+	default y if MACH_NOKIA_N8X0
+
+config MACH_OMAP_H4
+	bool "OMAP 2420 H4 board"
+	depends on ARCH_OMAP2 && ARCH_OMAP24XX
+	select OMAP_DEBUG_DEVICES
+
+config MACH_OMAP_APOLLON
+	bool "OMAP 2420 Apollon board"
+	depends on ARCH_OMAP2 && ARCH_OMAP24XX
+
+config MACH_OMAP_2430SDP
+	bool "OMAP 2430 SDP board"
+	depends on ARCH_OMAP2 && ARCH_OMAP24XX
+
+config MACH_OMAP3_BEAGLE
+	bool "OMAP3 BEAGLE board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP_LDP
+	bool "OMAP3 LDP board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OVERO
+	bool "Gumstix Overo board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP3EVM
+	bool "OMAP 3530 EVM board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+
+config MACH_OMAP3517EVM
+	bool "OMAP3517/ AM3517 EVM board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP3_PANDORA
+	bool "OMAP3 Pandora"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config WIFI_CONTROL_FUNC
+        bool "Enable WiFi control function abstraction"
+	depends on MACH_OMAP_ZOOM2 || MACH_SHOLES || MACH_OMAP_4430SDP
+        help
+          Enables Power/Reset/Carddetect function abstraction
+
+config TIWLAN_SDIO
+	bool "TI WLAN Enhanced SDIO Contoller support"
+	depends on MMC_OMAP || MMC_OMAP_MODULE || MMC_OMAP_HS || MMC_OMAP_HS_MODULE
+	help
+	   Say Y here if you want to be able to use TI's WLAN device using the
+	   SDIO interface. If unsure, say N.
+
+config TIWLAN_MMC_CONTROLLER
+	int "MMC Controller number that TI WLAN chip is connected to"
+	range 1 5
+	depends on TIWLAN_SDIO || MMC_EMBEDDED_SDIO
+	help
+	  Choose the number of the MMC controller that TI WLAN chip is
+	  connected to. TI WLAN has SDIO host controller that will control
+	  this MMC port.
+
+config MACH_OMAP_3430SDP
+	bool "OMAP 3430 SDP board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_NOKIA_N800
+       bool
+
+config MACH_NOKIA_N810
+       bool
+
+config MACH_NOKIA_N810_WIMAX
+       bool
+
+config MACH_NOKIA_N8X0
+	bool "Nokia N800/N810"
+	depends on ARCH_OMAP2420
+	select MACH_NOKIA_N800
+	select MACH_NOKIA_N810
+	select MACH_NOKIA_N810_WIMAX
+
+config MACH_NOKIA_RX51
+	bool "Nokia RX-51 board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP_ZOOM2
+	bool "OMAP3 Zoom2 board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP_ZOOM3
+	bool "OMAP3630 Zoom3 board"
+        depends on ARCH_OMAP3 && ARCH_OMAP34XX
+        select OMAP_PACKAGE_CBP
+
+config MACH_SHOLES
+	bool "Motorola sholes"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBP
+
+config MACH_SHOLES_UMTS
+	bool "Motorola sholes umts"
+	depends on MACH_SHOLES
+
+config MACH_CM_T35
+	bool "CompuLab CM-T35 module"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CUS
+
+config MACH_IGEP0020
+	bool "IGEP0020"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBB
+
+config MACH_OMAP_3630SDP
+	bool "OMAP3630 SDP board"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	select OMAP_PACKAGE_CBP
+
+config MACH_OMAP_4430SDP
+	bool "OMAP 4430 SDP board"
+	depends on ARCH_OMAP4
+
+config ERRATA_OMAP4_AXI2OCP
+	bool "OMAP 4430 axi2ocp errata workaround"
+	depends on ARCH_OMAP4
+	help
+	Pending response counter logic is incorrectly implemented
+	It decrements by only 1 even when there are 2+ responses in the
+	same cycle. If 2 MCMDs send out bridge at the same time counter
+	increments by.1 but when it decrement for 2 responses counter does
+	not go beyond 0.
+	Work-around:
+	Any new request before timer max out resets the timer. With this hang
+	issue will not happen.
+
+config OMAP3_EMU
+	bool "OMAP3 debugging peripherals"
+	depends on ARCH_OMAP3
+	select OC_ETM
+	help
+	  Say Y here to enable debugging hardware of omap3
+
+config OMAP3_SDRC_AC_TIMING
+	bool "Enable SDRC AC timing register changes"
+	depends on ARCH_OMAP3 && ARCH_OMAP34XX
+	default n
+	help
+	  If you know that none of your system initiators will attempt to
+	  access SDRAM during CORE DVFS, select Y here.  This should boost
+	  SDRAM performance at lower CORE OPPs.  There are relatively few
+	  users who will wish to say yes at this point - almost everyone will
+	  wish to say no.  Selecting yes without understanding what is
+	  going on could result in system crashes;
+
+
+config MACH_SAMSUNG
+        bool "Samsung Board"
+        default y
+
+
+config MACH_ARCHER
+        bool "OMAP3 ARCHER board"
+        depends on ARCH_OMAP3 && ARCH_OMAP34XX
+
+#        choice
+ #               prompt "Archer Carrier"
+      #          depends on MACH_ARCHER
+
+       #         config ARCHER_TARGET_EU
+        #        bool "Europe"
+         #       config ARCHER_TARGET_SK
+          #      bool "SKT"
+        #        config ARCHER_TARGET_KT
+         #       bool "KT"
+       # endchoice
+
+comment "Archer Board Type"
+	depends on MACH_ARCHER
+
+config ARCHER_HW_REV
+        int "ARCHER H/W Board Revision"
+        depends on MACH_ARCHER
+        default 0
+
+config ARCHER_KOR_DEBUG
+        bool "ARCHER Korea Debugging code"
+        depends on MACH_ARCHER && (ARCHER_TARGET_SK || ARCHER_TARGET_KT)
+        default n
+
+config ARCHER_KOR_DEBUG_USER
+        bool "ARCHER Korea Debugging - Enable User Fault"
+        depends on MACH_ARCHER && (ARCHER_TARGET_SK || ARCHER_TARGET_KT)
+        default n
+
+config DPRAM_START_ADDRESS_PHYS
+        hex "DPRAM Start Physical Address"
+        depends on ARCHER_TARGET_SK || ARCHER_TARGET_KT
+        default 0x88000000
+
+config ARCH_OMAP3_VIRT_IO_MEM_REMAP
+        bool "OMAP3 Virtual IO Memory Remap"
+        depends on ARCHER_TARGET_SK || ARCHER_TARGET_KT
+        default y
+
+config SAMSUNG_MODEL_NAME
+        string "Samsung Model Name"
+        depends on MACH_SAMSUNG && (ARCHER_TARGET_SK || ARCHER_TARGET_KT)
+        default ""
+
+config SEC_LOG_BUF
+	tristate "SEC Log Buffer"
+	default n
+	help
+	  Provides support for SEC log buffer shared with Loke bootloader.
+
+

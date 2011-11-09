@@ -1,0 +1,6 @@
+omapfb omapfb: failed to parse vram parameter
+rotation = 0, var->rotate = 0
+omapfb omapfb: illegal display bpp
+omapfb omapfb: failed to setup fb_info
+omapfb omapfb: failed to setup omapfb
+omapfb: probe of omapfb failed with error -22

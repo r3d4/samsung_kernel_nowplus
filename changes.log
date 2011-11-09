@@ -1,0 +1,14 @@
+- show boot log on framebuffer
+- add emmc (mmc2) driver
+- add fmradio routing
+- add fmradio driver
+- add cifs support
+- add tun support
+- add tbml driver
+- add rfs driver
+- fix ums for emmc (lun1)
+- remove cam driver, instead build as module
+- revert to stock voltages for mpu, dsp
+- change charging algo: add hysteresis: chg ends at 95%, chg starts at 90%
+    -> prevent toogling at 95%
+- fix camera

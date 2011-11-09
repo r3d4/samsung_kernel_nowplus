@@ -1,0 +1,28 @@
+#
+#   Makefile for eXtended Sector Remapper (XSR) driver on kernel 2.4
+#
+#   Copyright(C) 2004-2006, Samsung Electronics, Co., Ltd.
+#
+
+O_TARGET	:= tbmllink.o
+
+export-objs := tiny_base.o #adapt/LinuxOAM.o TinyBML/onenand_lld.o
+
+# XSR base module
+obj-$(CONFIG_RFS_TINYBML)			+= tiny.o
+
+# Should keep the build sequence. (xsr_base -> bml_block)
+
+# for tiny bml
+tiny-objs   := tiny_base.o tbml_block.o tbml_blkdev-24.o
+
+# This objects came from tbml, It will be never modified.
+tiny-objs	+= TinyBML/tbml_interface.o TinyBML/gbbm.o TinyBML/onenand_lld.o
+tiny-objs	+= adapt/onenand_interface.o adapt/LinuxOAM.o
+
+include $(TOPDIR)/Rules.make
+
+tiny.o: $(tiny-objs)
+		$(LD) -r -o $@ $(tiny-objs)
+
+

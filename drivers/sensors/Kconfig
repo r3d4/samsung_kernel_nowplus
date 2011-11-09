@@ -1,0 +1,22 @@
+# 
+# Sensors core device. 
+#
+
+menuconfig SENSORS
+	tristate "Sensors class support"
+	help
+	  Say Y here to enable Sensors class support. This allows
+	  sensors monitoring by userspace
+	  via sysfs and uevent (if available) and/or APM kernel interface
+	  (if selected below).
+
+if SENSORS
+
+config SENSORS_CORE
+	tristate "Sensors core"
+	help
+	  Say Y here to enable debugging messages for power supply class
+	  and drivers.
+
+
+endif # SENSORS

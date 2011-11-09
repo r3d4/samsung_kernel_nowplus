@@ -1,0 +1,26 @@
+#
+# Unified Flash Device configuration
+#
+
+menu "TinyBML Support for cramfs"
+
+config RFS_TINYBML
+	bool "Using TinyBML for Cramfs"
+	help
+	  cramfs using flash device
+
+config TINY_FLASH_PHYS_ADDR
+        hex "OneNAND flash Physical Location"
+        depends on RFS_TINYBML 
+        default "0x00000000"
+        help
+          This is the physical address in your flash memory the xsr will
+          be linked for and stored to.  This address is dependent on your
+          own flash usage.
+
+config RFS_TINY_DEBUG
+	bool
+	depends on RFS_TINYBML
+	default y
+
+endmenu
