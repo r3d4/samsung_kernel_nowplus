@@ -1008,6 +1008,11 @@ config SENSORS_APPLESMC
 	  Say Y here if you have an applicable laptop and want to experience
 	  the awesome power of applesmc.
 
+config SENSORS_OMAP34XX
+    tristate "TI OMAP34xx internal temperature sensor"
+    depends on ARCH_OMAP3 && HIGH_RES_TIMERS
+
+
 if ACPI
 
 comment "ACPI drivers"
