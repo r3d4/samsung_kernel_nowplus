@@ -1050,7 +1050,11 @@ static int vidioc_dqbuf(struct file *file, void *fh, struct v4l2_buffer *b)
 	int rval = 0;
 	int recnt = 0;
 //DBGPRINTF("in");
-
+#if 1
+//check if ccdc is busy
+u32 reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_PCR); 
+DBGPRINTF("ccdc module is state is %s", reg & ISPCCDC_PCR_BUSY?"busy":"idle"); 
+#endif	
 	while(recnt < 10)
 	{
 		rval = videobuf_dqbuf(&ofh->vbq, b, file->f_flags & O_NONBLOCK);
@@ -1131,7 +1135,7 @@ isp_stop();//from i9003
 	
 	}
 
-	isp_start(); //JWWON
+//	isp_start(); //JWWON
 
 out:
 	mutex_unlock(&vdev->mutex);

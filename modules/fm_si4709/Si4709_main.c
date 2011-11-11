@@ -569,7 +569,7 @@ static int Si4709_ioctl(struct inode *inode, struct file *filp,
 
 static irqreturn_t Si4709_isr( int irq, void *unused )
 {
-	printk("Si4709_isr: FM device called IRQ: %d\n",irq);  
+	//printk("Si4709_isr: FM device called IRQ: %d\n",irq);  
 #ifdef RDS_INTERRUPT_ON_ALWAYS
 	if( (Si4709_dev_wait_flag == SEEK_WAITING) || (Si4709_dev_wait_flag == TUNE_WAITING))
 	{
@@ -579,11 +579,11 @@ static irqreturn_t Si4709_isr( int irq, void *unused )
     }
 	else if(Si4709_RDS_flag == RDS_WAITING) //RDS Interrupt
 	{
-		printk("Si4709_isr: FM RDS Interrupt called IRQ %d\n",irq); 
+		debug_rds("Si4709_isr: FM RDS Interrupt called IRQ %d\n",irq); 
 		RDS_Data_Available++;
 		RDS_Groups_Available_till_now++;
 		
-		printk("RDS_Groups_Available_till_now b/w Power ON/OFF : %d\n",RDS_Groups_Available_till_now);
+		debug_rds("RDS_Groups_Available_till_now b/w Power ON/OFF : %d\n",RDS_Groups_Available_till_now);
         
         if (RDS_Data_Available > 1)
 			RDS_Data_Lost++;        
@@ -592,7 +592,7 @@ static irqreturn_t Si4709_isr( int irq, void *unused )
 			queue_work(Si4709_wq,&Si4709_work);
 	}
 	else
-		printk("do noting\n");
+		printk("Si4709_isr: unhandle irq, do noting\n");
 #else
 	if( (Si4709_dev_wait_flag == SEEK_WAITING) || (Si4709_dev_wait_flag == TUNE_WAITING) ||(Si4709_dev_wait_flag == RDS_WAITING))
 	{		
