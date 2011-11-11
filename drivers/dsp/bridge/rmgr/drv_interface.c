@@ -68,7 +68,7 @@
 #include <dspbridge/drv.h>
 
 #ifdef CONFIG_BRIDGE_DVFS
-#include <mach-omap2/omap3-opp.h>
+#include <plat/omap-pm.h>
 #endif
 
 #define BRIDGE_NAME "C6410"

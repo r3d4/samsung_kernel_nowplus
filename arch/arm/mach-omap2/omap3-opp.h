@@ -31,6 +31,56 @@
 #define S100M	100000000
 #define S83M    83000000
 
+#ifdef CONFIG_ARCH_OMAP3430
+
+// OMAP3430 MPU rate table
+// VDD1 nominal 0.950V .. 1.350V
+// VOUT = VSEL*12.5 mV + 600 mV
+static struct omap_opp omap3_mpu_rate_table[] = {
+	{0, 0, 0},
+	/*OPP1*/
+	{S125M, VDD1_OPP1, 0x1E},	// 0.975V
+	/*OPP2*/
+	{S250M, VDD1_OPP2, 0x26},	// 1.075V
+	/*OPP3*/
+	{S500M, VDD1_OPP3, 0x30},	// 1.200V
+	/*OPP4*/
+	{S550M, VDD1_OPP4, 0x36},	// 1.275V
+	/*OPP5*/
+	{S600M, VDD1_OPP5, 0x3C},	// 1.350V
+};
+
+// OMAP3430 L3 rate table
+// VDD2 nominal 0.950V .. 1.150V
+static struct omap_opp omap3_l3_rate_table[] = {
+	{0, 0, 0},
+	/*OPP1*/
+	{0,     VDD2_OPP1, 0x1E},   // 0.975V
+	/*OPP2*/
+//    {S83M, VDD2_OPP2, 0x2c},	// 1.150V
+	{S166M, VDD2_OPP2, 0x2c},	// 1.150V
+	/*OPP3*/
+	{S166M, VDD2_OPP3, 0x2c},	// 1.150V
+};
+
+// OMAP3430 IVA rate table
+// VDD1 nominal 0.950V .. 1.350V
+static struct omap_opp omap3_dsp_rate_table[] = {
+	{0, 0, 0},
+	/*OPP1*/
+	{S90M,  VDD1_OPP1, 0x1E},   // 0.975V
+	/*OPP2*/                    
+	{S180M, VDD1_OPP2, 0x26},   // 1.075V
+	/*OPP3*/                    
+	{S360M, VDD1_OPP3, 0x30},   // 1.200V
+	/*OPP4*/                    
+	{S400M, VDD1_OPP4, 0x36},   // 1.275V
+	/*OPP5*/                    
+	{S430M, VDD1_OPP5, 0x3C},   // 1.350V
+};
+
+#else
+
 static struct omap_opp omap3630_mpu_rate_table[] = {
 	{0, 0, 0},
 	/*OPP1 (OPP50) - 0.93mV*/
@@ -59,121 +109,7 @@ static struct omap_opp omap3630_dsp_rate_table[] = {
 	{S660M, VDD1_OPP3, 0x35},
 };
 
-static struct omap_opp omap3_mpu_rate_table[] = {
-	{0, 0, 0},
-#if 0	
-	/*OPP1*/
-	{S125M, VDD1_OPP1, 0x28},	//was 0x1E
-	/*OPP2*/
-	{S250M, VDD1_OPP2, 0x2D},	//was 0x26
-	/*OPP3*/
-	{S500M, VDD1_OPP3, 0x3C},	//was 0x30
-	/*OPP4*/
-	{S550M, VDD1_OPP4, 0x3E},	//was 0x36
-	/*OPP5*/
-	{S600M, VDD1_OPP5, 0x43},	//was 0x3C
-	/*OPP6*/
-//	{S720M, VDD1_OPP6, 0x43},	//was 0x3C
-#else
-	/*OPP1*/
-	{S125M, VDD1_OPP1, 0x1E},	//was 0x1E
-	/*OPP2*/
-	{S250M, VDD1_OPP2, 0x26},	//was 0x26
-	/*OPP3*/
-	{S500M, VDD1_OPP3, 0x30},	//was 0x30
-	/*OPP4*/
-	{S550M, VDD1_OPP4, 0x36},	//was 0x36
-	/*OPP5*/
-	{S600M, VDD1_OPP5, 0x3C},	//was 0x3C
 #endif
-};
 
-
-static struct omap_opp omap3_mpu_rate_table_opp5[] = {
-        {0, 0, 0},
-        /*OPP1*/
-        {S600M, VDD1_OPP1, 0x44},       //was 0x3C
-        /*OPP2*/
-        {S600M, VDD1_OPP2, 0x44},       //was 0x3C
-        /*OPP3*/
-        {S600M, VDD1_OPP3, 0x44},       //was 0x3C
-        /*OPP4*/
-        {S600M, VDD1_OPP4, 0x44},       //was 0x3C
-        /*OPP5*/
-        {S600M, VDD1_OPP5, 0x44},       //was 0x3C
-        /*OPP6*/
-        {S600M, VDD1_OPP6, 0x44},       //was 0x3C
-};
-
-
-static struct omap_opp omap3_l3_rate_table[] = {
-	{0, 0, 0},
-	/*OPP1*/
-	{0, VDD2_OPP1, 0x1E},
-	/*OPP2*/
-//	{S83M, VDD2_OPP2, 0x24},
-	{S166M, VDD2_OPP2, 0x30},	//For GFX OPP2 is same as OPP3 
-	/*OPP3*/
-	{S166M, VDD2_OPP3, 0x30},	//was 0x2C
-};
-
-//Hardcoded all OPP to OPP3 Frequency and voltage - Effective with lock_opp5
-static struct omap_opp omap3_l3_rate_table_opp5[] = {
-        {0, 0, 0},
-        /*OPP1*/
-        {0, VDD2_OPP1, 0x1E},
-        /*OPP2*/
-        {S166M, VDD2_OPP2, 0x30},
-        /*OPP3*/
-        {S166M, VDD2_OPP3, 0x30},       //was 0x2C
-};
-
-
-static struct omap_opp omap3_dsp_rate_table[] = {
-	{0, 0, 0},
-	/*OPP1*/
-	{S90M, VDD1_OPP1, 0x1E},
-	/*OPP2*/
-	{S180M, VDD1_OPP2, 0x26},
-	/*OPP3*/
-	{S360M, VDD1_OPP3, 0x30},
-	/*OPP4*/
-	{S400M, VDD1_OPP4, 0x36},
-	/*OPP5*/
-	{S430M, VDD1_OPP5, 0x3C},
-	/*OPP6*/
-	{S520M, VDD1_OPP6, 0x3C},
-};
-
-/* iva rate table for 3430 */
-static struct omap_opp omap3_dsp_rate_table_opp5[] = {
-        {0, 0, 0},
-        /*OPP1*/
-        {S430M, VDD1_OPP1, 0x3C},
-        /*OPP2*/
-        {S430M, VDD1_OPP2, 0x3C},
-        /*OPP3*/
-        {S430M, VDD1_OPP3, 0x3C},
-        /*OPP4*/
-        {S430M, VDD1_OPP4, 0x3C},
-        /*OPP5*/
-        {S430M, VDD1_OPP5, 0x3C},
-};
-
-static struct omap_opp omap3_dsp_rate_table_3440[] = {
-        {0, 0, 0},
-        /*OPP1*/
-        {S90M, VDD1_OPP1, 0x1E},
-        /*OPP2*/
-        {S180M, VDD1_OPP2, 0x26},
-        /*OPP3*/
-        {S360M, VDD1_OPP3, 0x30},
-        /*OPP4*/
-        {S430M, VDD1_OPP4, 0x36},
-        /*OPP5*/
-        {S430M, VDD1_OPP5, 0x3C},
-        /*OPP6*/
-        {S520M, VDD1_OPP6, 0x3C},
-};
 
 #endif

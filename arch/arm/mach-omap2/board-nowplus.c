@@ -140,7 +140,7 @@ EXPORT_SYMBOL(hw_revision);
 #ifndef CONFIG_TWL4030_CORE
 #error "no power companion board defined!"
 #else
-#define TWL4030_USING_BROADCAST_MSG 
+#define TWL4030_USING_BROADCAST_MSG
 #endif
 
 #ifdef CONFIG_WL127X_RFKILL
@@ -148,7 +148,7 @@ EXPORT_SYMBOL(hw_revision);
 #endif
 
 extern int always_opp5;
-int usbsel = 1;	
+int usbsel = 1;
 EXPORT_SYMBOL(usbsel);
 void (*usbsel_notify)(int) = NULL;
 EXPORT_SYMBOL(usbsel_notify);
@@ -221,7 +221,7 @@ static struct cpuidle_params omap3_cpuidle_params_table[] = {
 	/* C6 */
 	{1, 3000, 8500, 350000},
 	/* C7 */
-	{1, 10000, 30000, 500000},	
+	{1, 10000, 30000, 500000},
 #endif
 };
 
@@ -272,7 +272,7 @@ int nowplus_bt_hw_enable(void) {
     //tx
     omap34xx_pad_set_config_lcd(0x148 + 0x30, OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLUP);
     //rx
-    omap34xx_pad_set_config_lcd(0x14a + 0x30, OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP);  
+    omap34xx_pad_set_config_lcd(0x14a + 0x30, OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP);
     mdelay(50);
     return 0;
 };
@@ -283,11 +283,11 @@ int nowplus_bt_hw_disable(void){
     omap34xx_pad_set_config_lcd(0x144 + 0x30, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
     omap34xx_pad_set_config_lcd(0x146 + 0x30, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
     omap34xx_pad_set_config_lcd(0x148 + 0x30, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
-    omap34xx_pad_set_config_lcd(0x14a + 0x30, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN);       
+    omap34xx_pad_set_config_lcd(0x14a + 0x30, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
     mdelay(50);
     return 0;
 };
-	
+
 static struct wl127x_rfkill_platform_data wl127x_plat_data = {
 	.bt_nshutdown_gpio = OMAP_GPIO_BT_NSHUTDOWN , 	/* Bluetooth Enable GPIO */
 	.fm_enable_gpio = -1,		/* FM Enable GPIO */
@@ -379,13 +379,13 @@ static struct resource samsung_charger_resources[] = {
 };
 static int samsung_charger_config_data[] = {
 	// [ CHECK VF USING ADC ]
-	/*   1. ENABLE  (true, flase) */ 
+	/*   1. ENABLE  (true, flase) */
 	true,
 
 	/*   2. ADCPORT (ADCPORT NUM) */
 	1,
 
-	
+
 	// [ SUPPORT CHG_ING IRQ FOR CHECKING FULL ]
 	/*   1. ENABLE  (true, flase) */
 	true,
@@ -398,11 +398,11 @@ static int samsung_battery_config_data[] = {
 	/*   2. ADCPORT (ADCPORT NUM) */
 	4,
 
-	
+
 	// [ SUPPORT MONITORING TEMPERATURE OF THE SYSTEM FOR BLOCKING CHARGE ]
 	/*   1. ENABLE  (true, flase) */
 	true,
-	
+
 	/*   2. ADCPORT (ADCPORT NUM) */
 	5,
 };
@@ -410,7 +410,7 @@ static int samsung_battery_config_data[] = {
 static struct platform_device samsung_charger_device = {
 	.name           = "secChargerDev",
 	.id             = -1,
-	.num_resources  = ARRAY_SIZE(samsung_charger_resources), 
+	.num_resources  = ARRAY_SIZE(samsung_charger_resources),
 	.resource       = samsung_charger_resources,
 
 	.dev = {
@@ -421,7 +421,7 @@ static struct platform_device samsung_charger_device = {
 static struct platform_device samsung_battery_device = {
 	.name           = "secBattMonitor",
 	.id             = -1,
-	.num_resources  = 0, 
+	.num_resources  = 0,
 	.dev = {
 		.platform_data = &samsung_battery_config_data,
 	}
@@ -436,13 +436,13 @@ static struct platform_device samsung_virtual_rtc_device = {
 static struct platform_device samsung_vibrator_device = {
 	.name           = "secVibrator",
 	.id             = -1,
-	.num_resources  = 0, 
+	.num_resources  = 0,
 };
 
 static struct platform_device samsung_pl_sensor_power_device = {
 	.name           = "secPLSensorPower",
 	.id             = -1,
-	.num_resources  = 0, 
+	.num_resources  = 0,
 };
 
 static struct bd2802_led_platform_data nowplus_led_data = {
@@ -502,7 +502,7 @@ struct vout_platform_data nowplus_vout_data = {
         .set_max_mpu_wakeup_lat =  omap_pm_set_max_mpu_wakeup_lat,
         .set_min_mpu_freq = omap_pm_set_min_mpu_freq,
 };
-#endif 
+#endif
 
 
 #ifdef CONFIG_ANDROID_RAM_CONSOLE
@@ -573,7 +573,7 @@ static int __init msecure_init(void)
 #if 1
                 ret = gpio_request(OMAP_GPIO_SYS_DRM_MSECURE, "msecure");
                 if (ret < 0) {
-                        printk(KERN_ERR "msecure_init: can't"
+                        printk(KERN_ERR  "msecure_init: can't"
                                 "reserve GPIO:%d !\n", OMAP_GPIO_SYS_DRM_MSECURE);
                         goto out;
                 }
@@ -598,9 +598,9 @@ out:
 static struct platform_device *nowplus_devices[] __initdata = {
 	&nowplus_dss_device,
 	&headset_switch_device,
-#ifdef CONFIG_WL127X_RFKILL 
+#ifdef CONFIG_WL127X_RFKILL
 	&nowplus_wl127x_device,
-#endif	
+#endif
 	&nowplus_power_key_device,
 	//&nowplus_ear_key_device,
 	&samsung_battery_device,
@@ -677,7 +677,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(GPMC_D3,              OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"GPMC D4"
         OMAP3_MUX(GPMC_D4,              OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
-        //"GPMC D5" 
+        //"GPMC D5"
         OMAP3_MUX(GPMC_D5,              OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"GPMC D6"
         OMAP3_MUX(GPMC_D6,              OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
@@ -701,7 +701,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(GPMC_D15,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
 	    //"GPMC CS0"
         OMAP3_MUX(GPMC_NCS0,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_HIGH),
-        
+
         //"PCMSEL" gpio_52
         OMAP3_MUX(GPMC_NCS1,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT),
         //"PROXIMITY INT" gpio_53
@@ -716,8 +716,8 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(GPMC_NCS7,            OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP),
         OMAP3_MUX(GPMC_CLK,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN),
         OMAP3_MUX(GPMC_NADV_ALE,        OMAP34XX_MUX_MODE0),
-	    
-	    //"GPMC NOE"    
+
+	    //"GPMC NOE"
         OMAP3_MUX(GPMC_NOE,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_HIGH),
         //"GPMC NWE"
         OMAP3_MUX(GPMC_NWE,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_HIGH),
@@ -726,7 +726,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(GPMC_NBE1,            OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
         OMAP3_MUX(GPMC_NWP,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT),
         OMAP3_MUX(GPMC_WAIT0,           OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP),
-        //"BT_nSHUTDOWN" gpio_63	
+        //"BT_nSHUTDOWN" gpio_63
         OMAP3_MUX(GPMC_WAIT1,           OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
         //"CAMERA VGA RST" gpio_64
         OMAP3_MUX(GPMC_WAIT2,           OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
@@ -735,15 +735,15 @@ static struct omap_board_mux board_mux[] __initdata = {
 
         //"LCD MCLK"
         OMAP3_MUX(DSS_PCLK,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
-        //"LCD HSYNC"        
+        //"LCD HSYNC"
         OMAP3_MUX(DSS_HSYNC,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"LCD VSYNC"
         OMAP3_MUX(DSS_VSYNC,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"LCD CE"
         OMAP3_MUX(DSS_ACBIAS,           OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
-	
-        //"LCD DAT<0>"	        
-        OMAP3_MUX(DSS_DATA0,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),        
+
+        //"LCD DAT<0>"
+        OMAP3_MUX(DSS_DATA0,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"LCD DAT<1>"
         OMAP3_MUX(DSS_DATA1,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"LCD DAT<2>"
@@ -808,7 +808,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         //"CAMERA VGA STBY" gpio_101
         OMAP3_MUX(CAM_D2,               OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
         OMAP3_MUX(CAM_D3,               OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
-        
+
 	    //"CAM DD<0>"
 		OMAP3_MUX(CAM_D4,               OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
 		//"CAM DD<1>"
@@ -915,19 +915,19 @@ static struct omap_board_mux board_mux[] __initdata = {
         //"TOUCH INT" gpio_142
         OMAP3_MUX(MCBSP3_CLKX,          OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT),
     	OMAP3_MUX(MCBSP3_FSX,           OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
-    
+
 	    //"BTUART CTS"
         OMAP3_MUX(UART2_CTS,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN), //suspend
-        //OMAP3_MUX(UART2_CTS,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP), 
+        //OMAP3_MUX(UART2_CTS,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"BTUART RTS"
         OMAP3_MUX(UART2_RTS,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN), //suspend
-        //OMAP3_MUX(UART2_RTS,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW), 
+        //OMAP3_MUX(UART2_RTS,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
         //"BTUART TXD"
         OMAP3_MUX(UART2_TX,             OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN), //suspend
-        //OMAP3_MUX(UART2_TX,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLUP), 
+        //OMAP3_MUX(UART2_TX,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"BTUART RXD"
         OMAP3_MUX(UART2_RX,             OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN), //suspend
-        //OMAP3_MUX(UART2_RX,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP), 
+        //OMAP3_MUX(UART2_RX,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
 
         OMAP3_MUX(UART1_TX,             OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
         OMAP3_MUX(UART1_RTS,            OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
@@ -939,7 +939,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(MCBSP4_CLKX,          OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
     	OMAP3_MUX(MCBSP4_DR,            OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLDOWN),
     	//"PHONE ACTIVE" gpio_154
-        OMAP3_MUX(MCBSP4_DX,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT), 
+        OMAP3_MUX(MCBSP4_DX,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT),
         //"MOVI POWER EN" gpio_155
         OMAP3_MUX(MCBSP4_FSX,           OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
         //"HW REV0" gpio_156
@@ -958,7 +958,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(MCBSP1_CLKX,          OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT),
 
         OMAP3_MUX(UART3_CTS_RCTX,       OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP),
-        OMAP3_MUX(UART3_RTS_SD,         OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP), 
+        OMAP3_MUX(UART3_RTS_SD,         OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP),
         //OMAP3_MUX(UART3_RX_IRRX,        OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT ),
         //OMAP3_MUX(UART3_TX_IRTX,        OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT),
         //"UART1 RXD"
@@ -996,24 +996,24 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(I2C1_SCL,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"PWR I2C SDA"
         OMAP3_MUX(I2C1_SDA,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
-        
+
         //"I2C SCL"
         OMAP3_MUX(I2C2_SCL,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"I2C SDA"
         OMAP3_MUX(I2C2_SDA,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
-#if 0  
+#if 0
         //"TOUCH I2C SCL"
         OMAP3_MUX(I2C3_SCL,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"TOUCH I2C SDA"
         OMAP3_MUX(I2C3_SDA,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
-#else 
+#else
 // pins will be enabled in rmi driver with call to nowplus_enable_touch_pins(..)
 // -> fix touch fail after boot
         //"TOUCH I2C SCL"
         OMAP3_MUX(I2C3_SCL,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
         //"TOUCH I2C SDA"
         OMAP3_MUX(I2C3_SDA,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
-#endif   
+#endif
         //"MLCD RST" gpio_170
         OMAP3_MUX(HDQ_SIO,              OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_LOW),
         //"DISPLAY CLK"
@@ -1109,7 +1109,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(SAD2D_SREAD,          OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT),
         OMAP3_MUX(SAD2D_MBUSFLAG,       OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN),
         OMAP3_MUX(SAD2D_SBUSFLAG,       OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT),
-        
+
         //"SR I2C SCL"
         OMAP3_MUX(I2C4_SCL,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //"SR I2C SDA"
@@ -1118,9 +1118,9 @@ static struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(SYS_32K,              OMAP34XX_PIN_INPUT),
         OMAP3_MUX(SYS_CLKREQ,           OMAP34XX_MUX_MODE0),
         OMAP3_MUX(SYS_NRESWARM,         OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLUP),
-	
+
         OMAP3_MUX(SYS_BOOT0,            OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT),
-        //"FM_INT" gpio_3	
+        //"FM_INT" gpio_3
         OMAP3_MUX(SYS_BOOT1,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT),
         //gpio_4
         OMAP3_MUX(SYS_BOOT2,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT),
@@ -1152,7 +1152,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         //"INTERRUPT FROM PHONE"  gpio_15
         OMAP3_MUX(ETK_D1,                       OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP3_WAKEUP_EN),
         //"TA nCHG"  gpio_16
-        OMAP3_MUX(ETK_D2,                       OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT), 
+        OMAP3_MUX(ETK_D2,                       OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT),
 	    //"WLAN SDIO DAT0"
         OMAP3_MUX(ETK_D3,                       OMAP34XX_MUX_MODE2 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),
         //OMAP3_MUX(ETK_D3,                       OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN), //wlan off
@@ -1173,7 +1173,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         //"MMC1 DETECT"
         OMAP3_MUX(ETK_D9,                       OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP |OMAP3_WAKEUP_EN),
         //"KEY PWRON"
-        OMAP3_MUX(ETK_D10,                      OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN | OMAP3_WAKEUP_EN),        
+        OMAP3_MUX(ETK_D10,                      OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN | OMAP3_WAKEUP_EN),
         //"PS HOLD"
         OMAP3_MUX(ETK_D11,                      OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT | OMAP34XX_PIN_OFF_OUTPUT_HIGH),
         //"EARKEY DETECT"
@@ -1181,7 +1181,7 @@ static struct omap_board_mux board_mux[] __initdata = {
         //"35PI DETECT"
         OMAP3_MUX(ETK_D13,                      OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN | OMAP3_WAKEUP_EN),
         OMAP3_MUX(ETK_D14,                      OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN),
-        
+
         //"NO USED"
         OMAP3_MUX(ETK_D15,                      OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
 
@@ -1198,7 +1198,7 @@ static inline void __init nowplus_init_power_key(void)
 	nowplus_power_key_resource.start = OMAP_GPIO_IRQ(OMAP_GPIO_KEY_PWRON);
 
 	if (gpio_request(OMAP_GPIO_KEY_PWRON, "power_key_irq") < 0 ) {
-		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d for POWER KEY IRQ \n",OMAP_GPIO_KEY_PWRON);
+		printk(KERN_ERR  "\n FAILED TO REQUEST GPIO %d for POWER KEY IRQ \n",OMAP_GPIO_KEY_PWRON);
 		return;
 	}
 	gpio_direction_input(OMAP_GPIO_KEY_PWRON);
@@ -1212,7 +1212,7 @@ static inline void __init nowplus_init_battery(void)
 //	samsung_charger_resources[1].start = IH_USBIC_BASE + 1;
 	samsung_charger_resources[0].start = OMAP_GPIO_IRQ(OMAP_GPIO_USBSW_NINT);
 	samsung_charger_resources[1].start = OMAP_GPIO_IRQ(56); // NC
-	
+
 	samsung_charger_resources[2].start = OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N);
 	samsung_charger_resources[3].start = OMAP_GPIO_IRQ(OMAP_GPIO_CHG_EN);
 }
@@ -1221,7 +1221,7 @@ static inline void __init nowplus_init_ear_key(void)
 {
   nowplus_ear_key_resource.start = OMAP_GPIO_IRQ(OMAP_GPIO_EAR_KEY);
   if(gpio_request(OMAP_GPIO_EAR_KEY, "ear_key_irq") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d for POWER KEY IRQ \n",OMAP_GPIO_EAR_KEY);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d for POWER KEY IRQ \n",OMAP_GPIO_EAR_KEY);
     return;
   }
   gpio_direction_input(OMAP_GPIO_EAR_KEY);
@@ -1472,7 +1472,7 @@ static int nowplus_twl_gpio_setup(struct device *dev,
 #ifdef ENABLE_MOVIENAND
 	nowplus_vmmc2_supply.dev = nowplus_mmc[1].dev;
 #endif
-	nowplus_vsim_supply.dev = nowplus_mmc[2].dev;	
+	nowplus_vsim_supply.dev = nowplus_mmc[2].dev;
 
 	return 0;
 }
@@ -1576,9 +1576,9 @@ static struct twl4030_ins wrst_seq[] __initdata = {
  */
 #if 1
 	{MSG_SINGULAR(DEV_GRP_NULL, RES_RESET, RES_STATE_OFF), 2},
-	{MSG_SINGULAR(DEV_GRP_P1, RES_VDD1, RES_STATE_WRST), 0xE},          // VDD1 
-	{MSG_SINGULAR(DEV_GRP_P1, RES_VDD2, RES_STATE_WRST), 0xE},          // VDD2 
-	{MSG_SINGULAR(DEV_GRP_P1, RES_VPLL1, RES_STATE_WRST), 0x60},           // VPLL1 
+	{MSG_SINGULAR(DEV_GRP_P1, RES_VDD1, RES_STATE_WRST), 0xE},          // VDD1
+	{MSG_SINGULAR(DEV_GRP_P1, RES_VDD2, RES_STATE_WRST), 0xE},          // VDD2
+	{MSG_SINGULAR(DEV_GRP_P1, RES_VPLL1, RES_STATE_WRST), 0x60},           // VPLL1
 	{MSG_SINGULAR(DEV_GRP_P1, RES_HFCLKOUT, RES_STATE_ACTIVE), 2},
 	{MSG_SINGULAR(DEV_GRP_NULL, RES_RESET, RES_STATE_ACTIVE), 2},
 #else
@@ -1705,14 +1705,14 @@ static int nowplus_charger_online(void) {
 };
 
 static int nowplus_charger_enable(void) {
-	
+
 	if( fsa9480_get_charger_status() )
 	{
 		gpio_direction_output(OMAP_GPIO_CHG_EN, 0);
 		set_irq_type (OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N), IRQ_TYPE_EDGE_RISING);
         return 1;
 	}
-	
+
 	return 0;
 };
 
@@ -1749,13 +1749,13 @@ static struct i2c_board_info __initdata nowplus_i2c2_boardinfo[] = {
 	{
 		I2C_BOARD_INFO(S5KA3DFX_DRIVER_NAME, S5KA3DFX_I2C_ADDR),
 //		.platform_data = &nowplus1_s5ka3dfx_platform_data,
-	},	
+	},
 	{
 		I2C_BOARD_INFO(M4MO_DRIVER_NAME, M4MO_I2C_ADDR),
 //		.platform_data = &nowplus_m4mo_platform_data,
 	},
 	{
-		I2C_BOARD_INFO(CAM_PMIC_DRIVER_NAME, CAM_PMIC_I2C_ADDR),		
+		I2C_BOARD_INFO(CAM_PMIC_DRIVER_NAME, CAM_PMIC_I2C_ADDR),
 	},
 	{
 		I2C_BOARD_INFO("kxsd9", 0x18),
@@ -1804,7 +1804,7 @@ static struct i2c_board_info __initdata nowplus_i2c3_boardinfo[] = {
 	{
 		I2C_BOARD_INFO("synaptics_rmi4_i2c", 0x2C),
                 .irq = 0,
-                .platform_data = &synaptics_platform_data,		
+                .platform_data = &synaptics_platform_data,
 	},
 };
 
@@ -1828,16 +1828,16 @@ static void config_wlan_gpio(void)
 #if 1//TI HS.Yoon 20100827 for enabling WLAN_IRQ wakeup
 	omap_writel(omap_readl(0x480025E8)|0x410C0000, 0x480025E8);
 	omap_writew(0x10C, 0x48002194);
-#endif	
+#endif
         ret = gpio_request(OMAP_GPIO_WLAN_IRQ, "wifi_irq");
         if (ret < 0) {
-                printk(KERN_ERR "%s: can't reserve GPIO: %d\n", __func__,
+                printk(KERN_ERR  "%s: can't reserve GPIO: %d\n", __func__,
                         OMAP_GPIO_WLAN_IRQ);
                 return;
         }
         ret = gpio_request(OMAP_GPIO_WLAN_EN, "wifi_pmena");
         if (ret < 0) {
-                printk(KERN_ERR "%s: can't reserve GPIO: %d\n", __func__,
+                printk(KERN_ERR  "%s: can't reserve GPIO: %d\n", __func__,
                         OMAP_GPIO_WLAN_EN);
                 gpio_free(OMAP_GPIO_WLAN_EN);
                 return;
@@ -1845,57 +1845,57 @@ static void config_wlan_gpio(void)
         gpio_direction_input(OMAP_GPIO_WLAN_IRQ);
         gpio_direction_output(OMAP_GPIO_WLAN_EN, 0);
 
-#ifdef __TRISCOPE__ 
+#ifdef __TRISCOPE__
         gpio_set_value(OMAP_GPIO_WLAN_EN, 1);
 #endif
 }
 
 static void config_camera_gpio(void)
 {
-	if (gpio_request(OMAP_GPIO_CAMERA_LEVEL_CTRL,"OMAP_GPIO_CAMERA_LEVEL_CTRL") != 0) 
+	if (gpio_request(OMAP_GPIO_CAMERA_LEVEL_CTRL,"OMAP_GPIO_CAMERA_LEVEL_CTRL") != 0)
 	{
 		printk("Could not request GPIO %d\n", OMAP_GPIO_CAMERA_LEVEL_CTRL);
 		return;
-	} 
+	}
 
-	if (gpio_request(OMAP_GPIO_CAM_EN,"OMAP_GPIO_CAM_EN") != 0) 
+	if (gpio_request(OMAP_GPIO_CAM_EN,"OMAP_GPIO_CAM_EN") != 0)
 	{
 		printk("Could not request GPIO %d\n", OMAP_GPIO_CAM_EN);
 		return;
 	}
 
-	if (gpio_request(OMAP_GPIO_ISP_INT,"OMAP_GPIO_ISP_INT") != 0) 
+	if (gpio_request(OMAP_GPIO_ISP_INT,"OMAP_GPIO_ISP_INT") != 0)
 	{
 		printk("Could not request GPIO %d\n", OMAP_GPIO_ISP_INT);
 		return;
-	}    
+	}
 
-	if (gpio_request(OMAP_GPIO_CAM_RST,"OMAP_GPIO_CAM_RST") != 0) 
+	if (gpio_request(OMAP_GPIO_CAM_RST,"OMAP_GPIO_CAM_RST") != 0)
 	{
 		printk("Could not request GPIO %d\n", OMAP_GPIO_CAM_RST);
 		return;
-	}    
+	}
 
-	if (gpio_request(OMAP_GPIO_VGA_STBY,"OMAP_GPIO_VGA_STBY") != 0) 
+	if (gpio_request(OMAP_GPIO_VGA_STBY,"OMAP_GPIO_VGA_STBY") != 0)
 	{
 		printk("Could not request GPIO %d\n", OMAP_GPIO_VGA_STBY);
 		return;
-	}      
+	}
 
-	if (gpio_request(OMAP_GPIO_VGA_RST,"OMAP_GPIO_VGA_RST") != 0) 
+	if (gpio_request(OMAP_GPIO_VGA_RST,"OMAP_GPIO_VGA_RST") != 0)
 	{
 		printk("Could not request GPIO %d", OMAP_GPIO_VGA_RST);
 		return;
-	}       
-	
+	}
+
 	gpio_direction_output(OMAP_GPIO_CAMERA_LEVEL_CTRL, 0);
 	gpio_direction_output(OMAP_GPIO_CAM_EN, 0);
 	gpio_direction_input(OMAP_GPIO_ISP_INT);
 	gpio_direction_output(OMAP_GPIO_CAM_RST, 0);
 	gpio_direction_output(OMAP_GPIO_VGA_STBY, 0);
 	gpio_direction_output(OMAP_GPIO_VGA_RST, 0);
-	
-	           
+
+
 	gpio_free(OMAP_GPIO_CAMERA_LEVEL_CTRL);
 	gpio_free(OMAP_GPIO_CAM_EN);
 	gpio_free(OMAP_GPIO_ISP_INT);
@@ -1911,7 +1911,7 @@ static int __init wl127x_vio_leakage_fix(void)
 
 	ret = gpio_request(OMAP_GPIO_BT_NSHUTDOWN, "wl127x_bten");
 	if (ret < 0) {
-		printk(KERN_ERR "wl127x_bten gpio_%d request fail",
+		printk(KERN_ERR  "wl127x_bten gpio_%d request fail",
 						OMAP_GPIO_BT_NSHUTDOWN);
 		goto fail;
 	}
@@ -1922,7 +1922,7 @@ static int __init wl127x_vio_leakage_fix(void)
 	udelay(64);
 
 	gpio_free(OMAP_GPIO_BT_NSHUTDOWN);
-	
+
 fail:
 	return ret;
 }
@@ -1941,11 +1941,11 @@ int config_twl4030_resource_remap( void )
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_CLKEN_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_CLKEN_REMAP\n");
-		
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VDD1_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VDD1_REMAP\n");
-	
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VDD2_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VDD2_REMAP\n");
@@ -1977,11 +1977,11 @@ int config_twl4030_resource_remap( void )
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VSIM_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VSIM_REMAP\n");
-				
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VAUX1_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VAUX1_REMAP\n");
-		
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_ACTIVE, TWL4030_VAUX2_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VAUX2_REMAP\n");
@@ -1989,10 +1989,10 @@ int config_twl4030_resource_remap( void )
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VAUX3_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VAUX3_REMAP\n");
-		
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VAUX4_REMAP );
 	if (ret)
-		printk(" board-file: fail to set reousrce remap TWL4030_VAUX4_REMAP\n");						
+		printk(" board-file: fail to set reousrce remap TWL4030_VAUX4_REMAP\n");
 
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VMMC1_REMAP );
 	if (ret)
@@ -2000,8 +2000,8 @@ int config_twl4030_resource_remap( void )
 
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VMMC2_REMAP );
 	if (ret)
-		printk(" board-file: fail to set reousrce remap TWL4030_VMMC2_REMAP\n");			
-		
+		printk(" board-file: fail to set reousrce remap TWL4030_VMMC2_REMAP\n");
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VDAC_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VDAC_REMAP\n");
@@ -2017,12 +2017,12 @@ int config_twl4030_resource_remap( void )
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VUSB3V1_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VUSB3V1_REMAP\n");
-		
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_REGEN_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_REGEN_REMAP\n");
-												
-	// [ - In order to prevent damage to the PMIC(TWL4030 or 5030), 
+
+	// [ - In order to prevent damage to the PMIC(TWL4030 or 5030),
 	//     VINTANA1 should maintain active state even though the system is in offmode.
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_ACTIVE, TWL4030_VINTANA1_REMAP );
 	if (ret)
@@ -2038,7 +2038,7 @@ int config_twl4030_resource_remap( void )
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VDD1_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VDD1_REMAP\n");
-	
+
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_OFF, TWL4030_VDD2_REMAP );
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VDD2_REMAP\n");
@@ -2067,7 +2067,7 @@ int config_twl4030_resource_remap( void )
 	if (ret)
 		printk(" board-file: fail to set reousrce remap TWL4030_VSIM_REMAP\n");
 
-	// [ - In order to prevent damage to the PMIC(TWL4030 or 5030), 
+	// [ - In order to prevent damage to the PMIC(TWL4030 or 5030),
 	//     VINTANA1 should maintain active state even though the system is in offmode.
 	ret = twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, REMAP_ACTIVE, TWL4030_VINTANA1_REMAP );
 	if (ret)
@@ -2079,7 +2079,7 @@ int config_twl4030_resource_remap( void )
 	if (ret)
 		printk(" board-file: fail to set TWL4030_VIO_VSEL\n");
 #endif
-#endif		
+#endif
 	return ret;
 }
 
@@ -2097,7 +2097,7 @@ int get_powerup_reason(char *str)
 
 	i = strlen(POWERUP_REASON);
 	next = saved_command_line;
-    
+
 	while ((next = strchr(next, 'a')) != NULL) {
 		if (!strncmp(next, POWERUP_REASON, i)) {
 			start = next;
@@ -2124,25 +2124,25 @@ int get_powerup_reason(char *str)
 
 static inline void __init nowplus_init_lcd(void)
 {
-	printk(KERN_ERR"\n%s\n",__FUNCTION__);
+	printk(KERN_ERR "\n%s\n",__FUNCTION__);
 	if (gpio_request(OMAP_GPIO_MLCD_RST, "OMAP_GPIO_MLCD_RST") < 0 ) {
-		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_MLCD_RST);
+		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_MLCD_RST);
 		return;
 	}
 	gpio_direction_output(OMAP_GPIO_MLCD_RST,1);
-	
+
 	if (gpio_request(OMAP_GPIO_LCD_REG_RST, "OMAP_GPIO_LCD_REG_RST") < 0 ) {
-		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_LCD_REG_RST);
+		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_LCD_REG_RST);
 		return;
 	}
 	gpio_direction_input(OMAP_GPIO_LCD_REG_RST);
-	
+
 	if (gpio_request(OMAP_GPIO_LCD_ID, "OMAP_GPIO_LCD_ID") < 0 ) {
-		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_LCD_ID);
+		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_LCD_ID);
 		return;
 	}
 	gpio_direction_output(OMAP_GPIO_LCD_ID,0);
-	
+
 }
 
 
@@ -2150,16 +2150,16 @@ static inline void __init nowplus_init_fmradio(void)
 {
 
   if(gpio_request(OMAP_GPIO_FM_nRST, "OMAP_GPIO_FM_nRST") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_FM_nRST);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_FM_nRST);
     return;
   }
   gpio_direction_output(OMAP_GPIO_FM_nRST, 0);
  // mdelay(1);
  // gpio_direction_output(OMAP_GPIO_FM_nRST, 1); //temp disable
-  
-  
+
+
   if(gpio_request(OMAP_GPIO_FM_INT, "OMAP_GPIO_FM_INT") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_FM_INT);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_FM_INT);
     return;
   }
   gpio_direction_input(OMAP_GPIO_FM_INT);
@@ -2168,19 +2168,19 @@ static inline void __init nowplus_init_fmradio(void)
 static inline void __init nowplus_init_mmc1(void)
 {
 	if(gpio_request(OMAP_GPIO_TF_DETECT, "OMAP_GPIO_TF_DETECT") < 0 ){
-	    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_TF_DETECT);
+	    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d\n",OMAP_GPIO_TF_DETECT);
 	    return;
 	  }
 	  gpio_direction_input(OMAP_GPIO_TF_DETECT);
 	  set_irq_type(OMAP_GPIO_IRQ(OMAP_GPIO_TF_DETECT), IRQ_TYPE_EDGE_BOTH);
-	  
+
 	return;
 }
 
 static inline void __init nowplus_init_movi_nand(void)
 {
   if(gpio_request(OMAP_GPIO_MOVI_EN, "OMAP_GPIO_MOVI_EN") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_MOVI_EN);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_MOVI_EN);
     return;
   }
   gpio_direction_output(OMAP_GPIO_MOVI_EN,0);
@@ -2189,13 +2189,13 @@ static inline void __init nowplus_init_movi_nand(void)
 static inline void __init nowplus_init_sound(void)
 {
   if(gpio_request(OMAP_GPIO_PCM_SEL, "OMAP_GPIO_PCM_SEL") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PCM_SEL);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PCM_SEL);
     return;
   }
   gpio_direction_output(OMAP_GPIO_PCM_SEL,0);
-  
+
   if(gpio_request(OMAP_GPIO_TVOUT_SEL, "OMAP_GPIO_TVOUT_SEL") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_TVOUT_SEL);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_TVOUT_SEL);
     return;
   }
   gpio_direction_output(OMAP_GPIO_TVOUT_SEL,0);
@@ -2204,7 +2204,7 @@ static inline void __init nowplus_init_sound(void)
 static inline void __init nowplus_init_PL(void)
 {
   if(gpio_request(OMAP_GPIO_PS_OUT, "OMAP_GPIO_PS_OUT") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PS_OUT);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PS_OUT);
     return;
   }
   gpio_direction_input(OMAP_GPIO_PS_OUT);
@@ -2213,18 +2213,18 @@ static inline void __init nowplus_init_PL(void)
 static inline void __init nowplus_init_earphone(void)
 {
   if(gpio_request(OMAP_GPIO_DET_3_5, "OMAP_GPIO_DET_3_5") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_DET_3_5);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_DET_3_5);
     return;
   }
   gpio_direction_input(OMAP_GPIO_DET_3_5);
-  
- 
+
+
   if(gpio_request(OMAP_GPIO_EAR_MIC_LDO_EN, "OMAP_GPIO_EAR_MIC_LDO_EN") < 0 ){
-    printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_EAR_MIC_LDO_EN);
+    printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_EAR_MIC_LDO_EN);
     return;
   }
   gpio_direction_output(OMAP_GPIO_EAR_MIC_LDO_EN,0);
-  
+
   gpio_free( OMAP_GPIO_DET_3_5 );
   gpio_free( OMAP_GPIO_EAR_MIC_LDO_EN );
 }
@@ -2232,13 +2232,13 @@ static inline void __init nowplus_init_earphone(void)
 static inline void __init nowplus_init_platform(void)
 {
 	if(gpio_request(OMAP_GPIO_CHG_ING_N, "OMAP_GPIO_CHG_ING_N") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_CHG_ING_N);
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_CHG_ING_N);
     		return;
   	}
 	gpio_direction_input(OMAP_GPIO_CHG_ING_N);
 
 	if(gpio_request(OMAP_GPIO_CHG_EN, "OMAP_GPIO_CHG_EN") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_CHG_EN);
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_CHG_EN);
     		return;
   	}
 
@@ -2251,26 +2251,26 @@ static inline void __init nowplus_init_platform(void)
 	{
 		gpio_direction_output(OMAP_GPIO_CHG_EN, 0);
 	}
-		
+
 	/*NAND INT_GPIO*/
 	if(gpio_request(OMAP_GPIO_AP_NAND_INT, "OMAP_GPIO_AP_NAND_INT") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_AP_NAND_INT);
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_AP_NAND_INT);
     		return;
   	}
 	gpio_direction_input(OMAP_GPIO_AP_NAND_INT);
-		
+
 	if(gpio_request(OMAP_GPIO_IF_CON_SENSE, "OMAP_GPIO_IF_CON_SENSE") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_IF_CON_SENSE);
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_IF_CON_SENSE);
     		return;
   	}
 	gpio_direction_input(OMAP_GPIO_IF_CON_SENSE);
-		
+
 	if(gpio_request(OMAP_GPIO_VF, "OMAP_GPIO_VF") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_VF);
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_VF);
     		return;
   	}
 	gpio_direction_input(OMAP_GPIO_VF);
-		
+
 }
 
 
@@ -2325,7 +2325,7 @@ static ssize_t set_integer_param(param_idx idx, const char *buf, size_t size)
 {
 	int ret = 0;
 	char *after;
-	unsigned long value = simple_strtoul(buf, &after, 10);	
+	unsigned long value = simple_strtoul(buf, &after, 10);
 	unsigned int count = (after - buf);
 	if (*after && isspace(*after))
 		count++;
@@ -2343,10 +2343,10 @@ static ssize_t get_integer_param(param_idx idx, char *buf)
 
 	if (sec_get_param_value)	sec_get_param_value(idx, &value);
 
-	return sprintf(buf, "%d\n", value);        
+	return sprintf(buf, "%d\n", value);
 }
 REGISTER_PARAM(__DEBUG_LEVEL, debug_level);
-REGISTER_PARAM(__DEBUG_BLOCKPOPUP, block_popup); 
+REGISTER_PARAM(__DEBUG_BLOCKPOPUP, block_popup);
 static void *dev_attr[] = {
 	&dev_attr_debug_level,
 	&dev_attr_block_popup,
@@ -2359,7 +2359,7 @@ static int nowplus_param_sysfs_init(void)
 
 	if (IS_ERR(param_dev)) {
 		pr_err("Failed to create device(param)!\n");
-		return PTR_ERR(param_dev);	
+		return PTR_ERR(param_dev);
 	}
 
 	for (; i < ARRAY_SIZE(dev_attr); i++) {
@@ -2374,10 +2374,10 @@ static int nowplus_param_sysfs_init(void)
 	return 0;
 
 fail:
-	for (--i; i >= 0; i--) 
+	for (--i; i >= 0; i--)
 		device_remove_file(param_dev, dev_attr[i]);
 
-	return -1;	
+	return -1;
 }
 
 /* begins - andre.b.kim : added sec_setprio as module { */
@@ -2386,7 +2386,7 @@ static ssize_t sec_setprio_show(struct device *dev, struct device_attribute *att
 	if (sec_setprio_get_value) {
 		sec_setprio_get_value();
 	}
-	
+
 	return 0;
 }
 
@@ -2395,7 +2395,7 @@ static ssize_t sec_setprio_store(struct device *dev, struct device_attribute *at
 	if (sec_setprio_set_value) {
 		sec_setprio_set_value(buf);
 	}
-	
+
 	return size;
 }
 
@@ -2413,7 +2413,7 @@ static int nowplus_sec_setprio_sysfs_init(void)
 		pr_err("Failed to create device(sec_set_prio)!\n");
 	if (device_create_file(sec_set_prio, &dev_attr_sec_setprio) < 0)
 		pr_err("Failed to create device file(%s)!\n", dev_attr_sec_setprio.attr.name);
-	
+
 	return 0;
 }
 /* } ends - andre.b.kim : added sec_setprio as module */
@@ -2422,7 +2422,7 @@ static void synaptics_dev_init(void)
 {
         /* Set the ts_gpio pin mux */
         if (gpio_request(OMAP_GPIO_TOUCH_IRQ, "touch_synaptics") < 0) {
-                printk(KERN_ERR "can't get synaptics pen down GPIO\n");
+                printk(KERN_ERR  "can't get synaptics pen down GPIO\n");
                 return;
         }
         gpio_direction_input(OMAP_GPIO_TOUCH_IRQ);
@@ -2433,12 +2433,12 @@ void __init nowplus_peripherals_init(void)
 
 	spi_register_board_info(nowplus_spi_board_info,
 			ARRAY_SIZE(nowplus_spi_board_info));
-			
+
 //	platform_device_register(&archer_dss_device);
 	synaptics_dev_init();
 	omap_serial_init();
 	config_wlan_gpio();
-	
+
     config_camera_gpio();
 	mod_clock_correction();
 	usb_musb_init(&musb_board_data);
@@ -2449,7 +2449,7 @@ static void __init nowplus_init_irq(void)
 {
 	omap_board_config = nowplus_config;
 	omap_board_config_size = ARRAY_SIZE(nowplus_config);
-	
+
 	omap_init_irq();
 	omap3_pm_init_vc(&omap3_setuptime_table);
 	omap3_pm_init_cpuidle(omap3_cpuidle_params_table);
@@ -2462,7 +2462,7 @@ static void __init nowplus_init(void)
 {
 	char str_powerup_reason[15];
 	u32 regval;
-	
+
 	printk("\n.....[Nowplus] Initializing...\n");
 
 	// change reset duration (PRM_RSTTIME register)
@@ -2478,7 +2478,7 @@ static void __init nowplus_init(void)
 	printk("Gpio Output Setting Done");
 
     set_wakeup_gpio();
-    	
+
     get_powerup_reason(str_powerup_reason);
     printk( "\n\n <Powerup Reason : %s>\n\n", str_powerup_reason);
 
@@ -2494,25 +2494,25 @@ static void __init nowplus_init(void)
 	nowplus_usb_data.batt_dev = &samsung_battery_device.dev;
 	nowplus_usb_data.charger_dev = &samsung_charger_device.dev;
     nowplus_usb_data.switch_dev = &headset_switch_device.dev; //Added for Regulator
-		
+
 	msecure_init();
-			
+
 	nowplus_ramconsole_init();
 	nowplus_init_power_key();
 	nowplus_init_ear_key();
 	nowplus_init_battery();
 	nowplus_init_platform();
 	nowplus_init_lcd();
-	nowplus_init_PL();	
+	nowplus_init_PL();
 
 	nowplus_init_fmradio();
 	wl127x_vio_leakage_fix();
 
 	//nowplus_init_mmc1();
-//	nowplus_init_movi_nand();	
+//	nowplus_init_movi_nand();
 //	nowplus_init_sound();
 //	nowplus_init_earphone();
-	
+
 	get_board_hw_rev();
 
     sec_class = class_create(THIS_MODULE, "sec");

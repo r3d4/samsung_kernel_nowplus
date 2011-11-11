@@ -25,7 +25,8 @@
 #include <linux/pm.h>
 #include <linux/i2c/twl.h>
 #include <linux/delay.h>
-#include <mach/gpio.h>
+#include <plat/gpio.h>
+#include <plat/prcm.h>
 #include <plat/mux.h>
 #include <plat/microusbic.h>
 #if defined(CONFIG_USB_ANDROID)
@@ -53,21 +54,6 @@ void twl4030_poweroff(void)
 	u8 uninitialized_var(val);
 	int err;
 
-	/* Make sure SEQ_OFFSYNC is set so that all the res goes to wait-on */
-	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
-				   CFG_P123_TRANSITION);
-	if (err) {
-		pr_warning("I2C error %d while reading TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
-		return;
-	}
-
-	val |= SEQ_OFFSYNC;
-	err = twl_i2c_write_u8(TWL4030_MODULE_PM_MASTER, val,
-				    CFG_P123_TRANSITION);
-	if (err) {
-		pr_warning("I2C error %d while writing TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
-		return;
-	}
 
 	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
 				  PWR_P1_SW_EVENTS);
@@ -76,7 +62,8 @@ void twl4030_poweroff(void)
 		return;
 	}
 
-	val |= PWR_STOPON_POWERON | PWR_DEVOFF;
+//	val |= PWR_STOPON_POWERON | PWR_DEVOFF;
+	val |= PWR_DEVOFF;  //no backup, real power off
 
 	err = twl_i2c_write_u8(TWL4030_MODULE_PM_MASTER, val,
 				   PWR_P1_SW_EVENTS);
@@ -90,11 +77,56 @@ void twl4030_poweroff(void)
 }
 
 
-//#if defined(CONFIG_MACH_ARCHER) && defined(CONFIG_PANEL_AMS353)
-//extern void ams353_lcd_poweroff(void);
-//#endif
 extern void omap_watchdog_reset(void);
 extern void tl2796_lcd_poweroff(void);
+
+static void nowplus_poweroff(void)
+{
+
+	int usbic_state=0;
+    
+	printk("\nNOWPLUS BOARD GOING TO SHUTDOWN!!!\n");
+
+#if defined(CONFIG_USB_ANDROID)
+	android_usb_set_connected(0);
+#endif
+	tl2796_lcd_poweroff();
+
+    //powerdown phone part
+	gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
+
+	printk(KERN_ERR "Kernel Power OFF !!!\n");
+
+	usbic_state= get_real_usbic_state();
+	if (usbic_state==MICROUSBIC_TA_CHARGER
+			|| usbic_state==MICROUSBIC_USB_CABLE
+			|| usbic_state==MICROUSBIC_USB_CHARGER)
+    { /* USB/USB CHARGER/CHARGER*/	
+        preempt_disable();
+		local_irq_disable();
+		local_fiq_disable();
+		/* using watchdog reset */
+		omap_watchdog_reset();
+		printk(KERN_ERR "Charging ... need to reboot\n");
+	}
+//	else if(gpio_get_value(OMAP3430_GPIO_ALARM_AP) && !gpio_get_value(OMAP3430_GPIO_PHONE_ACTIVE18))
+	else if(gpio_get_value(OMAP_GPIO_AP_ALARM))
+	{
+		printk(KERN_ERR "Alarm Booting Detecting... need to reboot\n");
+		omap_prcm_arch_reset(1);
+	}
+	else 
+	{
+		printk(KERN_ERR "TWL4030 Power Off\n");
+		twl4030_poweroff();
+	}
+	while(1);
+
+	return;
+};
+
+
+
 static void zeus_poweroff(void)
 {
 	/* int n_usbic_state; */
@@ -145,7 +177,7 @@ static void zeus_poweroff(void)
 	else
 	{
 		printk("Power Off !\n\n");
-		gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 0);
+		gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
 		twl4030_poweroff();
 		while(1);
 	}
@@ -156,15 +188,8 @@ static void zeus_poweroff(void)
 
 
 static int __init twl4030_poweroff_init(void)
-{
-	/*PS HOLD*/
-	if(gpio_request(OMAP_GPIO_PS_HOLD_PU, "OMAP_GPIO_PS_HOLD_PU") < 0 ){
-    		printk(KERN_ERR"\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PS_HOLD_PU);
-    		return;
-  	}
-	gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 1);
-	
-	pm_power_off = zeus_poweroff;
+{	
+	pm_power_off = nowplus_poweroff;
 
 	return 0;
 }
