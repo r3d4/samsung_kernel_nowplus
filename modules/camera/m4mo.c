@@ -1132,7 +1132,8 @@ static int m4mo_get_mode(void)
 
 	return mode;
 }
-
+	
+ 
 static int m4mo_set_mode_common(u32 mode )
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -1252,7 +1253,7 @@ static int  m4mo_set_preview(void)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_PREVIEW;   
     
-    m4mo_set_mode(M4MO_PARMSET_MODE );
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
  
      
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
@@ -1263,6 +1264,35 @@ static int  m4mo_set_preview(void)
 //    m4mo_set_mode(M4MO_MONITOR_MODE );
 
 return 0;
+}
+
+void m4mo_dump(void)
+{
+	struct m4mo_sensor *sensor = &m4mo;
+	struct i2c_client *client = sensor->i2c_client;
+    u8 category, reg;
+    u32 val;
+    const u8 NUMREGS=0x30;
+    const u8 NUMCATS=0x0c;
+
+    printk("\nM4MO DUMP >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    printk("\nreg:           ");
+    for(reg=0; reg<NUMREGS; reg++)
+        printk("0x%02x, ", reg);
+    printk("\n---------------");  
+    for(reg=0; reg<NUMREGS; reg++)
+        printk("------"); 
+        
+    for(category=0; category<=NUMCATS; category++)
+    {
+        printk("\ncategory[0x%02x] ", category);
+        for(reg=0; reg<NUMREGS; reg++)
+        {
+            m4mo_read_category_parm(client, M4MO_8BIT, category, reg, &val); 
+            printk("0x%02x, ", val);
+        }
+    }
+    printk("\nM4MO DUMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 static int  m4mo_set_capture(int pixelformat)
@@ -1277,7 +1307,7 @@ static int  m4mo_set_capture(int pixelformat)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_CAPTURE;   
     
-    m4mo_set_mode(M4MO_PARMSET_MODE );
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
 
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
     m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
@@ -1314,6 +1344,7 @@ static int  m4mo_set_capture(int pixelformat)
     m4mo_set_jpeg_quality(M4MO_JPEG_FINE);
     m4mo_set_thumbnail_size(M4MO_THUMB_QVGA_SIZE);
 
+    m4mo_dump();
     m4mo_start_capture();
 
 //    m4mo_set_mode(M4MO_STILLCAP_MODE );
@@ -2047,7 +2078,8 @@ static int m4mo_set_jpeg_quality(s32 value)
 
 	if(sensor->jpeg_quality == value)
 		return 0;
-
+    dprintk(CAM_ERR, M4MO_MOD_NAME "[JPEG Quality] set value=%d!!!\n", value);
+    
 	switch(value)
 	{
 		case M4MO_JPEG_SUPERFINE:
@@ -2143,17 +2175,23 @@ static int m4mo_set_flash_capture(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
-
+    static int is_torch = 0;
+    
 	if(sensor->flash_capture== value)
 		return 0;
 	/* WDR & ISC are orthogonal!*/
 	switch(value)
 	{
 		case M4MO_FLASH_CAPTURE_OFF:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x00);
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x00);
-			if(sensor->scene == M4MO_SCENE_BACKLIGHT)
-				m4mo_set_photometry(M4MO_PHOTOMETRY_SPOT);
+            if(is_torch)
+            {
+                dprintk(CAM_ERR, M4MO_MOD_NAME "torch disabled \n");
+                is_torch = 0;
+            }
+            m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x00);
+            m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x00);
+            if(sensor->scene == M4MO_SCENE_BACKLIGHT)
+                m4mo_set_photometry(M4MO_PHOTOMETRY_SPOT);
 			break;
 		case M4MO_FLASH_CAPTURE_ON:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x01);
@@ -2165,6 +2203,13 @@ static int m4mo_set_flash_capture(s32 value)
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x02);
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x02);
 			break;
+        case M4MO_FLASH_MOVIE_ON:
+        	m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x03);
+            is_torch = 1;
+            dprintk(CAM_ERR, M4MO_MOD_NAME "torch enabled \n");
+			break;
+            
+#if 0            
 		case M4MO_FLASH_MOVIE_ON:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x03);
 			break;
@@ -2216,6 +2261,7 @@ static int m4mo_set_flash_capture(s32 value)
 		case M4MO_FLASH_LEVEL_OFF:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x06, 16);
 			break;
+#endif
 		default:
 			dprintk(CAM_ERR, M4MO_MOD_NAME "[FLASH CAPTURE]Invalid value is ordered!!!\n");
 			return -EINVAL;
@@ -3195,32 +3241,35 @@ static int m4mo_set_strobe(enum v4l2_strobe_conf mode)
 
 static void m4mo_set_skip(void)
 {
-  struct m4mo_sensor *sensor = &m4mo;
+    struct m4mo_sensor *sensor = &m4mo;
 
-  int skip_frame = 0; 
+    int skip_frame = 0; 
 
-  dprintk(CAM_INF, M4MO_MOD_NAME "m4mo_set_skip is called...\n");
+    dprintk(CAM_INF, M4MO_MOD_NAME "m4mo_set_skip is called for '%s'\n",
+        (sensor->state == M4MO_STATE_PREVIEW)?"preview":"capture");
 
-  //wait for overlay creation (250ms ~ 300ms)
-  if(sensor->state == M4MO_STATE_PREVIEW)
-  { 
-    if(m4mo_curr_state == M4MO_STATE_INVALID)
-    {
-      skip_frame = sensor->fps / 6 + 1; 
+    //wait for overlay creation (250ms ~ 300ms)
+    if(sensor->state == M4MO_STATE_PREVIEW)
+    { 
+        if(m4mo_curr_state == M4MO_STATE_INVALID)
+        {
+            skip_frame = sensor->fps / 6 + 1; 
+        }
+        else
+        {
+            skip_frame = sensor->fps / 4 + 1; 
+        }
     }
     else
     {
-       skip_frame = sensor->fps / 4 + 1; 
+        //skip_frame = 2;
+        skip_frame = 0;
     }
-  }
-  else
-  {
-    skip_frame = 2;
-  }
-  
-  dprintk(CAM_INF, M4MO_MOD_NAME "skip frame = %d frame\n", skip_frame);
 
-  isp_set_hs_vs(skip_frame);
+    dprintk(CAM_INF, M4MO_MOD_NAME "skip frame = %d frame\n", skip_frame);
+
+    isp_set_hs_vs(skip_frame);
+
 }
 
 
@@ -3285,9 +3334,9 @@ static int m4mo_start_capture_transfer(void)
        
 	dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);  
 
-// DPRINTK_ISPCCDC("ccdc status: -----------------------------------------\n");
-// ispccdc_print_status();
-// DPRINTK_ISPCCDC("-------------------------------------------------------\n");
+DPRINTK_ISPCCDC("ccdc status: -----------------------------------------\n");
+ispccdc_print_status();
+DPRINTK_ISPCCDC("-------------------------------------------------------\n");
 
 	/* Select main frame image and wait until capture size is non zero*/
 	m4mo_write_category_parm(client, M4MO_8BIT, 0x0C, 0x04, 0x01);
@@ -3367,6 +3416,7 @@ static int m4mo_start_capture(void)
 	
 	/* Start Single Capture */
 	m4mo_set_mode(M4MO_STILLCAP_MODE);
+    
 	/* Wait Capture Interrupt */
 	dprintk(CAM_DBG, M4MO_MOD_NAME "Waiting for interrupt... \n");
 	wait_event_interruptible(cam_wait, cam_interrupted == 1);
@@ -3448,6 +3498,7 @@ dprintk(CAM_DBG, M4MO_MOD_NAME "    SYNC_DETECT = %d\n", reg>>14&0x3);
     else
     {
         dprintk(CAM_DBG, M4MO_MOD_NAME "start capture transfer....................\n");
+        //m4mo_set_capture(V4L2_PIX_FMT_JPEG);
         if(m4mo_start_capture_transfer())
             goto streamon_fail;
     }
@@ -3957,7 +4008,7 @@ static int ioctl_try_fmt_cap(struct v4l2_int_device *s,
         dprintk(CAM_DBG, M4MO_MOD_NAME "set capture....................\n");
 
         if(m4mo_set_capture(pix->pixelformat))
-        goto try_fmt_fail;
+            goto try_fmt_fail;
     }  
 
     switch (pix->pixelformat) 
@@ -4009,8 +4060,7 @@ static char *getPxFmtName(int fmt)
  * format, returns error code if format not supported or HW can't be
  * correctly configured.
  */
-static int ioctl_s_fmt_cap(struct v4l2_int_device *s,
-				struct v4l2_format *f)
+static int ioctl_s_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 {
     struct v4l2_pix_format *pix = &f->fmt.pix;
     struct m4mo_sensor *sensor = s->priv;
@@ -4072,7 +4122,7 @@ static int ioctl_s_fmt_cap(struct v4l2_int_device *s,
         }
 
         if(m4mo_set_capture(pix->pixelformat))
-        goto s_fmt_fail;
+            goto s_fmt_fail;
         
     }  
     else

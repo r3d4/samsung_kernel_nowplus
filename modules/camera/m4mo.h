@@ -44,9 +44,9 @@
 #define SENSOR_DETECTED		            1
 #define SENSOR_NOT_DETECTED         	0
 
-#define M4MO_STATE_PREVIEW	            0x0001	/*  preview state */
-#define M4MO_STATE_CAPTURE	            0x0002	/*  capture state */
-#define M4MO_STATE_INVALID	            0x0003	/*  invalid state */
+#define M4MO_STATE_PREVIEW	            0	/*  preview state */
+#define M4MO_STATE_CAPTURE	            1	/*  capture state */
+#define M4MO_STATE_INVALID	            2	/*  invalid state */
 
 #define M4MO_MODE_CAMERA                1
 #define M4MO_MODE_CAMCORDER             2
@@ -340,22 +340,22 @@ struct m4mo_sensor {
 #define M4MO_FLASH_CAPTURE_ON		2
 #define M4MO_FLASH_CAPTURE_AUTO		3
 #define M4MO_FLASH_MOVIE_ON			4
-#define M4MO_FLASH_LEVEL_1PER2		5
-#define M4MO_FLASH_LEVEL_1PER4		6
-#define M4MO_FLASH_LEVEL_1PER6		7
-#define M4MO_FLASH_LEVEL_1PER8		8
-#define M4MO_FLASH_LEVEL_1PER10		9
-#define M4MO_FLASH_LEVEL_1PER12		10
-#define M4MO_FLASH_LEVEL_1PER14		11
-#define M4MO_FLASH_LEVEL_1PER16		12
-#define M4MO_FLASH_LEVEL_1PER18		13
-#define M4MO_FLASH_LEVEL_1PER20		14
-#define M4MO_FLASH_LEVEL_1PER22		15
-#define M4MO_FLASH_LEVEL_1PER24		16
-#define M4MO_FLASH_LEVEL_1PER26		17
-#define M4MO_FLASH_LEVEL_1PER28		18
-#define M4MO_FLASH_LEVEL_1PER30		19
-#define M4MO_FLASH_LEVEL_OFF	    20
+// #define M4MO_FLASH_LEVEL_1PER2		5
+// #define M4MO_FLASH_LEVEL_1PER4		6
+// #define M4MO_FLASH_LEVEL_1PER6		7
+// #define M4MO_FLASH_LEVEL_1PER8		8
+// #define M4MO_FLASH_LEVEL_1PER10		9
+// #define M4MO_FLASH_LEVEL_1PER12		10
+// #define M4MO_FLASH_LEVEL_1PER14		11
+// #define M4MO_FLASH_LEVEL_1PER16		12
+// #define M4MO_FLASH_LEVEL_1PER18		13
+// #define M4MO_FLASH_LEVEL_1PER20		14
+// #define M4MO_FLASH_LEVEL_1PER22		15
+// #define M4MO_FLASH_LEVEL_1PER24		16
+// #define M4MO_FLASH_LEVEL_1PER26		17
+// #define M4MO_FLASH_LEVEL_1PER28		18
+// #define M4MO_FLASH_LEVEL_1PER30		19
+// #define M4MO_FLASH_LEVEL_OFF	    20
 
 #define M4MO_ZOOM_STAGES            30
 
