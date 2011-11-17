@@ -630,11 +630,12 @@ __tagtable(ATAG_REVISION, parse_tag_revision);
 
 static int __init parse_tag_cmdline(const struct tag *tag)
 {
-	strlcpy(default_command_line, tag->u.cmdline.cmdline, COMMAND_LINE_SIZE);
+	printk("parse_tag_cmdline: %s\n",tag->u.cmdline.cmdline);
+	//strlcpy(default_command_line, tag->u.cmdline.cmdline, COMMAND_LINE_SIZE);
 	return 0;
 }
 
-//__tagtable(ATAG_CMDLINE, parse_tag_cmdline);
+__tagtable(ATAG_CMDLINE, parse_tag_cmdline);
 
 /*
  * Scan the tag table for this tag, and call its parse function.

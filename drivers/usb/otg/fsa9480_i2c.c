@@ -431,7 +431,7 @@ static irqreturn_t fsa9480_interrupt(int irq, void *ptr)
 
 static void fsa9480_interrupt_init(int irq, void *dev_id)
 {
-#define FSA9480_IRQ_FLAGS (IRQF_DISABLED | IRQF_SHARED)
+#define FSA9480_IRQ_FLAGS (IRQF_SHARED)
 
 	set_irq_type(irq, IRQ_TYPE_LEVEL_LOW/*IRQ_TYPE_EDGE_FALLING*/);
 
