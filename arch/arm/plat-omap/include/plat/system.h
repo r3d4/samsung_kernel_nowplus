@@ -59,16 +59,13 @@ static inline void arch_reset(char mode, const char *cmd)
 	omap_writel(0x54455352, OMAP343X_CTRL_BASE + 0x9C4); // set to normal reset
 #endif
 
-
-	switch(mode){	
-#if 0 // we don't have recovery/fota atm.
+	switch(mode){
 		case 'r': /* reboot mode = recovery */ 
 			omap_writel(scpad | REBOOTMODE_RECOVERY, OMAP343X_CTRL_BASE + 0x918);
 			break;
 		case 'f': /* reboot mode = fota */
 			omap_writel(scpad | REBOOTMODE_FOTA, OMAP343X_CTRL_BASE + 0x918);
 			break;
-#endif
 #ifdef CONFIG_SAMSUNG_KERNEL_DEBUG// klaatu
 		case 'L': /* reboot mode = Lockup */
 			omap_writel(scpad | REBOOTMODE_LOCKUP, OMAP343X_CTRL_BASE + 0x918);

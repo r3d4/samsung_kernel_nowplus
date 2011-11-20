@@ -37,7 +37,7 @@ extern void microusb_init(void);
 extern void mcirousb_usbpath_change(int usb_path);
 #endif
 
-
+extern int nowplus_enable_uart_pins(int enable);
 extern struct class *sec_class;
 extern void (*sec_set_param_value)(int idx, void *value);
 extern void (*sec_get_param_value)(int idx, void *value);
@@ -148,9 +148,11 @@ static void sio_switch_config(USB_UART_SW_MODE_TYPE sio_mode)
 			usb_api_set_usb_switch(USB_SW_CP);
 			break;
 		case AP_UART_MODE:
+		    nowplus_enable_uart_pins(1);
 			gpio_set_value(OMAP_GPIO_UART_SEL, GPIO_LEVEL_LOW);
 			break;
 		case CP_UART_MODE:
+		    nowplus_enable_uart_pins(0);
 			gpio_set_value(OMAP_GPIO_UART_SEL, GPIO_LEVEL_HIGH);
 			break;
 		default:

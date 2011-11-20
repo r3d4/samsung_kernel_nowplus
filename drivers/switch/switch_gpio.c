@@ -239,15 +239,11 @@ static void ear_adc_caculrator(unsigned long arg)
 			ear_key_enable_irq();
 			#endif
 
-			gpio_direction_output(EAR_ADC_SEL_GPIO , 1);
+			//gpio_direction_output(EAR_ADC_SEL_GPIO , 1);
 		}
 		else if(adc < 100)
 		{
-			#ifdef CONFIG_MACH_OSCAR
-			switch_set_state(&data->sdev,1);
-			#else
 			switch_set_state(&data->sdev, HEADSET_3POLE);
-			#endif
 			headset_status = HEADSET_3POLE;
 
 			#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
@@ -260,7 +256,7 @@ static void ear_adc_caculrator(unsigned long arg)
 			//ear_key_enable_irq();
 			//#endif
 
-			gpio_direction_output(EAR_ADC_SEL_GPIO , 1);
+			//gpio_direction_output(EAR_ADC_SEL_GPIO , 1);
 			gpio_direction_output(EAR_MIC_BIAS_GPIO, 0);
 		}
 		else
@@ -306,9 +302,7 @@ static void headset_detect_timer_handler(unsigned long arg)
 	
 	if(headset_detect_timer_token < count)
 	{
-		#if !defined(CONFIG_MACH_TICKERTAPE) && !defined(CONFIG_MACH_ZEUS)
-		gpio_direction_output(EAR_ADC_SEL_GPIO , 0);
-		#endif
+		//gpio_direction_output(EAR_ADC_SEL_GPIO , 0);
 
 		headset_detect_timer.expires = HEADSET_CHECK_TIME;
 		add_timer(&headset_detect_timer);
@@ -400,12 +394,7 @@ static int gpio_switch_probe(struct platform_device *pdev)
 	int ret = 0;
 	SEC_HEADSET_DBG("");  
 	this_dev = &pdev->dev;
-#if !defined(CONFIG_MACH_TICKERTAPE) && !defined(CONFIG_MACH_ZEUS)
-	if (gpio_request(EAR_ADC_SEL_GPIO , "TVOUT_SEL") == 0) 
-	{
-		gpio_direction_output(EAR_ADC_SEL_GPIO , 0);
-	}
-#endif
+
 	if (gpio_request(EAR_MIC_BIAS_GPIO, "EARMIC") == 1) 
 	{
 		gpio_direction_output(EAR_MIC_BIAS_GPIO, 0);
@@ -517,9 +506,6 @@ static struct platform_driver gpio_switch_driver = {
 
 static int __init gpio_switch_init(void)
 {
-#if !defined(CONFIG_MACH_TICKERTAPE) && !defined(CONFIG_MACH_ZEUS)
-	gpio_free(EAR_ADC_SEL_GPIO );
-#endif
 	gpio_free(EAR_MIC_BIAS_GPIO);
 	return platform_driver_register(&gpio_switch_driver);
 }

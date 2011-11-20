@@ -295,7 +295,7 @@
  * ---------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_MACH_NOWPLUS
+#ifdef CONFIG_MACH_SAMSUNG_NOWPLUS
 #include <mach/board-nowplus.h>
 #include <mach/nowplus.h>
 #endif
