@@ -1,0 +1,25 @@
+##
+# Project Name : Samsung Private Third-Party Device Drivers
+#
+# Project Description :
+#
+# Comments : tabstop = 8, shiftwidth = 8, noexpandtab
+##
+
+##
+# File Name : Kconfig
+#
+# File Description :
+#
+# Author : System Platform2
+# Dept : System S/W Group (Open OS S/W R&D Team)
+# Created Date : 15/Sep/2010
+# Version : Baby-Raccoon
+##
+
+config INPUT_AK8973B
+	tristate "AsahiKasei AK8973B Magnetic/Compass Sensor"
+	default y
+	help
+		AsahiKasei AK8973B Magnetic/Compass Sensor
+

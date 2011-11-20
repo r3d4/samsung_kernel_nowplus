@@ -1,0 +1,60 @@
+##
+# Copyright (C) 2010, Samsung Electronics Co., Ltd. All Rights Reserved.
+#  Written by System S/W Group, Open OS S/W R&D Team,
+#  Mobile Communication Division.
+##
+
+##
+# Project Name : Samsung Private Third-Party Device Drivers
+#
+# Project Description :
+#
+# Comments : tabstop = 8, shiftwidth = 8, noexpandtab
+##
+
+##
+# File Name : Kconfig
+#
+# File Description :
+#
+# Author : Joo, Young Jin (#4349, youngjin79.joo@samsung.com)
+# Dept : System S/W Group (Open OS S/W R&D Team)
+# Created Date : 09-Jul-2010
+# Version : Baby-Raccoon
+##
+
+menu "Samsung Private Third-Party Device Drivers"
+
+menu "RFS_3.0.0_b041-LinuStoreIII_1.2.0_b038-FSR_1.2.1p1_b139_RTM"
+source "samsung/rfs_fsr/drivers/tfsr/Kconfig"
+endmenu
+
+menu "Immersion Touch Sense Driver (vibetonz)"
+source "samsung/vibetonz/Kconfig"
+endmenu
+
+menu "Samsung Battery Driver"
+source "samsung/battery/Kconfig"
+endmenu
+
+menu "AsahiKasei AK8973B Magnetic/Compass Sensor Driver"
+source "samsung/ak8973b/Kconfig"
+endmenu
+
+menu "Samsung Flashless Boot Support (using DPRAM)"
+source "samsung/dpram_flashless/Kconfig"
+endmenu
+
+menu "Samsung Proximity/Light Sensor Driver"
+source "samsung/PL_sensor/Kconfig"
+endmenu
+
+menu "Kionix KXSD9 Accelerometer Driver"
+source "samsung/kxsd9/Kconfig"
+endmenu
+
+menu "Samsung Multiple Packet Data Protocol Support"
+source "samsung/multipdp/Kconfig"
+endmenu
+
+endmenu
