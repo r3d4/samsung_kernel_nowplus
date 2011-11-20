@@ -59,11 +59,21 @@
 #include "cm.h"
 
 #include "mux.h"
-#include "mmc-twl4030.h"
+#include "hsmmc.h"
 #include "sdram-nowplus.h"
-#include "omap3-opp.h"
 #include "pm.h"
 
+#ifdef CONFIG_SERIAL_OMAP
+#include <plat/omap-serial.h>
+#include <plat/serial.h>
+#endif
+
+#include <mach/param.h>
+#include <mach/sec_switch.h>
+
+#if defined(CONFIG_USB_SWITCH_FSA9480)
+#include <linux/fsa9480.h>
+#endif
 
 #ifdef CONFIG_PM
 #include <plat/vrfb.h>
@@ -88,7 +98,6 @@ struct s5ka3dfx_platform_data nowplus1_s5ka3dfx_platform_data;
 #define CAM_PMIC_I2C_ADDR               0x7D
 #endif
 
-#if defined(CONFIG_MACH_NOWPLUS)
 /* make easy to register param to sysfs */
 #define REGISTER_PARAM(idx,name)     \
 static ssize_t name##_show(struct device *dev, struct device_attribute *attr, char *buf)\
@@ -115,7 +124,7 @@ EXPORT_SYMBOL(sec_set_param_value);
 void (*sec_get_param_value)(int idx, void *value);
 EXPORT_SYMBOL(sec_get_param_value);
 
-/* begins - andre.b.kim : added sec_setprio as module { */
+#if defined(CONFIG_SAMSUNG_SETPRIO)
 struct class *sec_setprio_class;
 EXPORT_SYMBOL(sec_setprio_class);
 
@@ -126,8 +135,8 @@ EXPORT_SYMBOL(sec_setprio_set_value);
 
 void (*sec_setprio_get_value)(void);
 EXPORT_SYMBOL(sec_setprio_get_value);
-/* } ends - andre.b.kim : added sec_setprio as module */
 #endif
+
 
 u32 hw_revision;
 EXPORT_SYMBOL(hw_revision);
@@ -156,6 +165,19 @@ EXPORT_SYMBOL(usbsel_notify);
 extern unsigned get_last_off_on_transaction_id(struct device *dev);
 extern int omap34xx_pad_set_config_lcd(u16 pad_pin,u16 pad_val);
 
+
+static int sec_switch_status = 0;
+static int sec_switch_inited = 0;
+#ifdef _FMC_DM_
+static int usb_access_lock;
+#endif
+#endif
+#if defined(CONFIG_USB_SWITCH_FSA9480)
+static bool fsa9480_jig_status = 0;
+static enum cable_type_t set_cable_status;
+
+extern void twl4030_phy_enable(void);
+extern void twl4030_phy_disable(void);
 
 /* FIXME: These are not the optimal setup values to be used on 3430sdp*/
 static struct prm_setup_vc omap3_setuptime_table = {
@@ -375,18 +397,57 @@ static struct resource samsung_charger_resources[] = {
 		.flags = IORESOURCE_IRQ,
 	},
 };
+
+#ifdef CONFIG_USB_SWITCH_FSA9480
+struct sec_battery_callbacks {
+	void (*set_cable)(struct sec_battery_callbacks *ptr,
+		enum cable_type_t status);
+};
+
+struct sec_battery_callbacks *callbacks;
+
+static void sec_battery_register_callbacks(
+		struct sec_battery_callbacks *ptr)
+{
+	callbacks = ptr;
+	/* if there was a cable status change before the charger was
+	ready, send this now */
+	if ((set_cable_status != 0) && callbacks && callbacks->set_cable)
+		callbacks->set_cable(callbacks, set_cable_status);
+}
+#endif
+
+struct charger_device_config 
+// THIS CONFIG IS SET IN BOARD_FILE.(platform_data)
+{
+	/* CHECK BATTERY VF USING ADC */
+	int VF_CHECK_USING_ADC;	// true or false
+	int VF_ADC_PORT;
+	
+	/* SUPPORT CHG_ING IRQ FOR CHECKING FULL */
+	int SUPPORT_CHG_ING_IRQ;
+
+#ifdef CONFIG_USB_SWITCH_FSA9480
+	void (*register_callbacks)(struct sec_battery_callbacks *ptr);
+#endif
+};
+
 static int samsung_charger_config_data[] = {
 	// [ CHECK VF USING ADC ]
 	/*   1. ENABLE  (true, flase) */
-	false,  // n.c. no adc connected to battery on nowplus
+	.VF_CHECK_USING_ADC = false,  // n.c. no adc connected to battery on nowplus
 
 	/*   2. ADCPORT (ADCPORT NUM) */
-	0,  
+	.VF_ADC_PORT = 0,  
 
 
 	// [ SUPPORT CHG_ING IRQ FOR CHECKING FULL ]
 	/*   1. ENABLE  (true, flase) */
-	true,   //use /CHRG as IRQ
+	.SUPPORT_CHG_ING_IRQ = true,   //use /CHRG as IRQ
+    
+#ifdef CONFIG_USB_SWITCH_FSA9480
+	.register_callbacks = &sec_battery_register_callbacks,
+#endif
 };
 
 static int samsung_battery_config_data[] = {
@@ -495,14 +556,70 @@ static struct platform_device nowplus_dss_device = {
 
 
 #ifdef CONFIG_PM
-struct vout_platform_data nowplus_vout_data = {
-        .set_min_bus_tput = omap_pm_set_min_bus_tput,
-        .set_max_mpu_wakeup_lat =  omap_pm_set_max_mpu_wakeup_lat,
-        .set_min_mpu_freq = omap_pm_set_min_mpu_freq,
+static struct omap_volt_vc_data vc_config = {
+	/* MPU */
+	.vdd0_on	= 1200000, /* 1.2v */
+	.vdd0_onlp	=  975000, //1000000, /* 1.0v */
+	.vdd0_ret	=  975000, /* 0.975v */
+	.vdd0_off	= 1200000,//600000, /* 0.6v */
+	/* CORE */
+	.vdd1_on	= 1150000, /* 1.15v */
+	.vdd1_onlp	=  975000, //1000000, /* 1.0v */
+	.vdd1_ret	=  975000, /* 0.975v */
+	.vdd1_off	= 1150000,//600000, /* 0.6v */
+
+	.clksetup	= 0xff,
+	.voltoffset	= 0xff,
+	.voltsetup2	= 0xff,
+	.voltsetup_time1 = 0xfff,
+	.voltsetup_time2 = 0xfff,
 };
-#endif
+
+#ifdef CONFIG_TWL4030_CORE
+static struct omap_volt_pmic_info omap_pmic_mpu = { /* and iva */
+	.name = "twl",
+	.slew_rate = 4000,
+	.step_size = 12500,
+	.i2c_addr = 0x12,
+	.i2c_vreg = 0x0, /* (vdd0) VDD1 -> VDD1_CORE -> VDD_MPU */
+	.vsel_to_uv = omap_twl_vsel_to_uv,
+	.uv_to_vsel = omap_twl_uv_to_vsel,
+	.onforce_cmd = omap_twl_onforce_cmd,
+	.on_cmd = omap_twl_on_cmd,
+	.sleepforce_cmd = omap_twl_sleepforce_cmd,
+	.sleep_cmd = omap_twl_sleep_cmd,
+	.vp_config_erroroffset = 0,
+	.vp_vstepmin_vstepmin = 0x01,
+	.vp_vstepmax_vstepmax = 0x04,
+	.vp_vlimitto_timeout_us = 0xFFFF,//values taken from froyo
+	.vp_vlimitto_vddmin = 0x00,//values taken from froyo
+	.vp_vlimitto_vddmax = 0x3C,//values taken from froyo
+};
+
+static struct omap_volt_pmic_info omap_pmic_core = {
+	.name = "twl",
+	.slew_rate = 4000,
+	.step_size = 12500,
+	.i2c_addr = 0x12,
+	.i2c_vreg = 0x1, /* (vdd1) VDD2 -> VDD2_CORE -> VDD_CORE */
+	.vsel_to_uv = omap_twl_vsel_to_uv,
+	.uv_to_vsel = omap_twl_uv_to_vsel,
+	.onforce_cmd = omap_twl_onforce_cmd,
+	.on_cmd = omap_twl_on_cmd,
+	.sleepforce_cmd = omap_twl_sleepforce_cmd,
+	.sleep_cmd = omap_twl_sleep_cmd,
+	.vp_config_erroroffset = 0,
+	.vp_vstepmin_vstepmin = 0x01,
+	.vp_vstepmax_vstepmax = 0x04,
+	.vp_vlimitto_timeout_us = 0xFFFF,//values taken from froyo
+	.vp_vlimitto_vddmin = 0x00,//values taken from froyo
+	.vp_vlimitto_vddmax = 0x2C,//values taken from froyo
+};
+#endif /* CONFIG_TWL4030_CORE */
+#endif /* CONFIG_PM */
 
 
+// for storing /proc/last_kmsg
 #ifdef CONFIG_ANDROID_RAM_CONSOLE
 #define RAM_CONSOLE_START   0x8E000000
 #define RAM_CONSOLE_SIZE    0x20000
@@ -551,11 +668,60 @@ static struct platform_device sec_device_dpram = {
 	.id		= -1,
 };
 
+//>>> switch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+int sec_switch_get_cable_status(void)
+{
+	return set_cable_status;
+}
 
-struct platform_device sec_sio_switch = {
-	.name	= "switch-sio",
-	.id		= -1,
+void sec_switch_set_switch_status(int val)
+{
+	printk("%s (switch_status : %d)\n", __func__, val);
+
+#if defined(CONFIG_USB_SWITCH_FSA9480)
+	if(!sec_switch_inited) {
+		fsa9480_enable_irq();
+
+#ifdef _FMC_DM_
+		if (sec_switch_status & USB_LOCK_MASK)
+			usb_access_lock = 1;
+#endif
+
+		/*
+		 * TI CSR OMAPS00222879: "MP3 playback current consumption is very high"
+		 * This a workaround to reduce the mp3 power consumption when the system
+		 * is booted without USB cable.
+		 */
+		twl4030_phy_enable();
+
+#ifdef _FMC_DM_
+		if(usb_access_lock || (set_cable_status != CABLE_TYPE_USB))
+#else
+		if(set_cable_status != CABLE_TYPE_USB)
+#endif
+			twl4030_phy_disable();
+	}
+#endif
+
+	if(!sec_switch_inited)
+		sec_switch_inited = 1;
+
+	sec_switch_status = val;
+}
+
+static struct sec_switch_platform_data sec_switch_pdata = {
+	.get_cable_status = sec_switch_get_cable_status,
+	.set_switch_status = sec_switch_set_switch_status,
 };
+
+struct platform_device sec_device_switch = {
+	.name	= "sec_switch",
+	.id	= 1,
+	.dev	= {
+		.platform_data	= &sec_switch_pdata,
+	}
+};
+//<<< switch <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #define OMAP_GPIO_SYS_DRM_MSECURE 22
 static int __init msecure_init(void)
@@ -594,7 +760,7 @@ out:
 }
 
 static struct platform_device *nowplus_devices[] __initdata = {
-	&nowplus_dss_device,
+	//&nowplus_dss_device,
 	&headset_switch_device,
 #ifdef CONFIG_WL127X_RFKILL
 	&nowplus_wl127x_device,
@@ -606,7 +772,7 @@ static struct platform_device *nowplus_devices[] __initdata = {
 	&samsung_vibrator_device,   // cdy_100111 add vibrator device
 	&sec_device_dpram,
 	&samsung_pl_sensor_power_device,
-	&sec_sio_switch,
+	&sec_device_switch,
 #ifdef CONFIG_RTC_DRV_VIRTUAL
 	&samsung_virtual_rtc_device,
 #endif
@@ -852,9 +1018,10 @@ static struct omap_uart_config nowplus_uart_config __initdata = {
 };
 
 static struct omap_board_config_kernel nowplus_config[] __initdata = {
-	 { OMAP_TAG_UART,	&nowplus_uart_config },
-	 { OMAP_TAG_LCD,         &nowplus_lcd_config }, //ZEUS_LCD
+	 { OMAP_TAG_UART, &nowplus_uart_config },
+	 { OMAP_TAG_LCD,  &nowplus_lcd_config }, //ZEUS_LCD
 };
+
 static int nowplus_batt_table[] = {
 /* 0 C*/
 30800, 29500, 28300, 27100,
@@ -871,36 +1038,38 @@ static struct twl4030_bci_platform_data nowplus_bci_data = {
 	.tblsize		= ARRAY_SIZE(nowplus_batt_table),
 };
 
-static struct twl4030_hsmmc_info nowplus_mmc[] = {
+static struct omap2_hsmmc_info nowplus_mmc[] = {
 	{
-		.name		= "external",
-		.mmc		= 1,
-		.wires		= 4,
-		.gpio_wp	= -EINVAL,
+		.name		    = "external",
+		.mmc		    = 1,
+		.caps		    = MMC_CAP_4_BIT_DATA,
+		.gpio_wp	    = -EINVAL,
+		.power_saving	= true,
 	},
 	{
-		.name		= "internal",
-		.mmc		= 2,
-		.wires		= 8,
-		.gpio_cd	= -EINVAL,
-		.gpio_wp	= -EINVAL,
+		.name		    = "internal",
+		.mmc		    = 2,
+		.caps		    = MMC_CAP_4_BIT_DATA | MMC_CAP_8_BIT_DATA,
+		.gpio_cd	    = -EINVAL,
+		.gpio_wp	    = -EINVAL,
 		.nonremovable	= true,
+		.power_saving	= true,
 	},
 	{
-		.mmc		= 3,
-		.wires		= 4,
-		.gpio_cd	= -EINVAL,
-		.gpio_wp	= -EINVAL,
+		.mmc		    = 3,
+		.caps		    = MMC_CAP_4_BIT_DATA,
+		.gpio_cd	    = -EINVAL,
+		.gpio_wp	    = -EINVAL,
 	},
 	{}	/* Terminator */
 };
 
 
-static int nowplus_twl_gpio_setup(struct device *dev,
+static int __init nowplus_twl_gpio_setup(struct device *dev,
 		unsigned gpio, unsigned ngpio)
 {
 	nowplus_mmc[0].gpio_cd = OMAP_GPIO_TF_DETECT;
-	twl4030_mmc_init(nowplus_mmc);
+	omap2_hsmmc_init(nowplus_mmc);
 
 	/* link regulators to MMC adapters */
 	nowplus_vmmc1_supply.dev = nowplus_mmc[0].dev;
@@ -912,7 +1081,7 @@ static int nowplus_twl_gpio_setup(struct device *dev,
 	return 0;
 }
 
-static struct twl4030_gpio_platform_data nowplus_gpio_data = {
+static struct twl4030_gpio_platform_data __initdata nowplus_gpio_data = {
 	.gpio_base	= OMAP_MAX_GPIO_LINES,
 	.irq_base	= TWL4030_GPIO_IRQ_BASE,
 	.irq_end	= TWL4030_GPIO_IRQ_END,
@@ -952,7 +1121,7 @@ static struct twl4030_ins __initdata sleep_on_seq[] = {
 static struct twl4030_script sleep_on_script __initdata = {
 	.script	= sleep_on_seq,
 	.size	= ARRAY_SIZE(sleep_on_seq),
-	.flags	= TRITON_SLEEP_SCRIPT,
+	.flags	= TWL4030_SLEEP_SCRIPT,
 };
 
 static struct twl4030_ins wakeup_p12_seq[] __initdata = {
@@ -1105,7 +1274,7 @@ static struct twl4030_codec_data nowplus_codec_data = {
 	.audio = &nowplus_audio_data,
 };
 
-static struct twl4030_platform_data nowplus_twl_data __initdata = {
+static struct twl4030_platform_data __initdata nowplus_twl_data __initdata = {
 	.irq_base	= TWL4030_IRQ_BASE,
 	.irq_end	= TWL4030_IRQ_END,
 
@@ -1129,6 +1298,7 @@ static struct twl4030_platform_data nowplus_twl_data __initdata = {
 	.vaux4		= &nowplus_vaux4,
 	.vpll2		= &nowplus_vpll2,
 };
+
 #ifdef CONFIG_BATTERY_MAX17040  //use MAX17040 driver for charging
 u8 fsa9480_get_charger_status(void);
 static int nowplus_battery_online(void) {
@@ -1171,6 +1341,98 @@ static struct max17040_platform_data nowplus_max17040_data = {
 	.charger_disable = &nowplus_charger_disable,
 };
 #endif
+
+
+#ifdef CONFIG_USB_SWITCH_FSA9480
+static void fsa9480_usb_cb(bool attached)
+{
+	if(sec_switch_inited)
+#ifdef _FMC_DM_
+	if (attached && !usb_access_lock)
+#else
+	if (attached)
+#endif
+		twl4030_phy_enable();
+	else
+		twl4030_phy_disable();
+
+	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
+
+	if (callbacks && callbacks->set_cable)
+		callbacks->set_cable(callbacks, set_cable_status);
+}
+
+static void fsa9480_charger_cb(bool attached)
+{
+	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
+
+	if (callbacks && callbacks->set_cable)
+		callbacks->set_cable(callbacks, set_cable_status);
+}
+
+static void fsa9480_jig_cb(bool attached)
+{
+	printk("%s : attached (%d)\n", __func__, (int)attached);
+
+	fsa9480_jig_status = attached;
+}
+
+static void fsa9480_deskdock_cb(bool attached)
+{
+	// TODO
+}
+
+static void fsa9480_cardock_cb(bool attached)
+{
+	// TODO
+}
+
+static void fsa9480_reset_cb(void)
+{
+	// TODO
+}
+
+static struct fsa9480_platform_data fsa9480_pdata = {
+	.usb_cb = fsa9480_usb_cb,
+	.charger_cb = fsa9480_charger_cb,
+	.jig_cb = fsa9480_jig_cb,
+	.deskdock_cb = fsa9480_deskdock_cb,
+	.cardock_cb = fsa9480_cardock_cb,
+	.reset_cb = fsa9480_reset_cb,
+};
+#endif
+
+#ifdef CONFIG_OPTICAL_GP2A
+static void gp2a_gpio_init(void)
+{
+	// int ret = gpio_request(GPIO_PS_ON, "gp2a_power_supply_on");
+	int ret = gpio_request(OMAP_GPIO_PS_OUT, "gp2a_power_supply_on");
+	if (ret)
+		printk(KERN_ERR "Failed to request gpio gp2a power supply.\n");
+}
+
+static int gp2a_power(bool on)
+{
+	/* this controls the power supply rail to the gp2a IC */
+	// gpio_direction_output(GPIO_PS_ON, on);
+	gpio_direction_output(OMAP_GPIO_PS_OUT, on);
+	return 0;
+}
+
+static int gp2a_light_adc_value(void)
+{
+	// return s3c_adc_get_adc_data(9);
+	// Should be change for TI Chip 
+	return 1;
+}
+
+static struct gp2a_platform_data gp2a_pdata = {
+	.power = gp2a_power,
+	.p_out = OMAP_GPIO_PS_OUT, // GPIO_PS_VOUT,
+	.light_adc_value = gp2a_light_adc_value
+};
+#endif 
+
 static struct i2c_board_info __initdata nowplus_i2c1_boardinfo[] = {
 	{
 		I2C_BOARD_INFO("twl5030", 0x48),
@@ -1205,11 +1467,15 @@ static struct i2c_board_info __initdata nowplus_i2c2_boardinfo[] = {
 /*	{
 		I2C_BOARD_INFO("akm8976", 0x1c),
 	},*/
-#if defined(CONFIG_FSA9480_MICROUSB)
+#if defined(CONFIG_USB_SWITCH_FSA9480)
 	{
-		I2C_BOARD_INFO("fsa9480", 0x25),
-		.flags = I2C_CLIENT_WAKE,
+		I2C_BOARD_INFO("fsa9480", 0x4A >> 1),
+		.platform_data = &fsa9480_pdata,
 		.irq = OMAP_GPIO_IRQ(OMAP_GPIO_USBSW_NINT),
+	},
+#elif defined(CONFIG_MICROUSBIC_INTR)
+	{
+		I2C_BOARD_INFO("microusbic", 0x25),
 	},
 #endif
 
@@ -1220,10 +1486,19 @@ static struct i2c_board_info __initdata nowplus_i2c2_boardinfo[] = {
 #else
         // use samsung driver
 		I2C_BOARD_INFO("secFuelgaugeDev", 0x36),
+#if 0   //(CONFIG_ARCHER_REV >= ARCHER_REV11)
+		.flags = I2C_CLIENT_WAKE,
+		.irq = OMAP_GPIO_IRQ(OMAP_GPIO_FUEL_INT_N),
+#endif
 #endif
 	},
 	{
+#ifdef CONFIG_OPTICAL_GP2A
+        I2C_BOARD_INFO("gp2a",      0x44),
+        .platform_data = &gp2a_pdata,
+#else 
 		I2C_BOARD_INFO("PL_driver", 0x44),
+#endif 
 	},
 	{
 		I2C_BOARD_INFO("max9877", 0x4d),
@@ -1244,23 +1519,93 @@ static struct synaptics_rmi4_platform_data synaptics_platform_data[] = {
 static struct i2c_board_info __initdata nowplus_i2c3_boardinfo[] = {
 	{
 		I2C_BOARD_INFO("synaptics_rmi4_i2c", 0x2C),
-                .irq = 0,
-                .platform_data = &synaptics_platform_data,
+        .irq = 0,
+        .platform_data = &synaptics_platform_data,
 	},
 };
 
 static int __init nowplus_i2c_init(void)
 {
-	omap_register_i2c_bus(2, 200, nowplus_i2c2_boardinfo,
-			ARRAY_SIZE(nowplus_i2c2_boardinfo));
-
-	omap_register_i2c_bus(1, 400, nowplus_i2c1_boardinfo,
-			ARRAY_SIZE(nowplus_i2c1_boardinfo));
-
-	omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
-			ARRAY_SIZE(nowplus_i2c3_boardinfo));
+	/* CSR ID:- OMAPS00222372 Changed the order of I2C Bus Registration 
+ 	*  Previously I2C1 channel 1 was being registered followed by I2C2 but since
+ 	*  TWL4030-USB module had a dependency on FSA9480 USB Switch device which is
+ 	*  connected to I2C2 channel, changed the order such that I2C channel 2 will get
+ 	*  registered first and then followed by I2C1 channel. */
+	printk("=======================================\n");
+	printk("omap_i2c_init :: nowplus_i2c_boardinfo1 \n");
+	printk("=======================================\n");  
+	omap_register_i2c_bus(2, 200, nowplus_i2c2_boardinfo, ARRAY_SIZE(nowplus_i2c2_boardinfo));
+	
+    printk("=======================================\n");
+	printk("omap_i2c_init :: archer_i2c_boardinfo2  \n");
+	printk("=======================================\n");  
+	omap_register_i2c_bus(1, 400, nowplus_i2c1_boardinfo, ARRAY_SIZE(nowplus_i2c1_boardinfo));
+	
+    printk("=======================================\n");
+	printk("omap_i2c_init :: archer_i2c_boardinfo3\n");
+	printk("=======================================\n");  
+	omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo, ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return 0;
 }
+
+static struct omap_uart_port_info omap_serial_platform_data[] = {
+	{
+#if defined(CONFIG_SERIAL_OMAP_UART1_DMA)
+		.use_dma	= CONFIG_SERIAL_OMAP_UART1_DMA,
+		.dma_rx_buf_size = CONFIG_SERIAL_OMAP_UART1_RXDMA_BUFSIZE,
+		.dma_rx_timeout	= CONFIG_SERIAL_OMAP_UART1_RXDMA_TIMEOUT,
+#else
+		.use_dma	= 0,
+		.dma_rx_buf_size = 0,
+		.dma_rx_timeout	= 0,
+#endif /* CONFIG_SERIAL_OMAP_UART1_DMA */
+		.idle_timeout	= CONFIG_SERIAL_OMAP_IDLE_TIMEOUT,
+		.flags		= 1,
+	},
+	{
+#if defined(CONFIG_SERIAL_OMAP_UART2_DMA)
+		.use_dma	= CONFIG_SERIAL_OMAP_UART2_DMA,
+		.dma_rx_buf_size = CONFIG_SERIAL_OMAP_UART2_RXDMA_BUFSIZE,
+		.dma_rx_timeout	= CONFIG_SERIAL_OMAP_UART2_RXDMA_TIMEOUT,
+#else
+		.use_dma	= 0,
+		.dma_rx_buf_size = 0,
+		.dma_rx_timeout	= 0,
+#endif /* CONFIG_SERIAL_OMAP_UART2_DMA */
+		.idle_timeout	= CONFIG_SERIAL_OMAP_IDLE_TIMEOUT,
+		.flags		= 1,
+	},
+	{
+#if defined(CONFIG_SERIAL_OMAP_UART3_DMA)
+		.use_dma	= CONFIG_SERIAL_OMAP_UART3_DMA,
+		.dma_rx_buf_size = CONFIG_SERIAL_OMAP_UART3_RXDMA_BUFSIZE,
+		.dma_rx_timeout	= CONFIG_SERIAL_OMAP_UART3_RXDMA_TIMEOUT,
+#else
+		.use_dma	= 0,
+		.dma_rx_buf_size = 0,
+		.dma_rx_timeout	= 0,
+#endif /* CONFIG_SERIAL_OMAP_UART3_DMA */
+		.idle_timeout	= CONFIG_SERIAL_OMAP_IDLE_TIMEOUT,
+		.flags		= 1,
+	},
+	{
+#if defined(CONFIG_SERIAL_OMAP_UART4_DMA)
+		.use_dma	= CONFIG_SERIAL_OMAP_UART4_DMA,
+		.dma_rx_buf_size = CONFIG_SERIAL_OMAP_UART4_RXDMA_BUFSIZE,
+		.dma_rx_timeout	= CONFIG_SERIAL_OMAP_UART4_RXDMA_TIMEOUT,
+#else
+		.use_dma	= 0,
+		.dma_rx_buf_size = 0,
+		.dma_rx_timeout	= 0,
+#endif /* CONFIG_SERIAL_OMAP_UART3_DMA */
+		.idle_timeout	= CONFIG_SERIAL_OMAP_IDLE_TIMEOUT,
+		.flags		= 1,
+	},
+	{
+		.flags		= 0
+	}
+};
+
 
 static void config_wlan_gpio(void)
 {
@@ -1346,32 +1691,11 @@ static void config_camera_gpio(void)
 
 }
 
-static int __init wl127x_vio_leakage_fix(void)
-{
-	int ret = 0;
-
-	ret = gpio_request(OMAP_GPIO_BT_NSHUTDOWN, "wl127x_bten");
-	if (ret < 0) {
-		printk(KERN_ERR  "wl127x_bten gpio_%d request fail",
-						OMAP_GPIO_BT_NSHUTDOWN);
-		goto fail;
-	}
-
-	gpio_direction_output(OMAP_GPIO_BT_NSHUTDOWN, 1);
-	mdelay(10);
-	gpio_direction_output(OMAP_GPIO_BT_NSHUTDOWN, 0);
-	udelay(64);
-
-	gpio_free(OMAP_GPIO_BT_NSHUTDOWN);
-
-fail:
-	return ret;
-}
 
 static void mod_clock_correction(void)
 {
-    cm_write_mod_reg(0x00,OMAP3430ES2_SGX_MOD,CM_CLKSEL);
-    cm_write_mod_reg(0x04,OMAP3430_CAM_MOD,CM_CLKSEL);
+    cm_write_mod_reg(0x00, OMAP3430ES2_SGX_MOD, CM_CLKSEL);
+    cm_write_mod_reg(0x04, OMAP3430_CAM_MOD, CM_CLKSEL);
 }
 
 int config_twl4030_resource_remap( void )
@@ -1896,34 +2220,55 @@ static void synaptics_dev_init(void)
         gpio_direction_input(OMAP_GPIO_TOUCH_IRQ);
 }
 
+static void enable_board_wakeup_source(void)
+{
+	/* T2 interrupt line (keypad) */
+	omap_mux_init_signal("sys_nirq", OMAP_WAKEUP_EN | OMAP_PIN_INPUT_PULLUP);
+}
 void __init nowplus_peripherals_init(void)
 {
-
-	spi_register_board_info(nowplus_spi_board_info,
-			ARRAY_SIZE(nowplus_spi_board_info));
-
-//	platform_device_register(&archer_dss_device);
+   /* For Display */
+	spi_register_board_info(nowplus_spi_board_info, ARRAY_SIZE(nowplus_spi_board_info));
+	
+    nowplus_i2c_init();
 	synaptics_dev_init();
-	omap_serial_init();
+	omap_serial_init(omap_serial_platform_data);
 	config_wlan_gpio();
-
-    config_camera_gpio();
-	mod_clock_correction();
 	usb_musb_init(&musb_board_data);
+ #ifdef CONFIG_VIDEO_OMAP3
+    mod_clock_correction();
+#endif
+	enable_board_wakeup_source();
+
+    //remove beacuse gpiorequest only one time possible in new kernel
+    //config_camera_gpio();
+
+
 	//usb_ehci_init();  //Proper arguments should be passed
 }
+
+static const struct usbhs_omap_platform_data usbhs_pdata __initconst = {
+	.port_mode[0]		= OMAP_USBHS_PORT_MODE_UNUSED,
+	.port_mode[1]		= OMAP_EHCI_PORT_MODE_PHY,
+	.port_mode[2]		= OMAP_USBHS_PORT_MODE_UNUSED,
+	.phy_reset		    = true,
+	.reset_gpio_port[0]	= -EINVAL,
+	.reset_gpio_port[1]	= 64,
+	.reset_gpio_port[2]	= -EINVAL,
+};
 
 static void __init nowplus_init_irq(void)
 {
 	omap_board_config = nowplus_config;
 	omap_board_config_size = ARRAY_SIZE(nowplus_config);
+    //removed for new kernel:
+	//omap3_pm_init_vc(&omap3_setuptime_table);
+	//omap3_pm_init_cpuidle(omap3_cpuidle_params_table);
 
-	omap_init_irq();
-	omap3_pm_init_vc(&omap3_setuptime_table);
-	omap3_pm_init_cpuidle(omap3_cpuidle_params_table);
-
-	omap2_init_common_hw(nowplus_sdrc_params, nowplus_sdrc_params,omap3_mpu_rate_table,
-				 omap3_dsp_rate_table, omap3_l3_rate_table);
+	omap2_init_common_hw(nowplus_sdrc_params, NULL);
+    
+    omap2_gp_clockevent_set_gptimer(1);
+    omap_init_irq();
 }
 
 static void __init nowplus_init(void)
@@ -1932,29 +2277,22 @@ static void __init nowplus_init(void)
 	u32 regval;
 
 	printk("\n.....[Nowplus] Initializing...\n");
+	
+    omap3_mux_init(board_mux, OMAP_PACKAGE_CBB);
+	omap_gpio_out_init();	
+    set_wakeup_gpio();
+    msecure_init();
 
-	// change reset duration (PRM_RSTTIME register)
+    // change reset duration (PRM_RSTTIME register)
 	regval = omap_readl(0x48307254);
 	regval |= 0xFF;
 	omap_writew(regval, 0x48307254);
 
-	omap3_mux_init(board_mux, OMAP_PACKAGE_CBB);
-
-	if( omap_gpio_out_init() ){
-		printk( "nowplus gpio ouput set fail!!!!\n" );
-	}
-	printk("Gpio Output Setting Done");
-
-    set_wakeup_gpio();
-
     get_powerup_reason(str_powerup_reason);
     printk( "\n\n <Powerup Reason : %s>\n\n", str_powerup_reason);
 
-	nowplus_i2c_init();
-
-	platform_add_devices(nowplus_devices,
-			ARRAY_SIZE(nowplus_devices));
-
+	platform_add_devices(nowplus_devices, ARRAY_SIZE(nowplus_devices));
+// For Regulator Framework :
 	nowplus_vaux3_supply.dev = &nowplus_lcd_device.dev;
 	nowplus_vaux4_supply.dev = &nowplus_lcd_device.dev;
 	nowplus_vpll2_supply.dev = &nowplus_lcd_device.dev;
@@ -1962,39 +2300,50 @@ static void __init nowplus_init(void)
 	nowplus_usb_data.batt_dev = &samsung_battery_device.dev;
 	nowplus_usb_data.charger_dev = &samsung_charger_device.dev;
     nowplus_usb_data.switch_dev = &headset_switch_device.dev; //Added for Regulator
+	
+    get_board_hw_rev();
 
-	msecure_init();
+    sec_class = class_create(THIS_MODULE, "sec");
+    if (IS_ERR(sec_class))
+        pr_err("Failed to create class(sec)!\n");
 
-	nowplus_ramconsole_init();
-	nowplus_init_power_key();
-	nowplus_init_ear_key();
-	nowplus_init_battery();
-	nowplus_init_platform();
-	nowplus_init_lcd();
-	nowplus_init_PL();
+	nowplus_param_sysfs_init();
+    
+#if defined(CONFIG_SAMSUNG_SETPRIO)
+	nowplus_sec_setprio_sysfs_init();
+#endif
 
-	nowplus_init_fmradio();
-	wl127x_vio_leakage_fix();
 
 	//nowplus_init_mmc1();
 //	nowplus_init_movi_nand();
 //	nowplus_init_sound();
 //	nowplus_init_earphone();
 
-	get_board_hw_rev();
-
-    sec_class = class_create(THIS_MODULE, "sec");
-    if (IS_ERR(sec_class))
-    {
-            pr_err("Failed to create class(sec)!\n");
-    }
-
-	nowplus_param_sysfs_init();
-
-	/* andre.b.kim : added sec_setprio as module */
-	nowplus_sec_setprio_sysfs_init();
-
 	nowplus_peripherals_init();
+    omap_display_init(&nowplus_dss_data);  
+    usb_uhhtll_init(&usbhs_pdata);
+    
+#ifdef CONFIG_OMAP_SMARTREFLEX_CLASS3
+    sr_class3_init();
+#endif
+
+	nowplus_ramconsole_init();
+	nowplus_init_power_key();
+#ifdef CONFIG_INPUT_ZEUS_EAR_KEY
+	nowplus_init_ear_key();
+#endif
+	nowplus_init_battery();
+	nowplus_init_platform();
+	nowplus_init_lcd();
+	nowplus_init_PL();
+	nowplus_init_fmradio();
+#ifdef CONFIG_PM
+#ifdef CONFIG_TWL4030_CORE
+	omap_voltage_register_pmic(&omap_pmic_core, "core");
+	omap_voltage_register_pmic(&omap_pmic_mpu, "mpu");
+#endif
+	omap_voltage_init_vc(&vc_config);
+#endif
 }
 
 #if 0
@@ -2016,7 +2365,7 @@ static void __init bootloader_reserve_sdram(void)
 static void __init nowplus_map_io(void)
 {
 	omap2_set_globals_343x();
-	omap2_map_common_io();
+	omap34xx_map_common_io();
 	omap2_ramconsole_reserve_sdram();
 	#if 0
 	bootloader_reserve_sdram();
@@ -2028,7 +2377,7 @@ static void __init nowplus_fixup(struct machine_desc *desc,
 					struct meminfo *mi)
 {
 	mi->bank[0].start = 0x80000000;
-	mi->bank[0].size = 256 * SZ_1M; // DDR 128MB
+	mi->bank[0].size = 256 * SZ_1M; // DDR 256MB
 	mi->bank[0].node = 0;
 
 	mi->nr_banks = 1;
@@ -2036,12 +2385,12 @@ static void __init nowplus_fixup(struct machine_desc *desc,
 }
 
 MACHINE_START(NOWPLUS, "Samsung NOWPLUS board")
-	.phys_io	= 0x48000000,
+	.phys_io	    = 0x48000000,
 	.io_pg_offst	= ((0xfa000000) >> 18) & 0xfffc,
 	.boot_params	= 0x80000100,
-	.fixup		= nowplus_fixup,
-	.map_io		= nowplus_map_io,
-	.init_irq	= nowplus_init_irq,
+	.fixup		    = nowplus_fixup,
+	.map_io		    = nowplus_map_io,
+	.init_irq	    = nowplus_init_irq,
 	.init_machine	= nowplus_init,
-	.timer		= &omap_timer,
+	.timer		    = &omap_timer,
 MACHINE_END

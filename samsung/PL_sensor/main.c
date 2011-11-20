@@ -905,7 +905,7 @@ int __init PL_driver_init(void)
 
     /*Proximity sensor: IRQ*/
     /**********************************************************/
-	GPIO_setting(); // ryun
+//GPIO_setting(); //we do it in board file// ryun
 
     // GPIO for ALS_EN
     #ifdef CONFIG_MACH_OSCAR
