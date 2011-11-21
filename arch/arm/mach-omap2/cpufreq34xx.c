@@ -43,7 +43,7 @@ struct clk *dpll1_clk, *dpll2_clk, *dpll3_clk;
 
 static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* MPU OPP1 */
-	OMAP_OPP_DEF("mpu", true, 125000000, 0975000),
+	OMAP_OPP_DEF("mpu", true, 125000000,  975000),
 	/* MPU OPP2 */
 	OMAP_OPP_DEF("mpu", true, 250000000, 1075000),
 	/* MPU OPP3 */
@@ -62,7 +62,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	 * impact that frequency will do to the MPU and the whole system in
 	 * general.
 	 */
-	OMAP_OPP_DEF("l3_main", false, 41500000, 975000),
+	OMAP_OPP_DEF("l3_main", false, 41500000,  975000),
 	/* L3 OPP2 */
 	OMAP_OPP_DEF("l3_main", false, 83000000, 1050000),
 	/* L3 OPP3 */
@@ -70,7 +70,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 
 
 	/* DSP OPP1 */
-	OMAP_OPP_DEF("iva", true, 90000000,  0975000),
+	OMAP_OPP_DEF("iva", true, 90000000,   975000),
 	/* DSP OPP2 */                      
 	OMAP_OPP_DEF("iva", true, 180000000, 1075000),
 	/* DSP OPP3 */                      

@@ -44,7 +44,7 @@
 
 #include "dss.h"
 
-#if defined(CONFIG_MACH_SAMSUNG_ARCHER)
+#if defined(CONFIG_MACH_SAMSUNG_NOWPLUS)
 extern void dss_set_mainclk_state(bool mainclk_state);
 #endif
 
@@ -831,7 +831,7 @@ static int omap_dss_suspend(struct platform_device *pdev, pm_message_t state)
 		 */
 		dss_clk_disable_no_ctx(DSS_CLK_ICK | DSS_CLK_FCK1 | DSS_CLK_54M);
 		
-		#if defined(CONFIG_MACH_SAMSUNG_ARCHER)
+		#if defined(CONFIG_MACH_SAMSUNG_NOWPLUS)
 			dss_set_mainclk_state(false);
 		#endif
 	}
@@ -853,7 +853,7 @@ static int omap_dss_resume(struct platform_device *pdev)
 	 dss_clk_enable_no_ctx(DSS_CLK_ICK | DSS_CLK_FCK1 | DSS_CLK_54M);
 	
 
-#if defined(CONFIG_MACH_SAMSUNG_ARCHER)
+#if defined(CONFIG_MACH_SAMSUNG_NOWPLUS)
 	dss_set_mainclk_state(true);
 #endif
 

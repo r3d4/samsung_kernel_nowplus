@@ -93,6 +93,7 @@ struct musb_hdrc_config {
 
 };
 
+
 struct musb_hdrc_platform_data {
 	/* MUSB_HOST, MUSB_PERIPHERAL, or MUSB_OTG */
 	u8		mode;
@@ -149,12 +150,13 @@ struct musb_hdrc_platform_data {
 						u8 agent_id, long r);
 };
 
-
 /* TUSB 6010 support */
 
 #define	TUSB6010_OSCCLK_60	16667	/* psec/clk @ 60.0 MHz */
 #define	TUSB6010_REFCLK_24	41667	/* psec/clk @ 24.0 MHz XI */
 #define	TUSB6010_REFCLK_19	52083	/* psec/clk @ 19.2 MHz CLKIN */
+
+
 
 #ifdef	CONFIG_ARCH_OMAP2
 

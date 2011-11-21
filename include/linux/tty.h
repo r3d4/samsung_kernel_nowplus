@@ -289,7 +289,7 @@ struct tty_struct {
 	void *driver_data;
 	struct list_head tty_files;
 
-#if defined(CONFIG_SAMSUNG_ARCHER_TARGET_SK)
+#if defined(CONFIG_MACH_SAMSUNG_NOWPLUS)
 #undef N_TTY_BUF_SIZE
 #define N_TTY_BUF_SIZE 32768
 #endif

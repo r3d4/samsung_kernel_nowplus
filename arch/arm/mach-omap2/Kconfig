@@ -286,7 +286,7 @@ config MACH_OMAP_SAMSUNG
 	depends on ARCH_OMAP3 
 	default n
 	
-config MACH_NOWPLUS
+config MACH_SAMSUNG_NOWPLUS
     bool "Samsung Nowplus Board"
 	default y
 	select MACH_OMAP_SAMSUNG
@@ -332,11 +332,11 @@ choice
 config SAMSUNG_HW_EMU_BOARD
 	bool "Samsung HW EMUL-Board"
 	default n
-
+    
 config SAMSUNG_HW_REL_BOARD
 	bool "Samsung HW REAL-Board"
 	default y
-	
+    
 endchoice
 
 config SAMSUNG_EMU_HW_REV

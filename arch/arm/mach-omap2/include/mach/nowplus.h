@@ -76,6 +76,28 @@ typedef enum {
 					"omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=\"0:4M\""
 #endif
 
+/* REBOOT_MODE */
+#define REBOOT_MODE_NONE                0
+#define REBOOT_MODE_DOWNLOAD            1
+#define REBOOT_MODE_CHARGING            3
+#define REBOOT_MODE_RECOVERY            4
+#define REBOOT_MODE_ARM11_FOTA          5
+#define REBOOT_MODE_ARM9_FOTA           6
+
+typedef enum {
+	baud_1200,
+	baud_2400,
+	baud_4800,
+	baud_9600,
+	baud_19200,
+	baud_38400,
+	baud_57600,
+	baud_115200,
+	baud_230400,
+	baud_380400,
+	baud_460800,
+	baud_921600
+} serial_baud_t;
 
 extern void (*sec_set_param_value)(int idx, void *value);
 extern void (*sec_get_param_value)(int idx, void *value);

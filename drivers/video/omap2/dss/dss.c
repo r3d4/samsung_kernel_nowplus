@@ -145,7 +145,7 @@ bool dss_get_mainclk_state()
 	return dss.mainclk_state;
 }
 
-#if defined(CONFIG_MACH_SAMSUNG_ARCHER)
+#if defined(CONFIG_MACH_SAMSUNG_NOWPLUS)
 void dss_set_mainclk_state(bool mainclk_state)
 {
 	dss.mainclk_state = mainclk_state;

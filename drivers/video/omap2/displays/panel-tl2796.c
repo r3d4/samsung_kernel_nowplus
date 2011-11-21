@@ -214,7 +214,10 @@ static int tl2796_panel_suspend(struct omap_dss_device *dssdev)
 	spi_setup(tl2796lcd_spi);
 
     tl2796_lcd_poweroff();
-    
+     
+	 
+	dssdev->state = OMAP_DSS_DISPLAY_SUSPENDED;
+
 	return 0;
 }
 

@@ -53,6 +53,40 @@ static int def_tiler;
 static int def_rotate;
 static int def_mirror;
 
+int draw_progress = 1;
+#ifdef CONFIG_FB_DISPLAY_LOGO
+static int def_progress = 1;
+static int progress_flag = 0;
+static int progress_pos;
+static struct timer_list progress_timer;
+
+#define LOGO_MEM_BASE		(0x95000000 - 0x200000)
+#define LOGO_MEM_SIZE		(800 * 480 * 4)
+#define LCD_WIDTH				480
+#define PROGRESS_BAR_LEFT_POS	56
+#define PROGRESS_BAR_RIGHT_POS	424
+#define PROGRESS_BAR_START_Y	579
+#define PROGRESS_BAR_WIDTH		1
+#define PROGRESS_BAR_HEIGHT		2   
+
+// Png Image => bmp Image => Bmp header delete ==> Raw Data insert 
+static unsigned char anycall_progress_bar[] = 
+{
+    0xFE, 0XC5, 0x00, 0x00, 0xFE, 0XC5, 0x00, 0x00
+};
+
+static void omapfb_fb_update
+(
+	struct fb_info *fbi,
+	void *buf_ptr,
+	int src_width,
+	int src_starting_row,
+	int src_starting_column,
+	int num_of_rows,
+	int num_of_columns
+);
+static void progress_timer_handler(unsigned long data);
+#endif 
 
 #ifdef DEBUG
 unsigned int omapfb_debug;
@@ -1544,6 +1578,21 @@ static int omapfb_alloc_fbmem(struct fb_info *fbi, unsigned long size,
 		vaddr = NULL;
 	}
 
+#ifdef CONFIG_FB_DISPLAY_LOGO 
+	if(vaddr)
+	{
+		if (def_progress)
+		{
+			u8 *logo_virt_buf;
+			logo_virt_buf = phys_to_virt(LOGO_MEM_BASE);
+			memcpy(vaddr, logo_virt_buf, LOGO_MEM_SIZE);
+		}
+		else
+		{
+			memset(vaddr, 0x0, LOGO_MEM_SIZE);
+		}
+	}
+#endif 
 	rg->paddr = paddr;
 	rg->vaddr = vaddr;
 	rg->size = size;
@@ -1874,6 +1923,101 @@ err:
 	return r;
 }
 
+#ifdef CONFIG_FB_DISPLAY_LOGO
+void fb_start_progress(struct fb_info *fbi)
+{
+	struct omapfb_info    *ofbi  = FB2OFB(fbi);
+	struct omapfb2_device *fbdev = ofbi->fbdev;
+
+	init_timer(&progress_timer);
+	progress_timer.expires  = (get_jiffies_64() + (HZ/10));
+	progress_timer.data     = (long)fbdev->fbs[0];
+	progress_timer.function = progress_timer_handler;
+	progress_pos = PROGRESS_BAR_LEFT_POS;
+
+	printk(KERN_INFO " **** [LCD] fb_start_progress.\n");
+
+	omapfb_fb_update(fbdev->fbs[0],
+			(void*)anycall_progress_bar,
+			LCD_WIDTH,
+			PROGRESS_BAR_START_Y,
+			PROGRESS_BAR_LEFT_POS,
+			PROGRESS_BAR_HEIGHT,
+			PROGRESS_BAR_WIDTH);
+
+	progress_pos += PROGRESS_BAR_WIDTH;
+
+	omapfb_fb_update(fbdev->fbs[0],
+		(void*)anycall_progress_bar,
+		LCD_WIDTH,
+		PROGRESS_BAR_START_Y,
+		progress_pos,
+		PROGRESS_BAR_HEIGHT,
+		PROGRESS_BAR_WIDTH);
+
+	add_timer(&progress_timer);
+	progress_flag = 1;
+}
+
+void fb_stop_progress(void)
+{
+	if (progress_flag == 0)
+		return;
+	del_timer(&progress_timer);
+	progress_flag = 0;
+}
+
+static void omapfb_fb_update
+(
+	struct fb_info *fbi,
+	void *buf_ptr,
+	int src_width,
+	int src_starting_row,
+	int src_starting_column,
+	int num_of_rows,
+	int num_of_columns
+)
+{
+	int pos_cnt;
+	int row;
+	unsigned long *src_ptr = (unsigned long *)buf_ptr;
+	unsigned long *fb_ptr = (unsigned long *)fbi->screen_base;
+
+	fb_ptr += src_starting_row * src_width + src_starting_column;
+
+	for (row = 0; row < num_of_rows; row++)
+	{
+		for (pos_cnt = 0;pos_cnt < num_of_columns;pos_cnt++)
+		{
+			*fb_ptr++ = *src_ptr++;
+		}
+		fb_ptr += (src_width - num_of_columns);
+	}
+}
+
+static void progress_timer_handler(unsigned long data)
+{
+	omapfb_fb_update((struct fb_info *)data,
+		(void*)anycall_progress_bar,
+		LCD_WIDTH,
+		PROGRESS_BAR_START_Y,
+		progress_pos++,
+		PROGRESS_BAR_HEIGHT,
+		PROGRESS_BAR_WIDTH);
+
+    if (progress_pos >= PROGRESS_BAR_RIGHT_POS || !draw_progress)
+    {
+        fb_stop_progress();
+    }
+    else
+    {
+        progress_timer.expires = (get_jiffies_64() + (HZ/26)); 
+        progress_timer.function = progress_timer_handler; 
+        add_timer(&progress_timer);
+    }
+}
+#endif 
+
 /* initialize fb_info, var, fix to something sane based on the display */
 static int omapfb_fb_init(struct omapfb2_device *fbdev, struct fb_info *fbi)
 {
@@ -1982,6 +2126,14 @@ static int omapfb_fb_init(struct omapfb2_device *fbdev, struct fb_info *fbi)
 	if (r)
 		dev_err(fbdev->dev, "unable to allocate color map memory\n");
 
+#ifdef CONFIG_FB_DISPLAY_LOGO	
+	if (def_progress)
+    {
+        fb_start_progress(fbi);
+    }
+
+    printk(KERN_INFO " **** [LCD] omapfb_fb_init :: END.\n");
+#endif 
 
 err:
 	return r;
@@ -2584,7 +2736,9 @@ module_param_named(vrfb, def_vrfb, bool, 0);
 module_param_named(tiler, def_tiler, bool, 0);
 #endif
 module_param_named(mirror, def_mirror, bool, 0);
-
+#ifdef CONFIG_FB_DISPLAY_LOGO	
+module_param_named(progress, def_progress, bool, 0); 
+#endif 
 
 /* late_initcall to let panel/ctrl drivers loaded first.
  * I guess better option would be a more dynamic approach,

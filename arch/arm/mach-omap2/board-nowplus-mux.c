@@ -6,8 +6,27 @@
  * published by the Free Software Foundation.
  */
 
+#include	<plat/mcspi.h>
+#include	<plat/mux.h>
+#include	<plat/timer-gp.h>
+#include	<plat/board.h>
+#include	<plat/usb.h>
+#include	<plat/common.h>
+#include	<plat/dma.h>
+#include	<plat/gpmc.h>
+#include	<plat/display.h>
+#include 	<plat/opp_twl_tps.h>
+#include	<plat/control.h>
+#include	<plat/omap-pm.h>
+#include	<plat/mux_nowplus.h>
+#include	<plat/prcm.h>
+#include	"cm.h"
+
+#include	"mux.h"
+
+
 #ifdef CONFIG_OMAP_MUX
-struct omap_board_mux board_mux[] __initdata = {
+struct omap_board_mux board_mux[]  = {
         OMAP3_MUX(SDRC_D0,              OMAP34XX_PIN_INPUT),
         OMAP3_MUX(SDRC_D1,              OMAP34XX_PIN_INPUT),
         OMAP3_MUX(SDRC_D2,              OMAP34XX_PIN_INPUT),
@@ -106,8 +125,8 @@ struct omap_board_mux board_mux[] __initdata = {
         OMAP3_MUX(GPMC_NCS5,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT),
         OMAP3_MUX(GPMC_NCS6,            OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP ),
 //OMAP_GPIO_USB_TRIGGER, gpio58, not connect on hardware used as irq source
-OMAP3_MUX(GPMC_NCS7,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT),
-//OMAP3_MUX(GPMC_NCS7,             OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP),
+//OMAP3_MUX(GPMC_NCS7,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT),
+OMAP3_MUX(GPMC_NCS7,             OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT_PULLUP),
         OMAP3_MUX(GPMC_CLK,             OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN),
         OMAP3_MUX(GPMC_NADV_ALE,        OMAP34XX_MUX_MODE0),
 
@@ -578,7 +597,6 @@ OMAP3_MUX(GPMC_NCS7,            OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT),
 
         //"NO USED"
         OMAP3_MUX(ETK_D15,                      OMAP34XX_MUX_MODE7 | OMAP34XX_PIN_INPUT | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),
-
         OMAP3_MUX(SAD2D_SWAKEUP,        OMAP34XX_MUX_MODE0 | OMAP34XX_PIN_INPUT_PULLDOWN),
 
         { .reg_offset = OMAP_MUX_TERMINATOR },

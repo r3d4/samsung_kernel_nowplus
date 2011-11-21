@@ -205,11 +205,11 @@ obj-$(CONFIG_MACH_OMAP3517EVM)		+= board-am3517evm.o
 
 obj-$(CONFIG_MACH_SBC3530)		+= board-omap3stalker.o \
 					   hsmmc.o
-obj-$(CONFIG_MACH_SAMSUN_NOWPLUS)    += board-nowplus.o \
-                                        board-nowplus-mux.o
-                                             hsmmc.o sec_switch.o
-obj-$(CONFIG_MACH_SAMSUNG_ARCHER)                 += board-archer.o \
-                                             hsmmc.o sec_switch.o
+obj-$(CONFIG_MACH_SAMSUNG_NOWPLUS)	 += board-nowplus.o \
+										 board-nowplus-mux.o \
+										hsmmc.o sec_switch.o
+obj-$(CONFIG_MACH_SAMSUNG_ARCHER)		 += board-archer.o \
+										hsmmc.o sec_switch.o
 # Platform specific device init code
 obj-y					+= usb-musb.o
 obj-$(CONFIG_MACH_OMAP2_TUSB6010)	+= usb-tusb6010.o

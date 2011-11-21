@@ -22,12 +22,13 @@
 #include <linux/interrupt.h>
 #include <linux/gpio.h>
 #include <linux/max17040_battery.h>
+#include <linux/slab.h>
+#include <linux/fsa9480.h>
 
 #include <asm/mach/irq.h>
 #include <asm/io.h>
 #include <mach/gpio.h>
 
-u8 fsa9480_get_charger_status(void);
 //#include <mach/regs-gpio.h>
 
 //#include <plat/gpio-cfg.h>
@@ -45,8 +46,9 @@ u8 fsa9480_get_charger_status(void);
 #define MAX17040_CMD_MSB	0xFE
 #define MAX17040_CMD_LSB	0xFF
 
-#define MAX17040_DELAY		msecs_to_jiffies(1000)
+#define MAX17040_DELAY			msecs_to_jiffies(1000)
 #define MAX17040_BATTERY_FULL	95
+#define MAX17040_BATTERY_CHG	90  //add for hysteresis
 
 struct max17040_chip {
 	struct i2c_client		*client;
@@ -119,7 +121,7 @@ static int usb_get_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_ONLINE:
-		chip->usb_online = fsa9480_get_charger_status();
+		chip->usb_online = (chip->pdata->charger_online() == CABLE_TYPE_USB)?1:0;
 		val->intval =  chip->usb_online;
 		break;
 	default:
@@ -141,7 +143,7 @@ static int adapter_get_property(struct power_supply *psy,
 	switch (psp) {
 	case POWER_SUPPLY_PROP_PRESENT:
 	case POWER_SUPPLY_PROP_ONLINE:
-		val->intval = fsa9480_get_charger_status();
+		val->intval = (chip->pdata->charger_online() == CABLE_TYPE_AC)?1:0;
 		break;
 	default:
 		ret = -EINVAL;
@@ -236,40 +238,40 @@ static void max17040_get_online(struct i2c_client *client)
 static void max17040_get_status(struct i2c_client *client)
 {
 	struct max17040_chip *chip = i2c_get_clientdata(client);
-
+    static int old_soc = -1;
 
 	if (!chip->pdata->charger_online || !chip->pdata->charger_enable) {
 		chip->status = POWER_SUPPLY_STATUS_UNKNOWN;
 		return;
 	}
-
-	if (chip->online) {
-		//if(chip->pdata->charger_done()) 
-		if(chip->soc > MAX17040_BATTERY_FULL)
-		{
+    if (chip->online) { //charger is present
+        //if(chip->pdata->charger_done()) 
+        if(chip->soc > MAX17040_BATTERY_FULL)
+        {
 //			printk("charger_disable() \n");
-			chip->pdata->charger_disable();
-			chip->status = POWER_SUPPLY_STATUS_FULL;
-		}
-		else {
-			if(chip->soc > MAX17040_BATTERY_FULL)
-				chip->status = POWER_SUPPLY_STATUS_FULL;
-			else {
-				if (chip->pdata->charger_enable())
-					chip->status = POWER_SUPPLY_STATUS_CHARGING;
-				else
-					chip->status = POWER_SUPPLY_STATUS_NOT_CHARGING;
-			}
-		}
-	}
-	else {
-		if((chip->status == POWER_SUPPLY_STATUS_CHARGING)||(chip->status == POWER_SUPPLY_STATUS_FULL))
-			chip->pdata->charger_disable();
-		
-		chip->status = POWER_SUPPLY_STATUS_DISCHARGING;
-	}
-
-
+            chip->pdata->charger_disable();
+            chip->status = POWER_SUPPLY_STATUS_FULL;
+        }
+        else {
+            // add hysteresis
+            if(chip->soc <= MAX17040_BATTERY_CHG)
+            {
+                if (chip->pdata->charger_enable())
+                    chip->status = POWER_SUPPLY_STATUS_CHARGING;
+                else
+                    chip->status = POWER_SUPPLY_STATUS_NOT_CHARGING;
+             }
+             else
+                chip->status = POWER_SUPPLY_STATUS_DISCHARGING;
+        }
+        
+    }
+    else {  //no charger
+        if((chip->status == POWER_SUPPLY_STATUS_CHARGING)||(chip->status == POWER_SUPPLY_STATUS_FULL))
+            chip->pdata->charger_disable();
+        
+        chip->status = POWER_SUPPLY_STATUS_DISCHARGING;
+    }
 }
 
 static void max17040_work(struct work_struct *work)
@@ -282,11 +284,13 @@ static void max17040_work(struct work_struct *work)
 	old_online = chip->usb_online;
 	old_usb_online = chip->usb_online;
 	old_vcell = chip->vcell;
-	old_soc = old_soc;
+	old_soc = chip->soc;
 	max17040_get_online(chip->client);
 	max17040_get_vcell(chip->client);
 	max17040_get_soc(chip->client);
 	max17040_get_status(chip->client);
+	
+	printk("MAX17040: soc=%d %%, vbat=%d mV", chip->soc,  chip->vcell);
 
 	if((old_vcell != chip->vcell) || (old_soc != chip->soc))
 		power_supply_changed(&chip->battery);
@@ -345,7 +349,7 @@ static int __devinit max17040_probe(struct i2c_client *client,
 {
 	struct i2c_adapter *adapter = to_i2c_adapter(client->dev.parent);
 	struct max17040_chip *chip;
-	int ret, i;
+	int ret;
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE))
 		return -EIO;

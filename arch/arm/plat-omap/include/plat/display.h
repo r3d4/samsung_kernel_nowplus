@@ -465,6 +465,13 @@ struct omap_dss_color_weight_coef {
 	int br, bg, bb;
 };
 
+struct omap_color_conv_coef {
+	int  ry,  rcr,  rcb;
+	int  gy,  gcr,  gcb;
+	int  by,  bcr,  bcb;
+	int  full_range;
+};
+
 struct omap_dss_yuv2rgb_conv {
 	enum omap_dss_color_conv_type type;
 	struct omap_dss_color_weight_coef *weight_coef;

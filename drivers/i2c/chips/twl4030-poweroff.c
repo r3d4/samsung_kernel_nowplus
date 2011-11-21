@@ -24,10 +24,10 @@
 #include <linux/module.h>
 #include <linux/pm.h>
 #include <linux/i2c/twl.h>
-
+#include <linux/fsa9480.h>
 #include <mach/gpio.h>
 #include <plat/mux.h>
-#include <plat/microusbic.h>
+
 #if defined(CONFIG_USB_ANDROID)
 #include <linux/usb/android_composite.h>
 #endif
@@ -37,31 +37,16 @@
 #define PWR_DEVOFF	(1<<0)
 
 
-#define GPIO_PS_HOLD		25
-#define GPIO_MSM_RST		178
-#define GPIO_FONE_ACTIVE 	140	
+// prototypes
+extern void tl2796_lcd_poweroff(void);
+extern void omap_watchdog_reset(void);
+extern int sec_switch_get_cable_status(void);
 
 static void twl4030_poweroff(void)
 {
 	u8 val;
 	int err;
-#if 0	
-	/* Make sure SEQ_OFFSYNC is set so that all the res goes to wait-on */
-	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
-				   CFG_P123_TRANSITION);
-	if (err) {
-		pr_warning("I2C error %d while reading TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
-		return;
-	}
 
-	val |= SEQ_OFFSYNC;
-	err = twl_i2c_write_u8(TWL4030_MODULE_PM_MASTER, val,
-				    CFG_P123_TRANSITION);
-	if (err) {
-		pr_warning("I2C error %d while writing TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
-		return;
-	}
-#endif
 	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
 				  PWR_P1_SW_EVENTS);
 	if (err) {
@@ -85,9 +70,6 @@ static void twl4030_poweroff(void)
 }
 
 
-extern void tl2796_lcd_poweroff(void);
-extern void omap_watchdog_reset(void);
-
 static void zeus_poweroff(void)
 {
 	/* int n_usbic_state; */
@@ -98,15 +80,18 @@ static void zeus_poweroff(void)
 	android_usb_set_connected(0);
 #endif
 
+	tl2796_lcd_poweroff();
+	
 	/* get_real_usbic_state(); */
 	//gpio_direction_output(GPIO_MSM_RST,0);
 	//gpio_direction_output(GPIO_FONE_ACTIVE, 0);
 	// if (GPIO_TA_CONNECTED_N is LOW)
-#if 1
-	if ( get_real_usbic_state() )
-#else
-	if ( !gpio_get_value( OMAP_GPIO_TA_NCONNECTED ) || gpio_get_value( OMAP_GPIO_IF_CON_SENSE ) )
-#endif
+// #if (CONFIG_ARCHER_REV < ARCHER_REV13)
+	// if ( get_real_usbic_state() )
+// #else
+	// if ( !gpio_get_value( OMAP_GPIO_TA_NCONNECTED ) || gpio_get_value( OMAP_GPIO_IF_CON_SENSE ) )
+// #endif
+	if( sec_switch_get_cable_status() != CABLE_TYPE_NONE)
 	{
 		printk("Warmreset by TA or USB or Jtag\n\n");
 
@@ -135,7 +120,7 @@ static void zeus_poweroff(void)
 		printk("Power Off !\n\n");
 		while(1)
 		{
-			gpio_direction_output(GPIO_PS_HOLD, 0);
+			gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 0);
 
 			if (0 /*is_powerbutton_pressed*/)
 				printk("Power button is pressed\n\n");

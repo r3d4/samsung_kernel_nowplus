@@ -50,7 +50,7 @@ static u32 ce147_pre_state = CE147_STATE_INVALID;
 
 static bool ce147_720p_enable = false;
 
-int ce147_cap_started = 0;
+extern int ce147_cap_started;
 
 static struct ce147_sensor ce147 = {
 	.timeperframe = {

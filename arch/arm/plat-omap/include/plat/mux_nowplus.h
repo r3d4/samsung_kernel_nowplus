@@ -42,6 +42,7 @@
 #define OMAP34XX_PIN_OFF_NONE           0
 #define OMAP34XX_PIN_OFF_OUTPUT_HIGH    (OMAP3_OFF_EN | OMAP3_OFFOUT_VAL)
 #define OMAP34XX_PIN_OFF_OUTPUT_LOW     (OMAP3_OFF_EN)
+#define OMAP34XX_PIN_OFF_INPUT          (OMAP3_OFF_EN | OMAP3_OFFIN_EN)
 #define OMAP34XX_PIN_OFF_INPUT_PULLUP   (OMAP3_OFF_EN | OMAP3_OFFIN_EN \
                                                 | OMAP3_OFF_PULL_EN \
                                                 | OMAP3_OFF_PULL_UP)

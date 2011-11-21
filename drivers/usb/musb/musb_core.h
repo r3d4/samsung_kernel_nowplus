@@ -46,6 +46,8 @@
 #include <linux/usb/gadget.h>
 #include <linux/usb.h>
 #include <linux/usb/otg.h>
+#include <linux/platform_device.h>
+#include <plat/omap_device.h>
 #include <linux/usb/musb.h>
 
 struct musb;

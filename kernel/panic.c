@@ -354,7 +354,7 @@ typedef struct {
 	void *Excp_reserve4;
 }gExcpDebugInfo_t;
 
-extern gExcpDebugInfo_t *gExcpdebug_info;
+// extern gExcpDebugInfo_t *gExcpdebug_info;
 
 #ifdef CONFIG_SAMSUNG_KERNEL_DEBUG_USER
 int user_fault_enable = 0;
@@ -440,8 +440,8 @@ NORET_TYPE void panic(const char * fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
-	printk(KERN_EMERG "Build Info : %s, %s, %s\n", gExcpdebug_info->BuildRev, 
-			gExcpdebug_info->BuildDate, gExcpdebug_info->BuildTime );
+	// printk(KERN_EMERG "Build Info : %s, %s, %s\n", gExcpdebug_info->BuildRev, 
+			// gExcpdebug_info->BuildDate, gExcpdebug_info->BuildTime );
 	printk(KERN_EMERG "Kernel panic - not syncing: %s\n",buf);
 #ifdef CONFIG_DEBUG_BUGVERBOSE
 	dump_stack();

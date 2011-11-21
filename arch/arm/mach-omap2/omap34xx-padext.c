@@ -177,6 +177,7 @@ int omap34xx_pad_set_config_lcd(u16 pad_pin,u16 pad_val)
 }
 
 EXPORT_SYMBOL(omap34xx_pad_set_config_lcd);
+#if 0
 int omap34xx_pad_set_configs(struct pin_config *pin_configs, int n)
 {
 	unsigned long flags;
@@ -205,7 +206,7 @@ int omap34xx_pad_set_configs(struct pin_config *pin_configs, int n)
 	return 0;
 }
 EXPORT_SYMBOL(omap34xx_pad_set_configs);
-
+#endif
 
 int omap34xx_pad_set_padoff(int gpio, int wakeup_en)
 {

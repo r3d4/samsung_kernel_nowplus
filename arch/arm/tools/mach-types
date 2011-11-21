@@ -2930,7 +2930,7 @@ sky6410			MACH_SKY6410		SKY6410			2943
 dynasty			MACH_DYNASTY		DYNASTY			2944
 vivo			MACH_VIVO		VIVO			2945
 bury_bl7582		MACH_BURY_BL7582	BURY_BL7582		2946
-bury_bps5270		MACH_BURY_BPS5270	BURY_BPS5270		2947
+bury_bps5270	MACH_BURY_BPS5270	BURY_BPS5270		2947
 basi			MACH_BASI		BASI			2948
 tn200			MACH_TN200		TN200			2949
 c2mmi			MACH_C2MMI		C2MMI			2950
@@ -2949,7 +2949,7 @@ oratislink		MACH_ORATISLINK		ORATISLINK		2962
 davinci_dm365_dvr	MACH_DAVINCI_DM365_DVR	DAVINCI_DM365_DVR	2963
 netviz			MACH_NETVIZ		NETVIZ			2964
 flexibity		MACH_FLEXIBITY		FLEXIBITY		2965
-wlan_computer		MACH_WLAN_COMPUTER	WLAN_COMPUTER		2966
-archer                  MACH_SAMSUNG_ARCHER     SAMSUNG_ARCHER          1138
-latona                  MACH_LATONA             LATONA                  2968
-nowplus                 MACH_NOWPLUS            NOWPLUS                 1641
+wlan_computer	MACH_WLAN_COMPUTER	WLAN_COMPUTER		2966
+archer          MACH_SAMSUNG_ARCHER     SAMSUNG_ARCHER          1138
+latona          MACH_LATONA             LATONA                  2968
+nowplus         MACH_NOWPLUS            NOWPLUS                 1641

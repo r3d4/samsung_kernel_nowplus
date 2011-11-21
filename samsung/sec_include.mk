@@ -23,4 +23,4 @@
 # Version : Baby-Raccoon
 ##
 
-LINUXINCLUDE += -I$(srctree)/samsung/rfs_fsr/include
+#LINUXINCLUDE += -I$(srctree)/samsung/rfs_fsr/include

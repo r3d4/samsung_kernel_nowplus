@@ -35,7 +35,7 @@
 #include <linux/uaccess.h>
 #include <linux/fs.h>
 // ]
-#include <mach/archer.h>
+//#include <mach/archer.h>
 
 #define DRIVER_NAME "secBattMonitor"
 
@@ -1496,7 +1496,7 @@ static int __devinit battery_probe( struct platform_device *pdev )
 	batt_gptimer_12.expire_time =(unsigned int) MONITOR_DURATION_DUR_SLEEP;
 	batt_gptimer_12.expire_callback = &battery_monitor_fleeting_wakeup_handler;
 	batt_gptimer_12.data = (unsigned long) di;
-
+#if 0 //r3d4
 	if ( sec_get_param_value )
 	{
 		sec_get_param_value(__DEBUG_BLOCKPOPUP, &Debug_Usepopup);
@@ -1514,7 +1514,7 @@ static int __devinit battery_probe( struct platform_device *pdev )
 		sec_bci.battery.support_monitor_timeout = 0;
 		sec_bci.battery.support_monitor_full = 0;
 	}
-
+#endif
 	//schedule_delayed_work( &di->battery_monitor_work, 3*HZ );
 	queue_delayed_work( sec_bci.sec_battery_workq, &di->battery_monitor_work, 3*HZ );
 

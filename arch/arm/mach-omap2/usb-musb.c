@@ -20,6 +20,7 @@
 #include <linux/errno.h>
 #include <linux/delay.h>
 #include <linux/platform_device.h>
+#include <plat/omap_device.h>
 #include <linux/clk.h>
 #include <linux/dma-mapping.h>
 #include <linux/io.h>
@@ -33,7 +34,7 @@
 #include <mach/irqs.h>
 #include <plat/mux.h>
 #include <plat/usb.h>
-#include <plat/omap_device.h>
+
 #include <plat/omap_hwmod.h>
 #include <plat/omap-pm.h>
 

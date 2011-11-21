@@ -57,7 +57,7 @@ static int isp_complete_reset = 1;
 int flag_720p = 0;
 int isCamera = 0;
 
-extern int ce147_cap_started;
+int ce147_cap_started = 0;
 
 static void isp_save_ctx(struct device *dev);
 

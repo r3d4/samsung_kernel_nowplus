@@ -603,7 +603,7 @@ static void omap_uart_rtspad_init(struct omap_uart_state *uart)
 	switch (uart->num) {
 	// KMJ_db26
 	// Masking codes for preventing these codes to raise TSP_EN pin to high
-#ifndef CONFIG_MACH_NOWPLUS
+#ifndef CONFIG_MACH_SAMSUNG_NOWPLUS
 	case 0:
 		uart->rts_padconf = 0x17e;
 		break;

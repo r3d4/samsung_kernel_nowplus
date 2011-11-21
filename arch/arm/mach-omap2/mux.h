@@ -114,6 +114,11 @@ struct omap_mux_partition {
 	struct list_head	node;
 };
 
+struct omap_gpio_initdata {
+	int gpio;
+	int state;
+	char *name;
+};
 /**
  * struct omap_mux - data for omap mux register offset and it's value
  * @reg_offset:	mux register offset from the mux base

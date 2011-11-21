@@ -925,24 +925,21 @@ int __init omap_mux_init(const char * name, u32 flags,
 
 int omap_gpio_out_init( void )
 {
-	int ret = 0;
 	int i;
+	int gpio=output_gpio[i][0];
+	int state=output_gpio[i][1];
 
 	for( i = 0 ; i < ARRAY_SIZE( output_gpio ) ; i++ ) 
 	{
+		if (gpio_request(gpio, "") < 0) {
+			printk(KERN_ERR "can't get %d GPIO\n" , gpio);
+			return 0; 
+		}
+		gpio_direction_output(gpio, state);
+		gpio_free(gpio);
+	}
 
-        
-	    if (gpio_request(output_gpio[i][0], output_gpio[i][2]) < 0) {
-        printk(KERN_ERR "can't get %s GPIO\n" , output_gpio[i][2]);
-           return; 
-       }
-	    
-    gpio_direction_output(output_gpio[i][0], output_gpio[i][1]);
-  
-	
-}
-
-	return ret;
+	return 1;
 }
 
 
