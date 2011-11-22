@@ -257,10 +257,6 @@ static void max17040_work(struct work_struct *work)
 	max17040_get_soc(chip->client);
 	max17040_get_status(chip->client);
 #ifdef CONFIG_BATTERY_MAX17040_TEMP	
-
-	//workaround: turn usb1v8 un
-	// if((old_online != chip->online) || (old_usb_online != chip->usb_online))
-		// temp_adc_enable(chip->online);
 	// measure temp with twl ADC
 	max17040_get_temperature(chip->client);
 #endif
