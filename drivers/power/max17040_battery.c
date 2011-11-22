@@ -27,47 +27,12 @@
 #include <asm/io.h>
 #include <mach/gpio.h>
 
+#include "max17040.h"
+
 u8 fsa9480_get_charger_status(void);
 //#include <mach/regs-gpio.h>
 
 //#include <plat/gpio-cfg.h>
-
-#define MAX17040_VCELL_MSB	0x02
-#define MAX17040_VCELL_LSB	0x03
-#define MAX17040_SOC_MSB	0x04
-#define MAX17040_SOC_LSB	0x05
-#define MAX17040_MODE_MSB	0x06
-#define MAX17040_MODE_LSB	0x07
-#define MAX17040_VER_MSB	0x08
-#define MAX17040_VER_LSB	0x09
-#define MAX17040_RCOMP_MSB	0x0C
-#define MAX17040_RCOMP_LSB	0x0D
-#define MAX17040_CMD_MSB	0xFE
-#define MAX17040_CMD_LSB	0xFF
-
-#define MAX17040_DELAY		msecs_to_jiffies(1000)
-#define MAX17040_BATTERY_FULL	95
-#define MAX17040_BATTERY_CHG	90  //add for hysteresis
-
-struct max17040_chip {
-	struct i2c_client		*client;
-	struct delayed_work		work;
-	struct power_supply		battery;
-	struct power_supply		ac;
-	struct power_supply		usb;
-	struct max17040_platform_data	*pdata;
-
-	/* State Of Connect */
-	int online;
-	/* battery voltage */
-	int vcell;
-	/* battery capacity */
-	int soc;
-	/* State Of Charge */
-	int status;
-	/* usb online */
-	int usb_online;
-};
 
 
 static int max17040_get_property(struct power_supply *psy,
@@ -77,6 +42,7 @@ static int max17040_get_property(struct power_supply *psy,
 	struct max17040_chip *chip = container_of(psy,
 				struct max17040_chip, battery);
 
+//printk("max17040_get_property, psp=%d\n", psp);
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
 		val->intval = chip->status;
@@ -86,6 +52,7 @@ static int max17040_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
 		val->intval = chip->vcell;
+		break;
 	case POWER_SUPPLY_PROP_PRESENT:
 		val->intval = 1;
 		break;
@@ -102,7 +69,7 @@ static int max17040_get_property(struct power_supply *psy,
 		 	 val->intval = POWER_SUPPLY_HEALTH_GOOD;
 		break;
 	case POWER_SUPPLY_PROP_TEMP:
-			val->intval = 365;
+			val->intval = chip->temp;
 		break;
 	default:
 		return -EINVAL;
@@ -134,8 +101,7 @@ static int adapter_get_property(struct power_supply *psy,
 			enum power_supply_property psp,
 			union power_supply_propval *val)
 {
-	struct max17040_chip *chip = container_of(psy,
-				struct max17040_chip, ac);
+//	struct max17040_chip *chip = container_of(psy, struct max17040_chip, ac);
 
 	int ret = 0;
 
@@ -237,7 +203,7 @@ static void max17040_get_online(struct i2c_client *client)
 static void max17040_get_status(struct i2c_client *client)
 {
 	struct max17040_chip *chip = i2c_get_clientdata(client);
-    static int old_soc = -1;
+//    static int old_soc = -1;
 
 	if (!chip->pdata->charger_online || !chip->pdata->charger_enable) {
 		chip->status = POWER_SUPPLY_STATUS_UNKNOWN;
@@ -276,18 +242,31 @@ static void max17040_get_status(struct i2c_client *client)
 static void max17040_work(struct work_struct *work)
 {
 	struct max17040_chip *chip;
-	int old_usb_online, old_online, old_vcell, old_soc;
+	int old_usb_online, old_online, old_vcell, old_soc, old_temp;
 
 	chip = container_of(work, struct max17040_chip, work.work);
 
-	old_online = chip->usb_online;
+	old_online = chip->online;
 	old_usb_online = chip->usb_online;
 	old_vcell = chip->vcell;
 	old_soc = chip->soc;
+	old_temp = chip->temp;
+	
 	max17040_get_online(chip->client);
 	max17040_get_vcell(chip->client);
 	max17040_get_soc(chip->client);
 	max17040_get_status(chip->client);
+#ifdef CONFIG_BATTERY_MAX17040_TEMP	
+
+	//workaround: turn usb1v8 un
+	// if((old_online != chip->online) || (old_usb_online != chip->usb_online))
+		// temp_adc_enable(chip->online);
+	// measure temp with twl ADC
+	max17040_get_temperature(chip->client);
+#endif
+	
+//printk("[MAX17040] online=%d, vcell=%d mV, capacity=%d %%, temp= %d deg\n", 
+//	old_online, old_vcell, old_soc, old_temp);
 
 	if((old_vcell != chip->vcell) || (old_soc != chip->soc))
 		power_supply_changed(&chip->battery);
@@ -302,7 +281,7 @@ static void max17040_work(struct work_struct *work)
 static enum power_supply_property max17040_battery_props[] = {
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_STATUS,
-	/*POWER_SUPPLY_PROP_ONLINE,*/
+	POWER_SUPPLY_PROP_ONLINE,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	POWER_SUPPLY_PROP_CAPACITY,
 	POWER_SUPPLY_PROP_TECHNOLOGY,
@@ -380,6 +359,12 @@ static int __devinit max17040_probe(struct i2c_client *client,
 	chip->usb.properties	= usb_get_props;
 	chip->usb.num_properties	= ARRAY_SIZE(usb_get_props);
 	chip->usb.external_power_changed = NULL;
+#ifdef CONFIG_BATTERY_MAX17040_TEMP
+	if (max17040_init_temp(client))
+		goto err_temp_failed;	
+#else
+	chip->temp = 365;
+#endif	
 
 	ret = power_supply_register(&client->dev, &chip->battery);
 	if (ret)
@@ -441,10 +426,14 @@ err_ac_failed:
 	power_supply_unregister(&chip->battery);
 err_battery_failed:
 	dev_err(&client->dev, "failed: power supply register\n");
+#ifdef CONFIG_BATTERY_MAX17040_TEMP
+err_temp_failed:
+	dev_err(&client->dev, "failed: init temperature adc\n");
+#endif
 	i2c_set_clientdata(client, NULL);
 	kfree(chip);
 
-	return ret;
+	return 1;
 }
 
 static int __devexit max17040_remove(struct i2c_client *client)
@@ -456,6 +445,9 @@ static int __devexit max17040_remove(struct i2c_client *client)
 
 	for (i = ARRAY_SIZE(gpios) - 1; i >= 0; i--)
 		gpio_free(gpios[i].gpio);
+#endif
+#ifdef CONFIG_BATTERY_MAX17040_TEMP
+	max17040_exit_temp();
 #endif
 	power_supply_unregister(&chip->usb);
 	power_supply_unregister(&chip->ac);

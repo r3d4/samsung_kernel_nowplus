@@ -1716,11 +1716,10 @@ static int nowplus_charger_enable(void) {
 	return 0;
 };
 
-static int nowplus_charger_disable(void)
+static void nowplus_charger_disable(void)
 {
 	set_irq_type (OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N), IRQ_TYPE_NONE);
 	gpio_direction_output(OMAP_GPIO_CHG_EN, 1);
-	return 1;
 }
 
 static int nowplus_charger_done(void)
