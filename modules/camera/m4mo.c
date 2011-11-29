@@ -80,12 +80,15 @@ static u8* cam_fw_name              = "RS_M4Mo_RD.bin";;
 static int cam_fw_major_version     = 0xFB;;
 static int cam_fw_minor_version     = 0xAA;
 int camfw_update                    = 0;
+static int af_used 					= 0;	//1 if AF was use at some time
 
 static u32 m4mo_curr_state          = M4MO_STATE_INVALID;
 static u32 m4mo_pre_state           = M4MO_STATE_INVALID;
 static bool m4mo_720p_enable        = false;
 
+
 extern u32 hw_revision;
+
 
 
 /**
@@ -1341,7 +1344,7 @@ static int  m4mo_set_capture(int pixelformat)
     dprintk(CAM_DBG, M4MO_MOD_NAME "verify capture size = 0x%02x\n", val);
 
 
-    m4mo_set_jpeg_quality(M4MO_JPEG_FINE);
+    m4mo_set_jpeg_quality(M4MO_JPEG_SUPERFINE);
     m4mo_set_thumbnail_size(M4MO_THUMB_QVGA_SIZE);
 
     m4mo_dump();
@@ -2303,12 +2306,13 @@ static int m4mo_set_auto_focus(s32 value)
     if(m4mo_curr_state != M4MO_STATE_PREVIEW)
 	{
 		printk(M4MO_MOD_NAME "AF error: sensor is not preview state!!");
-		return -EINVAL;
+		//return -EINVAL;	// allo AF_STOP
 	}
     
 	switch(value) 
 	{
 		case M4MO_AF_START :
+			af_used = 1;
             dprintk(CAM_DBG, M4MO_MOD_NAME "AF start.\n");
             
 			/*AF VCM Driver Standby Mode OFF */
@@ -2319,6 +2323,7 @@ static int m4mo_set_auto_focus(s32 value)
 			sensor->af_mode = M4MO_AF_START;
 			break;
 		case M4MO_AF_STOP :
+			af_used = 0;
             dprintk(CAM_DBG, M4MO_MOD_NAME "AF stop.\n");
             
 			/* Release Auto Focus */
@@ -3239,7 +3244,7 @@ static int m4mo_set_strobe(enum v4l2_strobe_conf mode)
 #endif
 
 
-static void m4mo_set_skip(void)
+static void m4mo_set_skip(struct v4l2_pix_format *pix)
 {
     struct m4mo_sensor *sensor = &m4mo;
 
@@ -3262,8 +3267,10 @@ static void m4mo_set_skip(void)
     }
     else
     {
-        //skip_frame = 2;
-        skip_frame = 0;
+        if(pix->pixelformat == V4L2_PIX_FMT_JPEG)
+            skip_frame = 0;
+        else
+            skip_frame = 3;
     }
 
     dprintk(CAM_INF, M4MO_MOD_NAME "skip frame = %d frame\n", skip_frame);
@@ -3967,7 +3974,7 @@ static int ioctl_try_fmt_cap(struct v4l2_int_device *s,
     dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_try_fmt_cap. mode : %d\n", sensor->mode);
     dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_try_fmt_cap. state : %d\n", sensor->state);
 
-    m4mo_set_skip();  
+    m4mo_set_skip(pix);  
 
     if(sensor->state == M4MO_STATE_CAPTURE)
     { 
@@ -4078,15 +4085,14 @@ static int ioctl_s_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 
 
     m4mo_720p_enable = false;
-  
+    
+    m4mo_set_skip(pix);  
+    
     if(sensor->state == M4MO_STATE_CAPTURE)
     { 
         /* check for capture */
         // if(m4mo_prepare_capture())
         // goto s_fmt_fail;   
-
-        m4mo_set_skip();  
-
         for(index = 0; index < ARRAY_SIZE(m4mo_image_sizes); index++)
         {
             if(m4mo_image_sizes[index].width == pix->width && m4mo_image_sizes[index].height == pix->height)
@@ -4130,9 +4136,6 @@ static int ioctl_s_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
         /* check for preview */
         // if(m4mo_prepare_preview())
         // goto s_fmt_fail;
-
-
-        m4mo_set_skip();  
 
         for(index = 0; index < ARRAY_SIZE(m4mo_preview_sizes); index++)
         {

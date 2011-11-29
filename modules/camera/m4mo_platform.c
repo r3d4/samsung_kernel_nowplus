@@ -31,6 +31,8 @@
 #include <../drivers/media/video/isp/ispreg.h>
 #include "dprintk.h"
 
+#define M4MO_BIGGEST_FRAME_BYTE_SIZE  PAGE_ALIGN(1280 * 720 * 2 *6) //fix for usage of 6 buffers for 720p capture and avoiding camera launch issues.
+
 static struct v4l2_ifparm ifparm_m4mo = {
 	//.capability = 1,
 	.if_type = V4L2_IF_TYPE_BT656, 
@@ -49,14 +51,14 @@ static struct v4l2_ifparm ifparm_m4mo = {
 static struct omap34xxcam_sensor_config m4mo_hwc = {
 	.sensor_isp = 1,
 	.xclk = OMAP34XXCAM_XCLK_A,
+//    .capture_mem =  M4MO_BIGGEST_FRAME_BYTE_SIZE, 
 };
 
 struct isp_interface_config m4mo_if_config = {
 	.ccdc_par_ser = ISP_PARLL,
 	.dataline_shift = 0x2,
 	.hsvs_syncdetect = ISPCTRL_SYNC_DETECT_VSFALL,
-//	.vdint0_timing = 0x0, // commented for porting to zeus
-//	.vdint1_timing = 0x0, // commented for porting to zeus
+    .wait_hs_vs = 0x03,
 	.strobe = 0x0,
 	.prestrobe = 0x0,
 	.shutter = 0x0,
