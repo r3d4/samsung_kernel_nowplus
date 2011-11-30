@@ -32,14 +32,14 @@
  */
 
 
-  #define OMAP_ISPCTRL_DEBUG
-  #define OMAP_ISPCCDC_DEBUG
-  #define OMAP_ISPPREV_DEBUG
-  #define OMAP_ISPRESZ_DEBUG
-  #define OMAP_ISPMMU_DEBUG
-  #define OMAP_ISPH3A_DEBUG
-  #define OMAP_ISP_AF_DEBUG
-  #define OMAP_ISPHIST_DEBUG
+  // #define OMAP_ISPCTRL_DEBUG
+  // #define OMAP_ISPCCDC_DEBUG
+  // #define OMAP_ISPPREV_DEBUG
+  // #define OMAP_ISPRESZ_DEBUG
+  // #define OMAP_ISPMMU_DEBUG
+  // #define OMAP_ISPH3A_DEBUG
+  // #define OMAP_ISP_AF_DEBUG
+  // #define OMAP_ISPHIST_DEBUG
 
 
 #ifdef OMAP_ISPCTRL_DEBUG

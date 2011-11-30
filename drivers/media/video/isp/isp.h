@@ -63,7 +63,7 @@
 #else
 #define JPEG_CAPTURE_WIDTH          1024    //1536
 #define JPEG_CAPTURE_WIDTH_IN_OMAP  JPEG_CAPTURE_WIDTH/ISP_BYTES_PER_PIXEL
-#define JPEG_CAPTURE_HEIGHT         1800 //2000   2300
+#define JPEG_CAPTURE_HEIGHT         1800 // by trial & error ??? //2000   2300
 #endif
 #define is_isppreview_enabled()		0
 #define is_ispresizer_enabled()		0 // disabled for now, may need to enable

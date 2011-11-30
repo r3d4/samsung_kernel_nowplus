@@ -1050,7 +1050,7 @@ static int vidioc_dqbuf(struct file *file, void *fh, struct v4l2_buffer *b)
 	int rval = 0;
 	int recnt = 0;
 //DBGPRINTF("in");
-#if 1
+#if 0
 //check if ccdc is busy
 u32 reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_PCR); 
 DBGPRINTF("ccdc module is state is %s", reg & ISPCCDC_PCR_BUSY?"busy":"idle"); 

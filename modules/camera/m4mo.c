@@ -1344,10 +1344,10 @@ static int  m4mo_set_capture(int pixelformat)
     dprintk(CAM_DBG, M4MO_MOD_NAME "verify capture size = 0x%02x\n", val);
 
 
-    m4mo_set_jpeg_quality(M4MO_JPEG_SUPERFINE);
-    m4mo_set_thumbnail_size(M4MO_THUMB_QVGA_SIZE);
+    //m4mo_set_jpeg_quality(M4MO_JPEG_SUPERFINE);
+    //m4mo_set_thumbnail_size(M4MO_THUMB_QVGA_SIZE);
 
-    m4mo_dump();
+    //m4mo_dump();
     m4mo_start_capture();
 
 //    m4mo_set_mode(M4MO_STILLCAP_MODE );
@@ -3267,10 +3267,10 @@ static void m4mo_set_skip(struct v4l2_pix_format *pix)
     }
     else
     {
-        if(pix->pixelformat == V4L2_PIX_FMT_JPEG)
-            skip_frame = 0;
-        else
-            skip_frame = 3;
+        // if(pix->pixelformat == V4L2_PIX_FMT_JPEG)
+            // skip_frame = 0;
+        // else
+            skip_frame = 2;
     }
 
     dprintk(CAM_INF, M4MO_MOD_NAME "skip frame = %d frame\n", skip_frame);
@@ -3341,9 +3341,9 @@ static int m4mo_start_capture_transfer(void)
        
 	dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);  
 
-DPRINTK_ISPCCDC("ccdc status: -----------------------------------------\n");
-ispccdc_print_status();
-DPRINTK_ISPCCDC("-------------------------------------------------------\n");
+// DPRINTK_ISPCCDC("ccdc status: -----------------------------------------\n");
+// ispccdc_print_status();
+// DPRINTK_ISPCCDC("-------------------------------------------------------\n");
 
 	/* Select main frame image and wait until capture size is non zero*/
 	m4mo_write_category_parm(client, M4MO_8BIT, 0x0C, 0x04, 0x01);
@@ -3394,11 +3394,11 @@ DPRINTK_ISPCCDC("-------------------------------------------------------\n");
 
 	printk(KERN_INFO M4MO_MOD_NAME "Capture Image Transfer Complete!!\n");
     
-#if 1
-//check if ccdc is busy
-reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_PCR); 
-dprintk(CAM_DBG, M4MO_MOD_NAME "ccdc module is state is %s\n", reg & ISPCCDC_PCR_BUSY?"busy":"idle"); 
-#endif	
+
+// //check if ccdc is busy
+// reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_PCR); 
+// dprintk(CAM_DBG, M4MO_MOD_NAME "ccdc module is state is %s\n", reg & ISPCCDC_PCR_BUSY?"busy":"idle"); 
+
 
 	return 0;
 }
@@ -3457,7 +3457,7 @@ dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__);
 static int ioctl_streamon(struct v4l2_int_device *s)
 {
 	struct m4mo_sensor *sensor = s->priv;
-#if 1    
+#if 0    
 u32 reg;
 reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_VDINT);   
 dprintk(CAM_DBG, M4MO_MOD_NAME "ISPCCDC_VDINT =0x%x\n", reg); 
