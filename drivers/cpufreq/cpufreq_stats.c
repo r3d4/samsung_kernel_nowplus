@@ -50,7 +50,7 @@ struct cpufreq_stats_attribute {
 	ssize_t(*show) (struct cpufreq_stats *, char *);
 };
 
-static int cpufreq_stats_update(unsigned int cpu)
+int cpufreq_stats_update(unsigned int cpu)
 {
 	struct cpufreq_stats *stat;
 	unsigned long long cur_time;
@@ -66,6 +66,7 @@ static int cpufreq_stats_update(unsigned int cpu)
 	spin_unlock(&cpufreq_stats_lock);
 	return 0;
 }
+EXPORT_SYMBOL(cpufreq_stats_update);
 
 static ssize_t show_total_trans(struct cpufreq_policy *policy, char *buf)
 {

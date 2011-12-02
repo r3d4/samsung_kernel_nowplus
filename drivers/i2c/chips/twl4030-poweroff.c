@@ -92,16 +92,13 @@ static void nowplus_poweroff(void)
 #endif
 	tl2796_lcd_poweroff();
 
-    //powerdown phone part
-	gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
-
-	printk(KERN_ERR "Kernel Power OFF !!!\n");
-
+	
 	usbic_state= get_real_usbic_state();
 	if (usbic_state==MICROUSBIC_TA_CHARGER
 			|| usbic_state==MICROUSBIC_USB_CABLE
 			|| usbic_state==MICROUSBIC_USB_CHARGER)
     { /* USB/USB CHARGER/CHARGER*/	
+		printk("Warmreset by TA or USB or Jtag\n\n");
         preempt_disable();
 		local_irq_disable();
 		local_fiq_disable();
@@ -118,6 +115,8 @@ static void nowplus_poweroff(void)
 	else 
 	{
 		printk(KERN_ERR "TWL4030 Power Off\n");
+		//powerdown powersupply
+		gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
 		twl4030_poweroff();
 	}
 	while(1);

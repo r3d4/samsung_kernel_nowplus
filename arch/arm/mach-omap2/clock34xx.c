@@ -346,6 +346,7 @@ void omap2_clk_init_cpufreq_table(struct cpufreq_frequency_table **table)
 
 	*table = &freq_table[0];
 }
+EXPORT_SYMBOL(omap2_clk_init_cpufreq_table);
 #endif
 
 struct clk_functions omap2_clk_functions = {

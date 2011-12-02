@@ -3,8 +3,8 @@
 #endif
 
 #strip debug info
-INSTALL_MOD_STRIP := =1
-MODLIB := ~/modules
+INSTALL_MOD_STRIP :=1
+INSTALL_MOD_PATH := ~/lib
 
 MODULES_CAMERA=y
 MODULES_DPRAM=y
