@@ -3289,11 +3289,15 @@ static int m4mo_start_preview(void)
     int rval;
 	u32 intr_value;
 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);
+
 	/* If mode is already Monitor, return now */
-	// mode = m4mo_get_mode();
-	// if(mode == M4MO_MONITOR_MODE)
-		// return 0;
-    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...", __func__);
+	if( m4mo_get_mode() == M4MO_MONITOR_MODE)
+	{
+		dprintk(CAM_DBG, M4MO_MOD_NAME "m4mo already in monitior mode!\n");
+		return 0;
+	}
+
 
 	/* Interrupt Clear */
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x10, &intr_value);
