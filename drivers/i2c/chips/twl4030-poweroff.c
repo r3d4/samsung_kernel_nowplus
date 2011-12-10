@@ -107,11 +107,11 @@ static void nowplus_poweroff(void)
 		printk(KERN_ERR "Charging ... need to reboot\n");
 	}
 //	else if(gpio_get_value(OMAP3430_GPIO_ALARM_AP) && !gpio_get_value(OMAP3430_GPIO_PHONE_ACTIVE18))
-	else if(gpio_get_value(OMAP_GPIO_AP_ALARM))
-	{
-		printk(KERN_ERR "Alarm Booting Detecting... need to reboot\n");
-		omap_prcm_arch_reset(1);
-	}
+	// else if(gpio_get_value(OMAP_GPIO_AP_ALARM))
+	// {
+		// printk(KERN_ERR "Alarm Booting Detecting... need to reboot\n");
+		// omap_prcm_arch_reset(1);
+	// }
 	else 
 	{
 		printk(KERN_ERR "TWL4030 Power Off\n");

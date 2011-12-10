@@ -395,7 +395,7 @@ static int twl_iNand_set_power(struct device *dev, int slot, int power_on, int v
 	//		printk("Turn ON External LDO ***** \n");
 			gpio_set_value(OMAP_GPIO_MOVI_EN, 1);    // enable flash VDDF LDO, powers onchip nand
 			
-			msleep(1);
+			msleep(5);  // spec is 1ms
 			
 			// enable fixed voltage
 			ret = regulator_enable(c->vcc);	// enable VDD movi controller (1.8v interface)
@@ -412,7 +412,7 @@ static int twl_iNand_set_power(struct device *dev, int slot, int power_on, int v
 			omap_writew(PADCONF_ON, 0x48002168); //! DAT6
 			omap_writew(PADCONF_ON, 0x4800216a); //! DAT7
 			 
-			msleep(2);  //wait at least 1msec + power on ram time
+			msleep(5);  //wait at least 1msec + power on ramp time
 		}
 	}
 	else {
@@ -430,10 +430,13 @@ static int twl_iNand_set_power(struct device *dev, int slot, int power_on, int v
 			omap_writew(PADCONF_OFF, 0x48002168); //! DAT6
 			omap_writew(PADCONF_OFF, 0x4800216a); //! DAT7
 		  
-	//	    printk("Turn OFF External LDO\n");
-			gpio_set_value(OMAP_GPIO_MOVI_EN, 0);     // enable flash VDDF LDO
-		   
+  
 			ret = regulator_disable(c->vcc);	// disable 1.8V VDD
+
+            msleep(5); 
+            //	    printk("Turn OFF External LDO\n");
+			gpio_set_value(OMAP_GPIO_MOVI_EN, 0);     // enable flash VDDF LDO
+
 		}
 		
 	}
