@@ -3,7 +3,7 @@
 #
 #
 
-obj-m += dpram.o
+obj-m := dpram.o
 
 all:
 	@echo "$(MAKE) --no-print-directory -C $(KDIR) SUBDIRS=$(CURDIR) modules"
