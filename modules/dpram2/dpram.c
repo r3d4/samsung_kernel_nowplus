@@ -182,7 +182,8 @@ struct wake_lock dpram_wake_lock;
 #define SMS_BUFFER_MAXLEN  16 // only need to parse header
 #define SMS_BUFFER_APPEND  1
 
-// from ius libsamsung-ipc
+// with code from ius libsamsung-ipc
+// https://github.com/ius/libsamsung-ipc
 #define FRAME_START	0x7f
 #define FRAME_END	0x7e
 
@@ -231,8 +232,7 @@ void sms_ack_send(dpram_device_t *device)
 {
     // sms ack data
      unsigned char sms_ack_data[] = { 0x00, 0x00, 0x03, 0x00, 0x02 };
-     unsigned char frame[300];  //~247+12
-    //ipc_send(IPC_SMS_DELIVER_REPORT, IPC_TYPE_EXEC, data, sizeof(data), 0, device);
+     unsigned char frame[300];  //>247 data +12 header
 /*
 size:
 start+end:  2
@@ -276,7 +276,7 @@ ipc         7
 
 int sms_fix_add_data(unsigned char* buffer, int len, int append)
 {
-    printk("[DPRAM] %s\n", __func__);
+    //printk("[DPRAM] %s\n", __func__);
     if(!append)
     {
         sms_buffer_len = 0;
@@ -330,7 +330,7 @@ int sms_fix_process(dpram_device_t *device)
         data = &buffer[4];
         ipc = (struct ipc_header*)data;
 
-        printk("[DPRAM] SMSFIX: frame start detected, frame length=%d\n", *p_len);
+        //printk("[DPRAM] SMSFIX: frame start detected, frame length=%d\n", *p_len);
 
         // printk("        mseq  = 0x%02x\n"
                // "        aseq  = 0x%02x\n"
@@ -668,6 +668,10 @@ static int dpram_read(dpram_device_t *device, const u16 non_cmd)
     int data_size;
 
 	u16 head, tail, up_tail;
+
+    // todo: only do sms fix on /dpram0
+    // if (device==(unsigned long)&dpram_table[FORMATTED_INDEX])
+    //  ...
 
 	READ_FROM_DPRAM_VERIFY(&head, device->in_head_addr, sizeof(head));
 	READ_FROM_DPRAM_VERIFY(&tail, device->in_tail_addr, sizeof(tail));
