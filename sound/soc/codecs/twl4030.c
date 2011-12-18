@@ -251,7 +251,7 @@ bool twl4030_fm_radio_mute_enable = false;
 static const char *audio_path[]     = {"Playback Path", "Voice Call Path", "Memo Path", "VOIP Call Path", "FM Radio Path", "Idle Mode","Mic Mute","VR Mode", "Loopback Path"};   // hskwon-ss-db05, to support mic mute/unmute for CTS test
 static const char *playback_path[]  = {"off","RCV","SPK","HP","SPK_HP"};
 static const char *voicecall_path[] = {"off","RCV","SPK","HP","BT"};
-static const char *voicememo_path[] = {"off","MAIN","SUB"}; 
+static const char *voicememo_path[] = {"off","MAIN","HP"}; 
 static const char *voip_path[]    = {"off","RCV","SPK","HP"}; // hskwon-ss-cl31, added for FMC(VoIP) call path
 static const char *fmradio_path[]   = {"off","SPK","HP"};
 static const char *loopback_path[]=      {"off","RCV","SPK", "HP"};
@@ -2367,7 +2367,7 @@ static int twl4030_set_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ct
  
     return 0;
 }
-
+//fm recording ?
 static int twl4030_set_loopback_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
     struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
