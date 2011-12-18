@@ -2356,7 +2356,7 @@ static int twl4030_set_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ct
             twl4030_write(codec, 0x1b, (0xb<<3)|0x7 /*0x07*/);  // Audio RXL2: aGain ..dB, Digital-to-analog path enable, FM loop path enable
             
 			twl4030_write(codec, 0x22,0x24);   //Headset output L+R: Audio L2
-            //twl4030_write(codec, 0x23,0x05);   //Headset output L+R: Audio L2
+            twl4030_write(codec, 0x23,0x0a);   //Headset gain 0dB
 			twl4030_write(codec, 0x24,0x41);   //HS pop-noise: VMID buffer enable, Ramp down 
 			twl4030_write(codec, 0x24,0x42);   //HS pop-noise: VMID buffer enable, Ramp up
 		break;   
