@@ -2,7 +2,7 @@
 #define _DEBUG
 #define _ENABLE_ERROR_DEVICE
 //#define _DPRAM_DEBUG_HEXDUMP
-#define _ENABLE_SMS_FIX     // enable workaround for SMS multiple receive bug
+
 #define _HSDPA_DPRAM
 
 #include <linux/module.h>
@@ -175,186 +175,6 @@ static DECLARE_WAIT_QUEUE_HEAD(phone_power_wait);
 static DECLARE_MUTEX(write_mutex);
 
 struct wake_lock dpram_wake_lock;
-
-
-#ifdef _ENABLE_SMS_FIX
-
-#define SMS_BUFFER_MAXLEN  16 // only need to parse header
-#define SMS_BUFFER_APPEND  1
-
-// with code from ius libsamsung-ipc
-// https://github.com/ius/libsamsung-ipc
-#define FRAME_START	0x7f
-#define FRAME_END	0x7e
-
-#define IPC_TYPE_EXEC		                        0x01
-
-#define IPC_COMMAND(f)  ((f->group << 8) | f->index)
-#define FRAME_GRP(m)	(m >> 8)
-#define FRAME_IDX(m)	(m & 0xff)
-
-#define IPC_SMS_INCOMING_MSG            0x0402
-#define IPC_SMS_DELIVER_REPORT		    0x0406
-
-#define IPC_SMS_ACK_NO_ERROR            0x0000
-#define IPC_SMS_ACK_PDA_FULL_ERROR      0x8080
-#define IPC_SMS_ACK_MALFORMED_REQ_ERROR 0x8061
-#define IPC_SMS_ACK_UNSPEC_ERROR        0x806F
-
-
-struct ipc_header {
-    unsigned short length;
-    unsigned char mseq, aseq;
-    unsigned char group, index, type;
-} __attribute__((__packed__));
-
-struct hdlc_header {
-	unsigned short length;
-	unsigned char unknown;
-	struct ipc_header ipc;
-} __attribute__((__packed__));
-
-struct ipc_sms_incoming_msg {
-    unsigned char type, unk, length;
-} __attribute__((__packed__));
-
-
-static unsigned char sms_buffer[SMS_BUFFER_MAXLEN+1];
-static int sms_buffer_len=0;
-int smsfix_enable = 0;  //enabled by ioctl
-
-#ifdef _DPRAM_DEBUG_HEXDUMP
-static void hexdump(const char *buf, int len);
-#endif
-static int dpram_write(dpram_device_t *device,	const unsigned char *buf, int len);
-
-void sms_ack_send(dpram_device_t *device)
-{
-    // sms ack data
-     unsigned char sms_ack_data[] = { 0x00, 0x00, 0x03, 0x00, 0x02 };
-     unsigned char frame[300];  //>247 data +12 header
-/*
-size:
-start+end:  2
-hdlc:       3
-ipc         7
-          -> 12 bytes total
-*/
-    const int data_length=247;
-
-	struct hdlc_header header;
-	unsigned int hdr_len = sizeof(header);
-	unsigned int frame_length = (hdr_len + data_length);
-	//char *frame = malloc(frame_length);
-
-    memset(&frame, 0, sizeof(frame));
-
-    // build hdlc+ipc header
-	memset(&header, 0x00, hdr_len);
-	header.length = frame_length;
-	header.ipc.mseq = 0; //fixme
-	header.ipc.aseq = 0xff; //fixme
-	header.ipc.length = (frame_length - 3);
-	header.ipc.group = FRAME_GRP(IPC_SMS_DELIVER_REPORT);
-	header.ipc.index = FRAME_IDX(IPC_SMS_DELIVER_REPORT);
-	header.ipc.type = IPC_TYPE_EXEC;
-
-	memcpy(frame+1, &header, sizeof(header));
-	memcpy(frame+hdr_len+1, sms_ack_data, sizeof(sms_ack_data));
-
-    frame[0] = FRAME_START;
-    frame[frame_length+1] = FRAME_END;
-#ifdef _DPRAM_DEBUG_HEXDUMP
-    printk("[DPRAM] SMSFIX: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    hexdump(frame, frame_length+2);
-    printk("[DPRAM] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-#endif
-	dpram_write(device, frame, frame_length+2); //+2bytes start/end
-
-}
-
-
-int sms_fix_add_data(unsigned char* buffer, int len, int append)
-{
-    //printk("[DPRAM] %s\n", __func__);
-    if(!append)
-    {
-        sms_buffer_len = 0;
-
-        if (len < SMS_BUFFER_MAXLEN)
-        {
-            memcpy(sms_buffer, buffer, len);
-            sms_buffer_len = len;
-        }
-        else
-        {
-            memcpy(sms_buffer, buffer, SMS_BUFFER_MAXLEN);
-            sms_buffer_len = SMS_BUFFER_MAXLEN;
-        }
-    }
-    else
-    {
-         if (len+sms_buffer_len < SMS_BUFFER_MAXLEN)
-        {
-            memcpy(sms_buffer+sms_buffer_len, buffer, len);
-            sms_buffer_len += len;
-        }
-        else
-        {
-            memcpy(sms_buffer+sms_buffer_len, buffer, SMS_BUFFER_MAXLEN-sms_buffer_len);
-            sms_buffer_len = SMS_BUFFER_MAXLEN;
-        }
-    }
-    return sms_buffer_len;
-
-}
-// 1 byte frame start
-// --- hdlc header ---
-// 2 bytes  length
-// 1 byte   ?
-// --- ipc_header ----
-int sms_fix_process(dpram_device_t *device)
-{
-    unsigned char *buffer = sms_buffer;
-    int len = sms_buffer_len;
-    unsigned short *p_len;
-    struct ipc_header* ipc;
-    unsigned char *data;
-
-//printk("[DPRAM] %s\n", __func__);
-
-    // only process header
-    if ((*buffer == FRAME_START) && (len >= sizeof(struct hdlc_header)))
-    {
-        p_len = (unsigned short*)&buffer[1];
-        data = &buffer[4];
-        ipc = (struct ipc_header*)data;
-
-        //printk("[DPRAM] SMSFIX: frame start detected, frame length=%d\n", *p_len);
-
-        // printk("        mseq  = 0x%02x\n"
-               // "        aseq  = 0x%02x\n"
-               // "        group = 0x%02x\n"
-               // "        index = 0x%02x\n"
-               // "        type  = 0x%02x\n"
-               // "        length= 0x%02x\n",
-            // ipc->mseq, ipc->aseq, ipc->group, ipc->index, ipc->type, ipc->length);
-
-        //hack: samsung ril implementation lacks SMS acknowledge (maybe done by baseband itself?)
-        //so send SMS acknowledge from here direct after INCOMING SMS
-        if(IPC_COMMAND(ipc) == IPC_SMS_INCOMING_MSG)
-        {
-            printk("[DPRAM] SMSFIX: incoming SMS, send ACK\n");
-            // send ACK to baseband
-            sms_ack_send(device);
-        }
-    }
-
-    return 0;
-}
-
-#endif
-
 
 
 #ifdef CONFIG_EVENT_LOGGING
@@ -692,16 +512,12 @@ static int dpram_read(dpram_device_t *device, const u16 non_cmd)
 		    if (retval != size)
 			dprintk("Size Mismatch : Real Size = %d, Returned Size = %d\n", size, retval);
 
+#ifdef _DPRAM_DEBUG_HEXDUMP
             p_data = (unsigned char *)(DPRAM_VBASE + (device->in_buff_addr + tail));
             data_size = size;
-#ifdef _DPRAM_DEBUG_HEXDUMP
 			hexdump(p_data, data_size);
+#endif
 
-#endif
-#ifdef _ENABLE_SMS_FIX
-            if(smsfix_enable)
-                sms_fix_add_data(p_data, data_size, 0);
-#endif
 		}
 		else {
 			int tmp_size = 0;
@@ -714,27 +530,18 @@ static int dpram_read(dpram_device_t *device, const u16 non_cmd)
 			if (retval != tmp_size)
 				dprintk("Size Mismatch : Real Size = %d, Returned Size = %d\n", tmp_size, retval);
 
+#ifdef _DPRAM_DEBUG_HEXDUMP
 			p_data = (unsigned char *)(DPRAM_VBASE + (device->in_buff_addr + tail));
             data_size = tmp_size;
-#ifdef _DPRAM_DEBUG_HEXDUMP
 			hexdump(p_data, data_size);
-#endif
-#ifdef _ENABLE_SMS_FIX
-            if(smsfix_enable)
-                sms_fix_add_data(p_data, data_size, 0);
 #endif
 
 			if (size > tmp_size) {
 				dpram_tty_insert_data(device, (unsigned char *)(DPRAM_VBASE + device->in_buff_addr), size - tmp_size);
-
+#ifdef _DPRAM_DEBUG_HEXDUMP
                 p_data = (unsigned char *)(DPRAM_VBASE + device->in_buff_addr);
                 data_size = size - tmp_size;
-#ifdef _DPRAM_DEBUG_HEXDUMP
                 hexdump(p_data, data_size);
-#endif
-#ifdef _ENABLE_SMS_FIX
-                if(smsfix_enable)
-                    sms_fix_add_data(p_data, data_size, SMS_BUFFER_APPEND);
 #endif
 				retval += (size - tmp_size);
 			}
@@ -758,8 +565,6 @@ static int dpram_read(dpram_device_t *device, const u16 non_cmd)
 #ifdef CONFIG_EVENT_LOGGING
 	dpram_event_logging(DPRAM_READ, (void *)&tail, size);
 #endif
-    if(smsfix_enable)
-        sms_fix_process(device);
 
 	return retval;
 }
@@ -1096,7 +901,7 @@ static int dpram_tty_ioctl(struct tty_struct *tty, struct file *file,
 		unsigned int cmd, unsigned long arg)
 {
 	unsigned int val;
-	void __user *argp = (void __user *)arg;
+	//void __user *argp = (void __user *)arg;
 	//printk("[DPRAM] dpram_tty_ioctl: cmd=%d.\n", cmd);
 
 
@@ -1122,10 +927,6 @@ static int dpram_tty_ioctl(struct tty_struct *tty, struct file *file,
 
 		case DPRAM_PHONE_BOOTSTART:
     		printk("DPRAM_PHONE_BOOTSTART\n");
-            // enable smsfix as late as possible on ril startup
-            // DPRAM_PHONE_BOOTSTART seems to be fired as one of the last commands
-            smsfix_enable = 1;
-            printk("[DPRAM] SMSFIX %s\n", smsfix_enable?"enabled":"disabled");
 			return 0;
 
 		case DPRAM_NVDATA_LOAD:
@@ -1174,24 +975,6 @@ static int dpram_tty_ioctl(struct tty_struct *tty, struct file *file,
 //			if(copy_from_user((void *)&sec_sys_tz, (void *)arg, sizeof(struct timezone)))
 //        return -ENOIOCTLCMD;
 			return 0;
-#endif
-#ifdef _ENABLE_SMS_FIX
-		case DPRAM_PHONE_SMSFIX:
-        	{
-				int enable;
-				printk("DPRAM_PHONE_SMSFIX\n");
-
-				if(copy_from_user((void*) &enable, argp, sizeof(int)))
-                {
-					return -EFAULT;
-                }
-				else
-                {
-                    smsfix_enable = enable;
-                    printk("[DPRAM] SMSFIX %s\n", smsfix_enable?"enabled":"disabled");
-                    return 0;
-                }
-			}
 #endif
 
 		default:

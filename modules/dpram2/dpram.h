@@ -89,7 +89,6 @@
 #define DPRAM_PHONEIMG_LOAD				_IO(IOC_MZ_MAGIC, 0xd1)
 #define DPRAM_NVDATA_LOAD				_IO(IOC_MZ_MAGIC, 0xd2)
 #define DPRAM_PHONE_BOOTSTART			_IO(IOC_MZ_MAGIC, 0xd3)
-#define DPRAM_PHONE_SMSFIX			    _IO(IOC_MZ_MAGIC, 0xdf)
 
 #define IOC_SEC_MAGIC            (0xf0)
 #define DPRAM_PHONE_ON           _IO(IOC_SEC_MAGIC, 0xc0)
