@@ -51,6 +51,7 @@
 #include <plat/common.h>
 #include <plat/dma.h>
 #include <plat/gpmc.h>
+#include <plat/onenand.h>
 #include <plat/display.h>
 #include <plat/control.h>
 #include <plat/omap-pm.h>
@@ -1820,6 +1821,159 @@ static int __init nowplus_i2c_init(void)
 	return 0;
 }
 
+#if defined(CONFIG_MTD_ONENAND_OMAP2) || \
+	defined(CONFIG_MTD_ONENAND_OMAP2_MODULE)
+/*
+Adresses of the BML partitions
+
+minor position size blocks id
+
+  1: 0x00000000-0x00040000 0x00040000      2        0
+  2: 0x00040000-0x00640000 0x00600000     48        1
+  3: 0x00640000-0x00780000 0x00140000     10        2
+  4: 0x00780000-0x008c0000 0x00140000     10        3
+  5: 0x008c0000-0x00dc0000 0x00500000     40        4
+  6: 0x00dc0000-0x012c0000 0x00500000     40        5
+  7: 0x012c0000-0x02640000 0x01380000    156        6
+  8: 0x02640000-0x0da40000 0x0b400000   1440        7
+  9: 0x0da40000-0x1f280000 0x11840000   2242        8
+ 10: 0x1f280000-0x1f380000 0x00100000      8        9
+ 11: 0x1f380000-0x1f480000 0x00100000      8       10
+
+ 
+ Partition IDs as seen by Linux
+
+major minor #blocks name
+
+139     0     513280 tbmlc
+139     1        256 tbml1
+139     2       6144 tbml2
+139     3       1280 tbml3
+139     4       1280 tbml4
+139     5       5120 tbml5
+139     6       5120 tbml6
+139     7      19968 tbml7
+139     8     184320 tbml8
+139     9     286976 tbml9
+139    10       1024 tbml10
+139    11       1024 tbml11
+137     0     513280 bml0/c
+137     1        256 bml1
+137     2       6144 bml2
+137     3       1280 bml3
+137     4       1280 bml4
+137     5       5120 bml5
+137     6       5120 bml6
+137     7      19968 bml7
+137     8     184320 bml8
+137     9     286976 bml9
+137    10       1024 bml10
+137    11       1024 bml11
+138     2       5796 stl2
+138     5       4674 stl5
+138     9     275520 stl9
+
+
+
+ Data from the Firmware Image contained on OneNAND
+
+bml1   = boot.bin 262144 byte
+bml2   = ??? userdata? 6291456 byte
+bml3   = Sbl.bin 1310720 byte - (offset: 001000B80000000000000000 +bml3 = Sbl.bin)
+bml4   = ??? not to be found in flash-image 1310720 byte
+bml5   = params.lfs without a small sub-header and huge trailer (trailer seems to be the same content again -.-) 5242880 byte
+bml6   = kernel image zImage (j4fs,rw) 5242880 byte
+bml7   = initrd.cramfs 20447232 byte
+bml8   = factoryfs.cramfs 188743680 byte
+bml9   = datafs.rfs?! datafs is 1 MB bigger but content is similar 293863424 byte
+bml10  = EMPTY (bad block reserve?) 1048576 byte
+bml11  = EMPTY (bad block reserve?) 1048576 byte
+bml0!c = boot.bin + FFFF trailer 525598720 byte
+bml0/c = boot.bin + FFFF trailer 525598720 byte
+stl2   = /csa (rfs,rw) 5935104 byte
+stl5   = params.lfs (j4fs,rw) 4786176 byte
+stl9   = datafs.rfs userdata? /mnt/rsv (rfs,rw) 282132480 byte
+
+*/
+static struct mtd_partition onenand_partitions[] = {
+	{
+		.name           = "initrd",
+		.offset         = 0x012c0000,
+		.size           = 0x01380000,
+		//.mask_flags     = MTD_WRITEABLE,	/* Force read-only */
+	},
+	{
+		.name           = "system",
+		.offset         = 0x02640000,
+		.size           = 0x0b400000,
+	},
+	{
+		.name           = "data",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x0e640000  
+		//.size           = 0x11840000,
+	},    
+    {
+		.name           = "cache",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x03200000 ,
+	},  
+    
+	// {
+		// .name           = "bootloader",
+		// .offset         = 0,
+		// .size           = 0x20000,
+		// .mask_flags     = MTD_WRITEABLE,	/* Force read-only */
+	// },
+	// {
+		// .name           = "config",
+		// .offset         = MTDPART_OFS_APPEND,
+		// .size           = 0x60000,
+	// },
+	// {
+		// .name           = "log",
+		// .offset         = MTDPART_OFS_APPEND,
+		// .size           = 0x40000,
+	// },
+	// {
+		// .name           = "kernel",
+		// .offset         = MTDPART_OFS_APPEND,
+		// .size           = 0x200000,
+	// },
+	// {
+		// .name           = "initfs",
+		// .offset         = MTDPART_OFS_APPEND,
+		// .size           = 0x200000,
+	// },
+	// {
+		// .name           = "rootfs",
+		// .offset         = MTDPART_OFS_APPEND,
+		// .size           = MTDPART_SIZ_FULL,
+	// },
+};
+
+static struct omap_onenand_platform_data board_onenand_data = {
+	.cs		= 0,
+	// .gpio_irq	= 65,
+    .dma_channel = -1,  /* disable DMA in OMAP OneNAND driver */
+	.parts		= onenand_partitions,
+	.nr_parts	= ARRAY_SIZE(onenand_partitions),
+	.flags		= ONENAND_SYNC_READWRITE,
+};
+
+static void __init board_onenand_init(void)
+{
+	gpmc_onenand_init(&board_onenand_data);
+}
+
+#else
+
+static inline void board_onenand_init(void)
+{
+}
+
+#endif
+
 static void config_wlan_gpio(void)
 {
         int ret = 0;
@@ -2434,6 +2588,7 @@ void __init nowplus_peripherals_init(void)
 			ARRAY_SIZE(nowplus_spi_board_info));
 
 //	platform_device_register(&archer_dss_device);
+	board_onenand_init();
 	synaptics_dev_init();
 	omap_serial_init();
 	config_wlan_gpio();
