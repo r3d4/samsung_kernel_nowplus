@@ -1834,9 +1834,9 @@ minor position size blocks id
   4: 0x00780000-0x008c0000 0x00140000     10        3
   5: 0x008c0000-0x00dc0000 0x00500000     40        4
   6: 0x00dc0000-0x012c0000 0x00500000     40        5
-  7: 0x012c0000-0x02640000 0x01380000    156        6
-  8: 0x02640000-0x0da40000 0x0b400000   1440        7
-  9: 0x0da40000-0x1f280000 0x11840000   2242        8
+  7: 0x012c0000-0x02640000 0x01380000    156        6   initrd
+  8: 0x02640000-0x0da40000 0x0b400000   1440        7   factoryfs
+  9: 0x0da40000-0x1f280000 0x11840000   2242        8   datafs
  10: 0x1f280000-0x1f380000 0x00100000      8        9
  11: 0x1f380000-0x1f480000 0x00100000      8       10
 
@@ -1904,57 +1904,27 @@ static struct mtd_partition onenand_partitions[] = {
 	},
 	{
 		.name           = "system",
-		.offset         = 0x02640000,
+		.offset         = MTDPART_OFS_APPEND,
 		.size           = 0x0b400000,
 	},
 	{
 		.name           = "data",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x0e640000  
-		//.size           = 0x11840000,
-	},    
+		.size           = 0x11340000,
+		//.size           = 0x0e640000,
+	},
     {
 		.name           = "cache",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x03200000 ,
-	},  
-    
-	// {
-		// .name           = "bootloader",
-		// .offset         = 0,
-		// .size           = 0x20000,
-		// .mask_flags     = MTD_WRITEABLE,	/* Force read-only */
-	// },
-	// {
-		// .name           = "config",
-		// .offset         = MTDPART_OFS_APPEND,
-		// .size           = 0x60000,
-	// },
-	// {
-		// .name           = "log",
-		// .offset         = MTDPART_OFS_APPEND,
-		// .size           = 0x40000,
-	// },
-	// {
-		// .name           = "kernel",
-		// .offset         = MTDPART_OFS_APPEND,
-		// .size           = 0x200000,
-	// },
-	// {
-		// .name           = "initfs",
-		// .offset         = MTDPART_OFS_APPEND,
-		// .size           = 0x200000,
-	// },
-	// {
-		// .name           = "rootfs",
-		// .offset         = MTDPART_OFS_APPEND,
-		// .size           = MTDPART_SIZ_FULL,
-	// },
+		.size           = 0x00500000,
+		//.size           = 0x03200000,
+	},
+
 };
 
 static struct omap_onenand_platform_data board_onenand_data = {
 	.cs		= 0,
-	// .gpio_irq	= 65,
+	//.gpio_irq	= OMAP_GPIO_AP_NAND_INT,
     .dma_channel = -1,  /* disable DMA in OMAP OneNAND driver */
 	.parts		= onenand_partitions,
 	.nr_parts	= ARRAY_SIZE(onenand_partitions),
