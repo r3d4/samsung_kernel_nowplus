@@ -1330,7 +1330,9 @@ static struct regulator_init_data nowplus_vaux2 = {
 		.min_uV			= 2800000,
 		.max_uV			= 2800000,
 		.apply_uV		= true,
+#ifndef CONFIG_TOUCHSCREEN_SYNAPTICS_RMI4 /*macroliu,112.04.06 tw tsp*/
 		.always_on		= true,
+#endif
 		.valid_modes_mask	= REGULATOR_MODE_NORMAL
 					| REGULATOR_MODE_STANDBY,
 		.valid_ops_mask		= REGULATOR_CHANGE_MODE
