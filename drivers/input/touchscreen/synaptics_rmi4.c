@@ -366,7 +366,7 @@ static int synaptics_rmi4_suspend(struct i2c_client *client, pm_message_t msg)
 	#endif
 	//i2c_smbus_read_word_data(ts->client,20);
 	nowplus_enable_touch_pins(0);
-	regulator_disable(ts->regulator);
+	//regulator_disable(ts->regulator);
 	printk("[TSP] touchscreen suspend!\n");
 	return 0;
 }
@@ -376,7 +376,7 @@ static int synaptics_rmi4_resume(struct i2c_client *client)
 	/*touch sleep mode*/
 
 	struct synaptics_rmi4_data *ts = i2c_get_clientdata(client);
-	regulator_enable(ts->regulator);
+	//regulator_enable(ts->regulator);
 	nowplus_enable_touch_pins(1);
 	if (ts->irq)
 		enable_irq(ts->irq);
