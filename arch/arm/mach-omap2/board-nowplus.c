@@ -1330,7 +1330,9 @@ static struct regulator_init_data nowplus_vaux2 = {
 		.min_uV			= 2800000,
 		.max_uV			= 2800000,
 		.apply_uV		= true,
+#ifndef CONFIG_TOUCHSCREEN_SYNAPTICS_RMI4 /*macroliu,112.04.06 tw tsp*/
 		.always_on		= true,
+#endif
 		.valid_modes_mask	= REGULATOR_MODE_NORMAL
 					| REGULATOR_MODE_STANDBY,
 		.valid_ops_mask		= REGULATOR_CHANGE_MODE
@@ -1816,7 +1818,8 @@ static int __init nowplus_i2c_init(void)
 	omap_register_i2c_bus(1, 400, nowplus_i2c1_boardinfo,
 			ARRAY_SIZE(nowplus_i2c1_boardinfo));
 
-	omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
+	//omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
+	omap_register_i2c_bus(3, 400, nowplus_i2c3_boardinfo,
 			ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return 0;
 }

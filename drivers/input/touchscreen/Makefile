@@ -46,5 +46,6 @@ obj-$(CONFIG_TOUCHSCREEN_W90X900)	+= w90p910_ts.o
 obj-$(CONFIG_TOUCHSCREEN_PCAP)		+= pcap_ts.o
 obj-$(CONFIG_TOUCHSCREEN_SYNTM12XX)	+= syntm12xx.o
 obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_I2C_RMI4) += synaptics_i2c_rmi4.o
+obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_RMI4) += synaptics_rmi4.o
 obj-$(CONFIG_TOUCHSCREEN_AT42QT602240)      += atmel_touch_602240.o atmel_touchscreen.o atmel_touchscreen_i2c.o
 obj-$(CONFIG_TOUCHSCREEN_MELFAS)      += melfas_ts.o
