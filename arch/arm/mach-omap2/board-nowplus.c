@@ -1818,7 +1818,8 @@ static int __init nowplus_i2c_init(void)
 	omap_register_i2c_bus(1, 400, nowplus_i2c1_boardinfo,
 			ARRAY_SIZE(nowplus_i2c1_boardinfo));
 
-	omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
+	//omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
+	omap_register_i2c_bus(3, 400, nowplus_i2c3_boardinfo,
 			ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return 0;
 }

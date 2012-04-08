@@ -47,7 +47,12 @@ static struct omap_opp omap3_mpu_rate_table[] = {
 	/*OPP4*/
 	{S550M, VDD1_OPP4, 0x36},	// 1.275V
 	/*OPP5*/
+#ifdef CONFIG_MACH_NOWPLUS
+	//{S720M, VDD1_OPP5, 0x40},	// 1.400V
+	{S800M, VDD1_OPP5, 0x44},	// 1.450V
+#else
 	{S600M, VDD1_OPP5, 0x3C},	// 1.350V
+#endif
 };
 
 // OMAP3430 L3 rate table
