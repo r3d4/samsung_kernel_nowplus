@@ -1330,7 +1330,7 @@ static struct regulator_init_data nowplus_vaux2 = {
 		.min_uV			= 2800000,
 		.max_uV			= 2800000,
 		.apply_uV		= true,
-		.always_on		= true,
+		//.always_on		= true,
 		.valid_modes_mask	= REGULATOR_MODE_NORMAL
 					| REGULATOR_MODE_STANDBY,
 		.valid_ops_mask		= REGULATOR_CHANGE_MODE
@@ -1565,7 +1565,16 @@ static struct twl4030_script wakeup_p3_script __initdata = {
 	.size   = ARRAY_SIZE(wakeup_p3_seq),
 	.flags  = TWL4030_WAKEUP3_SCRIPT,
 };
+/* warm reset sequence:
+> omap_prcm_arch_reset: set OMAP_RST_GS Global Warm Reset
+> OMAP drive SYS_nRESWARM(=TWL nRESWARM) 1>0 
+> TWL start wrst sequence
 
+struct twl4030_ins {
+	u16 pmb_message;
+	u8 delay;
+};
+*/
 static struct twl4030_ins wrst_seq[] __initdata = {
 /*
  * Reset twl4030.
@@ -1810,13 +1819,18 @@ static struct i2c_board_info __initdata nowplus_i2c3_boardinfo[] = {
 
 static int __init nowplus_i2c_init(void)
 {
-	omap_register_i2c_bus(2, 200, nowplus_i2c2_boardinfo,
-			ARRAY_SIZE(nowplus_i2c2_boardinfo));
+/* TWL4030-USB module had a dependency on FSA9480 USB Switch device which is
+*  connected to I2C2 channel, so I2C channel 2 will get
+*  registered first and then followed by I2C1 channel. */
 
+//peripherie
+	omap_register_i2c_bus(2, 400, nowplus_i2c2_boardinfo,
+			ARRAY_SIZE(nowplus_i2c2_boardinfo));
+//pmic
 	omap_register_i2c_bus(1, 400, nowplus_i2c1_boardinfo,
 			ARRAY_SIZE(nowplus_i2c1_boardinfo));
-
-	omap_register_i2c_bus(3, 100, nowplus_i2c3_boardinfo,
+// tsp
+	omap_register_i2c_bus(3, 400, nowplus_i2c3_boardinfo,
 			ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return 0;
 }

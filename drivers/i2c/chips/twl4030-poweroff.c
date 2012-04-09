@@ -53,8 +53,23 @@ void twl4030_poweroff(void)
 {
 	u8 uninitialized_var(val);
 	int err;
+#if 0
+	/* Make sure SEQ_OFFSYNC is set so that all the res goes to wait-on */
+	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
+				   CFG_P123_TRANSITION);
+	if (err) {
+		pr_warning("I2C error %d while reading TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
+		return;
+	}
 
-
+	val |= SEQ_OFFSYNC;
+	err = twl_i2c_write_u8(TWL4030_MODULE_PM_MASTER, val,
+				    CFG_P123_TRANSITION);
+	if (err) {
+		pr_warning("I2C error %d while writing TWL4030 PM_MASTER CFG_P123_TRANSITION\n", err);
+		return;
+	}
+#endif
 	err = twl_i2c_read_u8(TWL4030_MODULE_PM_MASTER, &val,
 				  PWR_P1_SW_EVENTS);
 	if (err) {
@@ -63,7 +78,7 @@ void twl4030_poweroff(void)
 	}
 
 //	val |= PWR_STOPON_POWERON | PWR_DEVOFF;
-	val |= PWR_DEVOFF;  //no backup, real power off
+    val |= PWR_DEVOFF;
 
 	err = twl_i2c_write_u8(TWL4030_MODULE_PM_MASTER, val,
 				   PWR_P1_SW_EVENTS);
@@ -125,69 +140,15 @@ static void nowplus_poweroff(void)
 };
 
 
-
-static void zeus_poweroff(void)
-{
-	/* int n_usbic_state; */
-
-	printk("\nZEUS BOARD GOING TO SHUTDOWN!!!\n");
-
-#if defined(CONFIG_USB_ANDROID)
-	android_usb_set_connected(0);
-#endif
-
-	/* get_real_usbic_state(); */
-	//gpio_direction_output(GPIO_MSM_RST,0);
-	//gpio_direction_output(GPIO_FONE_ACTIVE, 0);
-	// if (GPIO_TA_CONNECTED_N is LOW)
-	
-	tl2796_lcd_poweroff();
-
-#if 0	
-	if (__do_forced_modemoff != NULL)
-	{
-	    printk("__do_forced_modemoff\n\n");
-		__do_forced_modemoff();
-	}	
-
-    msleep(2000);
-#endif
-	if ( get_real_usbic_state() )
-	{
-		printk("Warmreset by TA or USB or Jtag\n\n");
-
-		preempt_disable();
-		local_irq_disable();
-		local_fiq_disable();
-
-#if 1
-
-		/* using watchdog reset */
-		omap_watchdog_reset();
-		/* machine_restart("ta_inserted"); */
-#else
-		/* using core_dpll_warmreset with global reset */
-		//omap3_configure_core_dpll_warmreset();
-		//machine_restart("ta_inserted");
-#endif
-
-		while(1);
-	}
-	else
-	{
-		printk("Power Off !\n\n");
-		gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
-		twl4030_poweroff();
-		while(1);
-	}
-
-	return;
-}
-
-
-
 static int __init twl4030_poweroff_init(void)
-{	
+{
+	/*PS HOLD*/
+	if(gpio_request(OMAP_GPIO_PS_HOLD_PU, "OMAP_GPIO_PS_HOLD_PU") < 0 ){
+    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PS_HOLD_PU);
+    		return 1;
+  	}
+    gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 1);
+
 	pm_power_off = nowplus_poweroff;
 
 	return 0;
