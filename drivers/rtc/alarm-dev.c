@@ -60,6 +60,7 @@ static struct alarm alarms[ANDROID_ALARM_TYPE_COUNT];
 static long alarm_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	int rv = 0;
+	static int set_rtc_enable = 0; 
 	unsigned long flags;
 	struct timespec new_alarm_time;
 	struct timespec new_rtc_time;
@@ -165,6 +166,11 @@ from_old_alarm_set:
 		spin_unlock_irqrestore(&alarm_slock, flags);
 		break;
 	case ANDROID_ALARM_SET_RTC:
+		if (!set_rtc_enable){  /*基带发过来的时间2005.01.07,这个时间是错误的，在这里先屏蔽掉*/
+			set_rtc_enable = 1;
+			rv = -EFAULT;
+			goto err1;
+		}
 		if (copy_from_user(&new_rtc_time, (void __user *)arg,
 		    sizeof(new_rtc_time))) {
 			rv = -EFAULT;

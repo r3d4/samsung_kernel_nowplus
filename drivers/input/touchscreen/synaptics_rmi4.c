@@ -218,15 +218,12 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *pdata)
 	x = val[22] << 4 | (val[24] & 0x0f);//x
 	y = val[23] << 4 | ((val[24] & 0xf0) >> 4);//y
 	
-	if (x > 479)
-		x = 479;
-	if (y > 799)
-		y = 799;
-	if (x < 1)
-		x = 1;
-	if (y < 1)
-		y = 1;
-
+	x = x*1000/1025; /*480->468*//*1012 480 ->474*/
+	y = y*1000/1025; /*800->790*//*1012 800->780*/
+	
+	if ((x > 480) || (x < 1) || (y > 800) || (y < 1))
+		goto goback;
+		
 	if ((finger_contact == 0) || (finger_pressure == 0)) /*保证放手动作正常*/
 		finger_pressure = finger_contact = 0;
 		
@@ -264,7 +261,7 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *pdata)
 	//printk("X= %d Y= %d finger_contact= %d finger_pressure= %d\n",x,y,finger_contact, finger_pressure );	
 	//printk("[TSP-LCQ]: X= %d Y= %d CONTACT= %d SIZE= %d R13= %d=%02x\n",(val[2] << 8 | val[3]), (val[4] << 8 | val[5]), val[1],val[12], val[13],val[13] );
 
-//goback:
+goback:
 	if(ts->irq)
 	
 	{
