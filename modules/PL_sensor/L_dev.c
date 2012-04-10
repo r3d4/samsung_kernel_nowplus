@@ -139,8 +139,9 @@ static L_device_t L_dev =
     .op_state = 0,
 };    
 
-static int adc_table[] = { 100000, 500, 400, 100, 30, 0};
-
+//static int adc_table[] = { 100000, 500, 400, 100, 30, 0};
+//increase repoting sensitivity
+static int adc_table[] = { 100000, 2500, 1500, 1000, 800, 700, 600, 500, 400, 300, 200, 100};
 /**************************************************************/
 
 // ryun 20091030 for calculate LCD brightness
