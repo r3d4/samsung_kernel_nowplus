@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Thu Apr  5 17:00:54 2012
+# Tue Apr 10 16:36:29 2012
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -994,7 +994,7 @@ CONFIG_INPUT_NOWPLUS_POWER_KEY=y
 # CONFIG_INPUT_YEALINK is not set
 # CONFIG_INPUT_CM109 is not set
 # CONFIG_INPUT_TWL4030_PWRBUTTON is not set
-# CONFIG_INPUT_UINPUT is not set
+CONFIG_INPUT_UINPUT=y
 # CONFIG_INPUT_GPIO is not set
 # CONFIG_INPUT_GPIO_ROTARY_ENCODER is not set
 # CONFIG_INPUT_HALLEFFECT_BU52014HV is not set
