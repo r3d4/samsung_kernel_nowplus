@@ -447,7 +447,7 @@ static int synaptics_rmi4_suspend(struct i2c_client *client, pm_message_t msg)
 	struct synaptics_rmi4_data *ts = i2c_get_clientdata(client);
 	ts->touch_stopped = true;
 	if(ts->irq){		
-		i2c_smbus_read_word_data(ts->client, ts->f01_data_base + 1);
+		//i2c_smbus_read_word_data(ts->client, ts->f01_data_base + 1);
 		disable_irq(ts->irq);
 	}
 #ifdef TP_USE_WORKQUEUE
@@ -461,10 +461,13 @@ static int synaptics_rmi4_suspend(struct i2c_client *client, pm_message_t msg)
 	#endif
 	//i2c_smbus_read_word_data(ts->client,20);
 	nowplus_enable_touch_pins(0);
-	/* 关了电后触摸屏再上电要很久才有响应
+	/* 关了电后触摸屏再上电要很久才有响应*/
 	if (ts->regulator)
-		regulator_disable(ts->regulator);
-	*/
+	{
+		regulator_disable(ts->regulator); /*关一下电，让TP完全复位*/
+		mdelay(100);		
+		regulator_enable(ts->regulator); /*这样可以在suspend期间，TP自己恢复工作*/
+	}
 	printk("[TSP] touchscreen suspend!\n");
 	return 0;
 }
@@ -475,15 +478,15 @@ static int synaptics_rmi4_resume(struct i2c_client *client)
 	/*touch sleep mode*/
 
 	struct synaptics_rmi4_data *ts = i2c_get_clientdata(client);
-	/* 关了电后触摸屏再上电要很久才有响应 
+	/* 关了电后触摸屏再上电要4秒才有响应
 	if (ts->regulator)
 		regulator_enable(ts->regulator);
 	mdelay(1);
-	*/
+	*/ 
 	nowplus_enable_touch_pins(1);
 	mdelay(1);
 	if (ts->irq){
-		i2c_smbus_read_word_data(ts->client, ts->f01_data_base + 1);
+		//i2c_smbus_read_word_data(ts->client, ts->f01_data_base + 1);
 		enable_irq(ts->irq);
 	}
 	ts->touch_stopped = false;
