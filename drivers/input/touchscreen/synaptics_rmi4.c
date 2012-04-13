@@ -180,14 +180,17 @@ static irqreturn_t synaptics_rmi4_irq_handler(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 #else
+#define X_OFFSET_MAX	10
+#define Y_OFFSET_MAX	20
 static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *pdata)
 {	
 	struct synaptics_rmi4_data *ts = pdata;
 
 	/*register status*/
 	//int i;
-	s32 finger_pressure,finger_contact;
-	int x,y;//,xx,yy;
+	int finger_pressure,finger_contact;
+	static int pre_x = -1,pre_y = -1,pre_val26 = -1;
+	int x = 0,y = 0;//,xx,yy;
 	unsigned char val[TOTAL_REG];
 	//i2c_smbus_read_i2c_block_data(ts->client,0,TOTAL_REG,val); /*一次读27个数，我认为可能太占时间*/
 	//printk("tp\n");
@@ -212,20 +215,48 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *pdata)
 	//xx = val[2] << 8 | val[3];/*这个值再放手时为0其它时后等于x*/
 	//yy = val[4] << 8 | val[5];/*这个值再放手时为0其它时后等于y*/
 
-	finger_pressure = val[26]>>4;//val[13]&0xf;
-	finger_contact = (val[12]<<4) | ((val[13] >> 4) & 0xf);
-
 	x = val[22] << 4 | (val[24] & 0x0f);//x
 	y = val[23] << 4 | ((val[24] & 0xf0) >> 4);//y
-	
-	x = x*1000/1025; /*480->468*//*1012 480 ->474*/
-	y = y*1000/1025; /*800->790*//*1012 800->780*/
+	//printk("old X= %d Y= %d\n",x,y);	
 	
 	if ((x > 480) || (x < 1) || (y > 800) || (y < 1))
 		goto goback;
+	
+	/*不想重复上报相同的点
+	if ((x == pre_x) && (y == pre_y) && (pre_val26 == val[26]))
+		goto goback;
+	
+	pre_x = x;
+	pre_y = y;
+	pre_val26 = val[26];
+	*/	
+	if ((x < 5) || (x > 478))
+		x--;
+	else
+		x = x + X_OFFSET_MAX - X_OFFSET_MAX * x /240;
+
+	if ((y < 3) || (y > 798))
+		y--;
+	else
+		y = y + Y_OFFSET_MAX - Y_OFFSET_MAX * y /400;
+	//printk("new X= %d Y= %d\n",x,y);	
 		
-	if ((finger_contact == 0) || (finger_pressure == 0)) /*保证放手动作正常*/
-		finger_pressure = finger_contact = 0;
+	if ((x >= 480) || (x < 0) || (y >= 800) || (y < 0))
+		goto goback;
+	
+	//x = x*1000/1025; /*480->468*//*1012 480 ->474*/
+	//y = y*1000/1025; /*800->790*//*1012 800->780*/
+	finger_pressure = val[26]>>4;//val[13]&0xf;
+	finger_contact = (val[12]<<4) | ((val[13] >> 4) & 0xf);
+	/*
+	finger_contact <<= 1;
+	if (finger_contact > 254)
+		finger_contact = 254; 
+	*/
+			
+	if (finger_pressure == 0) /*保证放手动作正常(finger_contact == 0) ||*/
+		finger_contact = 0;
+	
 		
 	//if (finger_contact > 30)
 	//	finger_contact = 30;
@@ -251,8 +282,8 @@ static int synaptics_rmi4_sensor_report(struct synaptics_rmi4_data *pdata)
 
 	input_report_abs(ts->input, ABS_MT_TOUCH_MAJOR,finger_contact);//finger contact finger_contact
 	input_report_abs(ts->input, ABS_MT_WIDTH_MAJOR,finger_pressure);//pressure finger_pressure
-	input_report_abs(ts->input, ABS_MT_POSITION_X,x - 1);//x
-	input_report_abs(ts->input, ABS_MT_POSITION_Y,y - 1);//y
+	input_report_abs(ts->input, ABS_MT_POSITION_X,x);//x
+	input_report_abs(ts->input, ABS_MT_POSITION_Y,y);//y
 
 	input_mt_sync(ts->input);
 

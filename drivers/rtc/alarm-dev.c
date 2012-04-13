@@ -28,7 +28,7 @@
 #define ANDROID_ALARM_PRINT_INFO (1U << 0)
 #define ANDROID_ALARM_PRINT_IO (1U << 1)
 #define ANDROID_ALARM_PRINT_INT (1U << 2)
-
+#define RECEIVE_MODEM_BASEBAND_TIME
 static int debug_mask = ANDROID_ALARM_PRINT_INFO;
 module_param_named(debug_mask, debug_mask, int, S_IRUGO | S_IWUSR | S_IWGRP);
 
@@ -60,7 +60,9 @@ static struct alarm alarms[ANDROID_ALARM_TYPE_COUNT];
 static long alarm_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	int rv = 0;
+	#ifndef RECEIVE_MODEM_BASEBAND_TIME
 	static int set_rtc_enable = 0; 
+	#endif
 	unsigned long flags;
 	struct timespec new_alarm_time;
 	struct timespec new_rtc_time;
@@ -166,11 +168,13 @@ from_old_alarm_set:
 		spin_unlock_irqrestore(&alarm_slock, flags);
 		break;
 	case ANDROID_ALARM_SET_RTC:
+		#ifndef RECEIVE_MODEM_BASEBAND_TIME
 		if (!set_rtc_enable){  /*基带发过来的时间2005.01.07,这个时间是错误的，在这里先屏蔽掉*/
 			set_rtc_enable = 1;
 			rv = -EFAULT;
 			goto err1;
 		}
+		#endif
 		if (copy_from_user(&new_rtc_time, (void __user *)arg,
 		    sizeof(new_rtc_time))) {
 			rv = -EFAULT;
