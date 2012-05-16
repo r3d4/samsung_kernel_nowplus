@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.35.7
-# Wed May 16 09:08:52 2012
+# Wed May 16 19:32:41 2012
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -276,7 +276,7 @@ CONFIG_OMAP_SMARTREFLEX=y
 CONFIG_OMAP_SMARTREFLEX_TESTING=y
 # CONFIG_OMAP_SMARTREFLEX_CLASS3 is not set
 # CONFIG_OMAP_ABB is not set
-CONFIG_OMAP_RESET_CLOCKS=y
+# CONFIG_OMAP_RESET_CLOCKS is not set
 CONFIG_OMAP_MUX=y
 CONFIG_OMAP_MUX_DEBUG=y
 CONFIG_OMAP_MUX_WARNINGS=y
@@ -429,7 +429,7 @@ CONFIG_ALIGNMENT_TRAP=y
 #
 CONFIG_ZBOOT_ROM_TEXT=0x0
 CONFIG_ZBOOT_ROM_BSS=0x0
-CONFIG_CMDLINE="root=/dev/mmcblk0p2 rw mem=256M init=/init mpurate=600M rootwait videoout=omap_vout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=\"0:4M\""
+CONFIG_CMDLINE="root=/dev/mmcblk0p2 rw mem=256M init=/init rootwait videoout=omap_vout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram=\"0:4M\""
 CONFIG_CMDLINE_FORCE=y
 # CONFIG_XIP_KERNEL is not set
 # CONFIG_KEXEC is not set
@@ -1995,11 +1995,7 @@ CONFIG_SAMSUNG_PROXIMITY_LIGHT=y
 # Kionix KXSD9 Accelerometer Driver
 #
 CONFIG_INPUT_KXSD9=y
-CONFIG_SGX530=y
-CONFIG_SGX_REV121=y
-# CONFIG_SGX_REV125 is not set
-CONFIG_SGX_530_BUILD_RELEASE=y
-# CONFIG_SGX_530_BUILD_DEBUG is not set
+# CONFIG_SGX530 is not set
 CONFIG_MPU_BRIDGE=y
 # CONFIG_BRIDGE_DVFS is not set
 CONFIG_BRIDGE_MEMPOOL_SIZE=0x600000

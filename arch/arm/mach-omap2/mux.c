@@ -195,7 +195,7 @@ static int __init _omap_mux_init_signal(struct omap_mux_partition *partition,
 				old_mode = omap_mux_read(partition,
 							 m->reg_offset);
 				mux_mode = val | i;
-				pr_debug("%s: Setting signal "
+				printk/*pr_debug*/("%s: Setting signal "
 					 "%s.%s 0x%04x -> 0x%04x\n",
 					 __func__, m0_entry, muxname,
 					old_mode, mux_mode);

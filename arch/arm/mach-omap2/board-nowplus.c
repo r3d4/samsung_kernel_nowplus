@@ -1015,22 +1015,22 @@ static	struct	omap2_hsmmc_info	nowplus_mmc[]	=	{
 		.gpio_wp		=	-EINVAL,
 		.power_saving	=	true,
 	},
-	{
-		.name			=	"internal",
-		.mmc			=	2,
-		.caps			=	MMC_CAP_4_BIT_DATA	|	MMC_CAP_8_BIT_DATA,
-		.gpio_cd		=	-EINVAL,
-		.gpio_wp		=	-EINVAL,
-		.nonremovable	=	true,
-		.power_saving	=	true,
-	},
-	{
-		.mmc			=	3,
-		.caps			=	MMC_CAP_4_BIT_DATA,
-		.gpio_cd		=	-EINVAL,
-		.gpio_wp		=	-EINVAL,
-	},
-	{}	/*	Terminator	*/
+	// {
+		// .name			=	"internal",
+		// .mmc			=	2,
+		// .caps			=	MMC_CAP_4_BIT_DATA	|	MMC_CAP_8_BIT_DATA,
+		// .gpio_cd		=	-EINVAL,
+		// .gpio_wp		=	-EINVAL,
+		// .nonremovable	=	true,
+		// .power_saving	=	true,
+	// },
+	// {
+		// .mmc			=	3,
+		// .caps			=	MMC_CAP_4_BIT_DATA,
+		// .gpio_cd		=	-EINVAL,
+		// .gpio_wp		=	-EINVAL,
+	// },
+	// {}	/*	Terminator	*/
 };
 
 
@@ -1042,10 +1042,10 @@ static	int	__init	nowplus_twl_gpio_setup(struct	device	*dev,
 
 	/*	link	regulators	to	MMC	adapters	*/
 	nowplus_vmmc1_supply.dev	=	nowplus_mmc[0].dev;
-#ifdef	ENABLE_EMMC
-	nowplus_vmmc2_supply.dev	=	nowplus_mmc[1].dev;
-#endif
-	nowplus_vsim_supply.dev	=	nowplus_mmc[2].dev;
+// #ifdef	ENABLE_EMMC
+	// nowplus_vmmc2_supply.dev	=	nowplus_mmc[1].dev;
+// #endif
+	// nowplus_vsim_supply.dev	=	nowplus_mmc[2].dev;
 
 	return	0;
 }
@@ -1507,7 +1507,7 @@ static	int	__init	nowplus_i2c_init(void)
 		*	registered	first	and	then	followed	by	I2C1	channel.	*/
 	omap_register_i2c_bus(2, 400, NULL, nowplus_i2c2_boardinfo,	ARRAY_SIZE(nowplus_i2c2_boardinfo));
 	omap_register_i2c_bus(1, 400, NULL, nowplus_i2c1_boardinfo,	ARRAY_SIZE(nowplus_i2c1_boardinfo));
-	omap_register_i2c_bus(3, 100, NULL, nowplus_i2c3_boardinfo,	ARRAY_SIZE(nowplus_i2c3_boardinfo));
+	omap_register_i2c_bus(3, 400, NULL, nowplus_i2c3_boardinfo,	ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return	0;
 }
 
@@ -2205,7 +2205,7 @@ void	__init	nowplus_peripherals_init(void)
 {
 	/*	For	Display	*/
 
-	nowplus_i2c_init();
+
 	synaptics_dev_init();
 	omap_serial_init(omap_serial_platform_data);
 	usb_musb_init(&musb_board_data);
@@ -2216,7 +2216,7 @@ void	__init	nowplus_peripherals_init(void)
 	
 	omap_display_init(&nowplus_dss_data);
 	spi_register_board_info(nowplus_spi_board_info,	ARRAY_SIZE(nowplus_spi_board_info));
-
+    nowplus_i2c_init();
 }
 
 

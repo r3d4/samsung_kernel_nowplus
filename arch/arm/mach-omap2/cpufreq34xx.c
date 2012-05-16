@@ -53,7 +53,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* MPU OPP5 */
 	OMAP_OPP_DEF("mpu", true, 600000000, 1437500),
 	/* MPU OPP6 */
-	OMAP_OPP_DEF("mpu", true, 720000000, 1450000),
+//	OMAP_OPP_DEF("mpu", true, 720000000, 1450000),
 	/*
 	 * L3 OPP1 - 41.5 MHz is disabled because: The voltage for that OPP is
 	 * almost the same than the one at 83MHz thus providing very little
@@ -80,7 +80,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* DSP OPP5 */
 	OMAP_OPP_DEF("iva", true, 430000000, 1437500),
 	/* DSP OPP6 */
-	OMAP_OPP_DEF("iva", true, 520000000, 1450000),
+//	OMAP_OPP_DEF("iva", true, 520000000, 1450000),
 };
 static u32 omap34xx_opp_def_size = ARRAY_SIZE(omap34xx_opp_def_list);
 

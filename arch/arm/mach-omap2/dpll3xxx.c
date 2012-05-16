@@ -142,7 +142,7 @@ static int _omap3_noncore_dpll_lock(struct clk *clk)
 	u8 ai;
 	int r;
 
-	printk("clock: locking DPLL %s\n", clk->name);
+	//printk("clock: locking DPLL %s\n", clk->name);
 
 	ai = omap3_dpll_autoidle_read(clk);
 
@@ -176,13 +176,13 @@ static int _omap3_noncore_dpll_bypass(struct clk *clk)
 	int r;
 	u8 ai;
     
-	printk("_omap3_noncore_dpll_bypass\n");
+	//printk("_omap3_noncore_dpll_bypass\n");
          
 	if (!(clk->dpll_data->modes & (1 << DPLL_LOW_POWER_BYPASS)))
 		return -EINVAL;
 
-	printk("clock: configuring DPLL %s for low-power bypass\n",
-		 clk->name);
+	// printk("clock: configuring DPLL %s for low-power bypass\n",
+		 // clk->name);
 
 	ai = omap3_dpll_autoidle_read(clk);
 
