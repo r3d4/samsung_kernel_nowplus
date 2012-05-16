@@ -128,6 +128,8 @@ static struct omap_video_timings tl2796_panel_timings = {
 
 static int tl2796_panel_probe(struct omap_dss_device *dssdev)
 {
+    int ret;
+    
 	dssdev->panel.config = OMAP_DSS_LCD_TFT | OMAP_DSS_LCD_IVS |
 				OMAP_DSS_LCD_IHS | OMAP_DSS_LCD_RF |
 				OMAP_DSS_LCD_ONOFF; /*OMAP_DSS_LCD_TFT | OMAP_DSS_LCD_IVS |OMAP_DSS_LCD_IEO |OMAP_DSS_LCD_IPC |
@@ -168,7 +170,7 @@ static void tl2796_panel_remove(struct omap_dss_device *dssdev)
 	regulator_put( vaux4 );
 	regulator_put( vaux3 );
 	//regulator_put( vpll2 );
-	// gpio_free(OMAP_GPIO_MLCD_RST);
+	 //gpio_free(OMAP_GPIO_MLCD_RST);
 }
 
 static int tl2796_panel_enable(struct omap_dss_device *dssdev)
@@ -227,6 +229,8 @@ static int tl2796_panel_resume(struct omap_dss_device *dssdev)
 
 	spi_setup(tl2796lcd_spi);
     tl2796_lcd_poweron();
+    dssdev->state = OMAP_DSS_DISPLAY_ACTIVE;
+
 	return 0;
 }
 

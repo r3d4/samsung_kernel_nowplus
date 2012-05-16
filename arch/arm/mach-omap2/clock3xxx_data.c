@@ -332,7 +332,7 @@ static struct clk dpll1_ck = {
 	.name		= "dpll1_ck",
 	.ops		= &clkops_null,
 	.parent		= &sys_ck,
-	.init		= &omap3_dpll_init,
+	//.init		= &omap3_dpll_init,
 	.dpll_data	= &dpll1_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -406,7 +406,7 @@ static struct clk dpll2_ck = {
 	.name		= "dpll2_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	.init		= &omap3_dpll_init,
+	//.init		= &omap3_dpll_init,
 	.dpll_data	= &dpll2_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -467,7 +467,7 @@ static struct clk dpll3_ck = {
 	.name		= "dpll3_ck",
 	.ops		= &clkops_null,
 	.parent		= &sys_ck,
-	.init		= &omap3_dpll_init,
+	//.init		= &omap3_dpll_init,
 	.dpll_data	= &dpll3_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.clkdm_name	= "dpll3_clkdm",
@@ -617,7 +617,7 @@ static struct clk dpll4_ck = {
 	.name		= "dpll4_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	.init		= &omap3_dpll_init,
+	//.init		= &omap3_dpll_init,
 	.dpll_data	= &dpll4_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_dpll4_set_rate,
@@ -954,7 +954,7 @@ static struct clk dpll5_ck = {
 	.name		= "dpll5_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	.init		= &omap3_dpll_init,
+	//.init		= &omap3_dpll_init,
 	.dpll_data	= &dpll5_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -3096,6 +3096,7 @@ static struct clk gpt12_fck = {
 	.name		= "gpt12_fck",
 	.ops		= &clkops_null,
 	.parent		= &secure_32k_fck,
+    .clkdm_name	= "wkup_clkdm",
 	.recalc		= &followparent_recalc,
 };
 
@@ -3103,6 +3104,7 @@ static struct clk wdt1_fck = {
 	.name		= "wdt1_fck",
 	.ops		= &clkops_null,
 	.parent		= &secure_32k_fck,
+    .clkdm_name	= "wkup_clkdm",
 	.recalc		= &followparent_recalc,
 };
 
@@ -3562,7 +3564,7 @@ int __init omap3xxx_clk_init(void)
 	       "%ld.%01ld/%ld/%ld MHz\n",
 	       (osc_sys_ck.rate / 1000000), (osc_sys_ck.rate / 100000) % 10,
 	       (core_ck.rate / 1000000), (arm_fck.rate / 1000000));
-
+           
 	/*
 	 * Only enable those clocks we will need, let the drivers
 	 * enable other clocks as necessary

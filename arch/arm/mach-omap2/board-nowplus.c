@@ -945,7 +945,7 @@ static	struct	regulator_init_data	nowplus_vpll2	=	{
 	.constraints	=	{
 		.min_uV			=	1800000,
 		.max_uV			=	1800000,
-		//.apply_uV		=	true,
+		.apply_uV		=	true,
 		.boot_on		=	true,
 		.valid_modes_mask	=	REGULATOR_MODE_NORMAL
 					|	REGULATOR_MODE_STANDBY,
@@ -2224,7 +2224,7 @@ static	void	__init	nowplus_init_irq(void)
 {
 	omap_board_config	=	nowplus_config;
 	omap_board_config_size	=	ARRAY_SIZE(nowplus_config);
-	omap2_init_common_hw(nowplus_sdrc_params,	nowplus_sdrc_params);
+	omap2_init_common_hw(nowplus_sdrc_params,	NULL);
 	omap2_gp_clockevent_set_gptimer(1);
 	omap_init_irq();
 }

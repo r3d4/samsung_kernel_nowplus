@@ -43,6 +43,7 @@
 
 #define MAX_DPLL_WAIT_TRIES		1000000
 
+#define DEBUG
 /* Private functions */
 
 /* _omap3_dpll_write_clken - write clken_bits arg to a DPLL's enable bits */
@@ -96,6 +97,7 @@ static u16 _omap3_dpll_compute_freqsel(struct clk *clk, u8 n)
 	u16 f = 0;
 
 	fint = clk->dpll_data->clk_ref->rate / (n + 1);
+	//fint = clk->dpll_data->clk_ref->rate / n;
 
 	pr_debug("clock: fint is %lu\n", fint);
 
@@ -140,7 +142,7 @@ static int _omap3_noncore_dpll_lock(struct clk *clk)
 	u8 ai;
 	int r;
 
-	pr_debug("clock: locking DPLL %s\n", clk->name);
+	printk("clock: locking DPLL %s\n", clk->name);
 
 	ai = omap3_dpll_autoidle_read(clk);
 
@@ -173,11 +175,13 @@ static int _omap3_noncore_dpll_bypass(struct clk *clk)
 {
 	int r;
 	u8 ai;
-
+    
+	printk("_omap3_noncore_dpll_bypass\n");
+         
 	if (!(clk->dpll_data->modes & (1 << DPLL_LOW_POWER_BYPASS)))
 		return -EINVAL;
 
-	pr_debug("clock: configuring DPLL %s for low-power bypass\n",
+	printk("clock: configuring DPLL %s for low-power bypass\n",
 		 clk->name);
 
 	ai = omap3_dpll_autoidle_read(clk);
@@ -410,10 +414,13 @@ int omap3_noncore_dpll_enable(struct clk *clk)
 {
 	int r;
 	struct dpll_data *dd;
-
+    
 	dd = clk->dpll_data;
 	if (!dd)
 		return -EINVAL;
+
+printk("omap3_noncore_dpll_enable: %s, rate=%d, bypass: %s, rate=%d\n", 
+    clk->name, clk->rate, dd->clk_bypass->name, dd->clk_bypass->rate);
 
 	if (clk->rate == dd->clk_bypass->rate) {
 		WARN_ON(clk->parent != dd->clk_bypass);
