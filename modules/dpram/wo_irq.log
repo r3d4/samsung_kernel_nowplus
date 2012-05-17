@@ -1,0 +1,112 @@
+E/RIL     ( 1119): [*] RIL initialized: TID(1119)
+E/RIL     ( 1119): [RIL_Init] RILD-Silent flag :: 
+D/RIL     ( 1119): dload_test start. 
+I/RIL     ( 1119): Opening tty device /dev/ttyS0
+D/RILC    ( 1119): startMultiClientSocket() START
+D/RILC    ( 1119): startMultiClientSocket() fd=14 END
+I/RIL     ( 1119): setRadioState: sState 0, s_closed 0
+D/RILC    ( 1119): responseString()
+I/RIL     ( 1119): setRadioState: sState 4, s_closed 0
+E/RIL     ( 1119): wifi addr file open failed.
+E/RIL     ( 1119): csc ver file open failed.
+I/PHONE   ( 1357): Network Mode set to 1
+I/PHONE   ( 1357): Cdma Subscription set to 1
+I/PHONE   ( 1357): RILClassname is 
+I/PHONE   ( 1357): Creating GSMPhone
+D/RILC    ( 1119): removeWatch: fd=10
+I/RILC    ( 1119): libril: new connection=20
+D/RILC    ( 1119): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_SIM_READY}
+I/RILC    ( 1119): RIL Daemon version: Samsung RIL(IPC) v1.0
+I/RILJ    ( 1357): Connected to 'rild' socket
+D/RILJ    ( 1357): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_READY
+D/RILJ    ( 1357): Radio ON @ init; reset to OFF
+D/RILJ    ( 1357): [0000]> REQUEST_SET_PREFERRED_NETWORK_TYPE : 1
+D/RILC    ( 1119): [0000]> SET_PREFERRED_NETWORK_TYPE (1)
+D/RILJ    ( 1357): [0001]> RIL_REQUEST_CDMA_SET_SUBSCRIPTION : 1
+D/RILC    ( 1119): [0001]> CDMA_SET_SUBSCRIPTION (1)
+D/RILJ    ( 1357): [0002]> RADIO_POWER
+D/RILC    ( 1119): [0002]> RADIO_POWER (0)
+D/RILC    ( 1119): [0000]< SET_PREFERRED_NETWORK_TYPE
+D/RILC    ( 1119): [0001]< CDMA_SET_SUBSCRIPTION fails by E_REQUEST_NOT_SUPPORTED
+D/RILJ    ( 1357): [0000]< REQUEST_SET_PREFERRED_NETWORK_TYPE 
+D/RILJ    ( 1357): [0001]< RIL_REQUEST_CDMA_SET_SUBSCRIPTION error: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+D/PHONE   ( 1357): mDoesRilSendMultipleCallRing=false
+D/PHONE   ( 1357): mCallRingDelay=3000
+W/GSM     ( 1357): Can't open /system/etc/voicemail-conf.xml
+D/GSM     ( 1357): [DSAC DEB] registerForPsRestrictedEnabled 
+D/GSM     ( 1357): [DSAC DEB] registerForPsRestrictedDisabled 
+D/GSM     ( 1357): [GsmDataConnection-1] DataConnection constructor E
+D/GSM     ( 1357): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1357): [GsmDataConnection-1] DataConnection constructor X
+D/GSM     ( 1357): [GsmDataConnection-1] Made GsmDataConnection-1
+D/RILJ    ( 1357): [0003]> RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING
+D/STK     ( 1357): StkService: StkService: is running
+D/STK     ( 1357): StkService: NEW sInstance
+D/RILC    ( 1119): [0003]> REPORT_STK_SERVICE_IS_RUNNING 
+D/RILJ    ( 1357): [0004]> GET_CURRENT_CALLS
+E/GSM     ( 1357): Wrong network type: 0
+E/GSM     ( 1357): Wrong network type: 0
+D/GSM     ( 1357): Poll ServiceState done:  oldSS=[1 home null null null  Unknown CSS not supported 0 0RoamInd: 0DefRoamInd: 0EmergOnly: false] newSS=[1 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=1 oldType=unknown newType=unknown
+D/GSM     ( 1357): [GsmDataConnection-1] DcInactiveState: msg.what=EVENT_RESET, ignore we're already reset
+D/GSM     ( 1357): [GsmDataConnection-1] NotifyDisconnectCompleted
+D/GSM     ( 1357): [DataConnection] Stop poll NetStat
+D/GSM     ( 1357): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1357): [DataConnection] Stop poll NetStat
+D/GSM     ( 1357): [DSAC DEB] trySetupData with mIsPsRestricted=false
+D/GSM     ( 1357): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED NOT_READY reason null
+D/RILJ    ( 1357): [0005]> SCREEN_STATE: true
+D/RILC    ( 1119): [0004]> GET_CURRENT_CALLS 
+D/RILC    ( 1119): [0005]> SCREEN_STATE (1)
+D/RILC    ( 1119): [0002]< RADIO_POWER
+D/RILC    ( 1119): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_OFF}
+I/RIL     ( 1119): setRadioState: sState 0, s_closed 0
+D/RILC    ( 1119): [0003]< REPORT_STK_SERVICE_IS_RUNNING fails by E_REQUEST_NOT_SUPPORTED
+D/RILJ    ( 1357): [0002]< RADIO_POWER 
+D/RILJ    ( 1357): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED RADIO_OFF
+D/RILB    ( 1357): Notifying: radio available
+D/RILJ    ( 1357): [0006]> SCREEN_STATE: true
+D/RILC    ( 1119): [0004]< GET_CURRENT_CALLS
+D/RILC    ( 1119): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1119): [0005]< SCREEN_STATE
+D/RILJ    ( 1357): [0003]< RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING error: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+D/RILJ    ( 1357): [0004]< GET_CURRENT_CALLS  
+D/RILC    ( 1119): [0006]> SCREEN_STATE (1)
+D/RILC    ( 1119): [0006]< SCREEN_STATE fails by E_RAIDO_NOT_AVAILABLE
+D/RILJ    ( 1357): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1357): [0005]< SCREEN_STATE 
+D/RILJ    ( 1357): [0006]< SCREEN_STATE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/GSM     ( 1357): [DataConnection] Stop poll NetStat
+E/GSM     ( 1357): Wrong network type: 0
+E/GSM     ( 1357): Wrong network type: 0
+D/GSM     ( 1357): Poll ServiceState done:  oldSS=[1 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=1 oldType=unknown newType=unknown
+D/RILJ    ( 1357): [0007]> BASEBAND_VERSION
+D/RILC    ( 1119): [0007]> BASEBAND_VERSION 
+D/RILJ    ( 1357): [0008]> GET_IMEI
+D/RILC    ( 1119): responseString()
+D/RILC    ( 1119): [0007]< BASEBAND_VERSION {i8320BUJA2}
+D/RILJ    ( 1357): [0007]< BASEBAND_VERSION i8320BUJA2
+D/RILC    ( 1119): [0008]> GET_IMEI 
+D/RILJ    ( 1357): [0009]> GET_IMEISV
+D/RILC    ( 1119): responseString()
+D/RILC    ( 1119): [0008]< GET_IMEI {353629030345598}
+D/RILC    ( 1119): [0009]> GET_IMEISV 
+D/RILC    ( 1119): responseString()
+D/RILC    ( 1119): [0009]< GET_IMEISV {01}
+E/GSM     ( 1357): Wrong network type: 0
+E/GSM     ( 1357): Wrong network type: 0
+D/GSM     ( 1357): Poll ServiceState done:  oldSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=1 oldType=unknown newType=unknown
+D/GSM     ( 1357): Baseband version: i8320BUJA2
+D/RILJ    ( 1357): [0008]< GET_IMEI 
+D/RILJ    ( 1357): [0009]< GET_IMEISV 
+D/STK     ( 1357): StkService: Return current sInstance
+D/STK     ( 1357): StkAppService$ServiceHandler: OP_BOOT_COMPLETED
+D/RILJ    ( 1357): [0010]> SCREEN_STATE: false
+D/GSM     ( 1357): [DataConnection] Stop poll NetStat
+D/RILC    ( 1119): [0010]> SCREEN_STATE (0)
+D/RILC    ( 1119): [0010]< SCREEN_STATE fails by E_RAIDO_NOT_AVAILABLE
+D/RILJ    ( 1357): [0010]< SCREEN_STATE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/RILJ    ( 1357): [0011]> SCREEN_STATE: true
+D/RILC    ( 1119): [0011]> SCREEN_STATE (1)
+D/RILC    ( 1119): [0011]< SCREEN_STATE fails by E_RAIDO_NOT_AVAILABLE
+D/RILJ    ( 1357): [0011]< SCREEN_STATE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/GSM     ( 1357): [DataConnection] Stop poll NetStat

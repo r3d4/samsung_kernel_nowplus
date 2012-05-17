@@ -25,6 +25,7 @@
 #include <linux/pm.h>
 #include <linux/i2c/twl.h>
 #include <linux/fsa9480.h>
+#include <linux/delay.h>
 #include <mach/gpio.h>
 #include <plat/mux.h>
 
@@ -36,6 +37,8 @@
 #define PWR_P1_SW_EVENTS	0x10
 #define PWR_DEVOFF	(1<<0)
 
+void (*__do_forced_modemoff)(void) = NULL;
+EXPORT_SYMBOL(__do_forced_modemoff);
 
 // prototypes
 extern void tl2796_lcd_poweroff(void);
@@ -81,7 +84,16 @@ static void zeus_poweroff(void)
 #endif
 
 	tl2796_lcd_poweroff();
-	
+ 
+#if 0 
+    //run modem powerdown
+	if (__do_forced_modemoff != NULL)
+	{
+	    printk("__do_forced_modemoff\n\n");
+		__do_forced_modemoff();
+         msleep(2000);
+	}	
+#endif
 	/* get_real_usbic_state(); */
 	//gpio_direction_output(GPIO_MSM_RST,0);
 	//gpio_direction_output(GPIO_FONE_ACTIVE, 0);

@@ -1,0 +1,962 @@
+<6>[    0.000000] Initializing cgroup subsys cpu
+<5>[    0.000000] Linux version 2.6.32.9 (i8320@h1droid) (gcc version 4.3.3 (Sourcery G++ Lite 2009q1-203) ) #223 PREEMPT Fri Dec 2 15:23:49 CET 2011
+<4>[    0.000000] CPU: ARMv7 Processor [411fc083] revision 3 (ARMv7), cr=10c53c7f
+<4>[    0.000000] CPU: VIPT nonaliasing data cache, VIPT nonaliasing instruction cache
+<4>[    0.000000] Machine: Samsung NOWPLUS board
+<4>[    0.000000] parse_tag_cmdline: root=139:7 rootfstype=cramfs console=ttyS2,115200 mem=256M quiet version=Sbl(1.0.0) 2010-01-26 12:54:26 switch_sel=1 lcd_level=6
+<4>[    0.000000] Memory policy: ECC disabled, Data cache writeback
+<7>[    0.000000] On node 0 totalpages: 65536
+<7>[    0.000000] free_area_init_node: node 0, pgdat c05cee80, node_mem_map c074d000
+<7>[    0.000000]   Normal zone: 512 pages used for memmap
+<7>[    0.000000]   Normal zone: 0 pages reserved
+<7>[    0.000000]   Normal zone: 65024 pages, LIFO batch:15
+<4>[    0.000000] L2 CACHE is not enabled in bootloader
+<4>[    0.000000] Enable the L2 Cache here
+<6>[    0.000000] OMAP3430/3530 ES3.1 (l2cache iva sgx neon isp )
+<6>[    0.000000] omap_sam_base (VA) == 0xfe400000
+<6>[    0.000000] omap_sram_start (PA) == 0x40200000
+<6>[    0.000000] omap_sram_size (SIZE) == 0x10000
+<6>[    0.000000] SRAM: Mapped pa 0x40200000 to va 0xfe400000 size: 0x100000
+<6>[    0.000000] Reserving 14745600 bytes SDRAM for VRAM
+<4>[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65024
+<5>[    0.000000] Kernel command line: root=/dev/mmcblk0p2 rw mem=256M init=/init  rootwait videoout=omap_vout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram="0:4M"
+<6>[    0.000000] PID hash table entries: 1024 (order: 0, 4096 bytes)
+<6>[    0.000000] Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+<6>[    0.000000] Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+<6>[    0.000000] Memory: 256MB = 256MB total
+<5>[    0.000000] Memory: 231552KB available (5320K code, 1802K data, 188K init, 0K highmem)
+<5>[    0.000000] Virtual kernel memory layout:
+<5>[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+<5>[    0.000000]     fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+<5>[    0.000000]     vmalloc : 0xd0800000 - 0xf8000000   ( 632 MB)
+<5>[    0.000000]     lowmem  : 0xc0000000 - 0xd0000000   ( 256 MB)
+<5>[    0.000000]     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+<5>[    0.000000]       .init : 0xc0008000 - 0xc0037000   ( 188 kB)
+<5>[    0.000000]       .text : 0xc0037000 - 0xc0569000   (5320 kB)
+<5>[    0.000000]       .data : 0xc0588000 - 0xc05d30f8   ( 301 kB)
+<6>[    0.000000] Hierarchical RCU implementation.
+<6>[    0.000000] NR_IRQS:402
+<6>[    0.000000] IRQ: Found an INTC at 0xfa200000 (revision 4.0) with 96 interrupts
+<6>[    0.000000] Total of 96 interrupts on 1 active controller
+<6>[    0.000000] Clocking rate (Crystal/Core/MPU): 26.0/332/600 MHz
+<6>[    0.000000] GPMC revision 5.0
+<6>[    0.000000] OMAP GPIO hardware version 2.5
+<6>[    0.000000] OMAP clockevent source: GPTIMER1 at 32768 Hz
+<4>[    0.000000] Console: colour dummy device 80x30
+<6>[    0.000000] console [tty0] enabled
+<6>[    0.000000] Calibrating delay loop... 597.64 BogoMIPS (lpj=2334720)
+<4>[    0.000000] Mount-cache hash table entries: 512
+<6>[    0.000000] Initializing cgroup subsys debug
+<6>[    0.000000] Initializing cgroup subsys cpuacct
+<6>[    0.000000] Initializing cgroup subsys freezer
+<6>[    0.000000] CPU: Testing write buffer coherency: ok
+<6>[    0.000000] regulator: core version 0.5
+<6>[    0.000000] NET: Registered protocol family 16
+<4>[    0.000000] 
+<4>[    0.000000] .....[Nowplus] Initializing...
+<4>[    0.000000] Gpio Output Setting Done
+<4>[    0.000000] 
+<4>[    0.000000]  <Powerup Reason : >
+<4>[    0.000000] 
+<6>[    0.000000] ram_console: got buffer at 8e000000, size 20000
+<6>[    0.000000] ram_console: found existing buffer, size 131060, start 125068
+<6>[    0.000000] console [ram-1] enabled
+<3>[    0.000000] 
+<3>[    0.000000] nowplus_init_lcd
+<4>[    0.000000] BOARD HW REV : 2
+<6>[77591.296630] OMAP DMA hardware revision 4.0
+<4>[77591.323211] bio: create slab <bio-0> at 0
+<7>[77591.325622] omap2_mcspi omap2_mcspi.1: registered master spi1
+<7>[77591.325714] spi spi1.0: setup: speed 375000, sample leading edge, clk normal
+<7>[77591.325775] spi spi1.0: setup mode 0, 8 bits/w, 375000 Hz max --> 0
+<7>[77591.326080] omap2_mcspi omap2_mcspi.1: registered child spi1.0
+<7>[77591.326446] omap2_mcspi omap2_mcspi.2: registered master spi2
+<7>[77591.326843] omap2_mcspi omap2_mcspi.3: registered master spi3
+<7>[77591.327209] omap2_mcspi omap2_mcspi.4: registered master spi4
+<6>[77591.329223] usbcore: registered new interface driver usbfs
+<6>[77591.329528] usbcore: registered new interface driver hub
+<6>[77591.329895] usbcore: registered new device driver usb
+<4>[77591.331115] omap_device: i2c_omap.2: new worst case activate latency 0: 671386
+<6>[77591.331237] i2c_omap i2c_omap.2: bus 2 rev3.12 at 200 kHz
+<4>[77591.331298] omap_device: i2c_omap.2: new worst case deactivate latency 0: 30517
+<6>[77591.334350] i2c_omap i2c_omap.1: bus 1 rev3.12 at 400 kHz
+<6>[77591.359069] twl4030: PIH (irq 7) chaining IRQs 368..375
+<6>[77591.359130] twl4030: power (irq 373) chaining IRQs 376..383
+<6>[77591.359710] twl4030: gpio (irq 368) chaining IRQs 384..401
+<6>[77591.363006] regulator: VUSB1V5: 1500 mV normal standby
+<6>[77591.363800] regulator: VUSB1V8: 1800 mV normal standby
+<6>[77591.364593] regulator: VUSB3V1: 3100 mV normal standby
+<6>[77593.438171] twl4030_usb twl4030_usb: Initialized TWL4030 USB module
+<6>[77593.439300] regulator: VMMC1: 1850 <--> 3150 mV at 2850 mV normal standby
+<6>[77593.440063] regulator: VDAC: 1800 mV normal standby
+<6>[77593.441345] regulator: VAUX2: 2800 mV normal standby
+<6>[77593.442504] regulator: VPLL2: 1800 mV normal standby
+<6>[77593.443420] regulator: VMMC2: 1800 mV normal standby
+<6>[77593.444549] regulator: VSIM: 1800 mV normal standby
+<6>[77593.445343] regulator: VAUX1: 3000 mV normal standby
+<6>[77593.446563] regulator: VAUX3: 1800 mV normal standby
+<6>[77593.447753] regulator: VAUX4: 2800 mV normal standby
+<6>[77593.448089] i2c_omap i2c_omap.3: bus 3 rev3.12 at 100 kHz
+<6>[77593.451446] Bluetooth: Core ver 2.15
+<6>[77593.451843] NET: Registered protocol family 31
+<6>[77593.451873] Bluetooth: HCI device and connection manager initialized
+<6>[77593.451934] Bluetooth: HCI socket layer initialized
+<6>[77593.452514] Switching to clocksource 32k_counter
+<6>[77593.464599] musb_hdrc: version 6.0, musb-dma, otg (peripheral+host), debug=0
+<7>[77593.464874] HS USB OTG: revision 0x33, sysconfig 0x2000, sysstatus 0x1, intrfsel 0x1, simenable  0x0
+<7>[77593.464965] musb_hdrc: ConfigData=0xde (UTMI-8, dyn FIFOs, bulk combine (X), bulk split (X), HB-ISO Rx, HB-ISO Tx, SoftConn)
+<7>[77593.465057] musb_hdrc: MHDRC RTL version 1.400 
+<7>[77593.465087] musb_hdrc: setup fifo_mode 4
+<7>[77593.465118] musb_hdrc: 28/31 max ep, 16384/16384 memory
+<6>[77593.465209] musb_hdrc: USB OTG mode controller at fa0ab000 using DMA, IRQ 92
+<6>[77593.465881] NET: Registered protocol family 2
+<6>[77593.466094] IP route cache hash table entries: 2048 (order: 1, 8192 bytes)
+<6>[77593.466644] TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+<6>[77593.466918] TCP bind hash table entries: 8192 (order: 3, 32768 bytes)
+<6>[77593.467102] TCP: Hash tables configured (established 8192 bind 8192)
+<6>[77593.467132] TCP reno registered
+<6>[77593.467346] NET: Registered protocol family 1
+<6>[77593.470367] dspbridge_init: 600000 bytes @ 81800000
+<6>[77593.471038] omap-iommu omap-iommu.0: isp registered
+<4>[77593.472015] NetWinder Floating Point Emulator V0.97 (double precision)
+<6>[77593.481079] ashmem: initialized
+<5>[77593.481628] VFS: Disk quotas dquot_6.5.2
+<4>[77593.481750] Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+<6>[77593.482421] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+<6>[77593.482543] Registering unionfs 2.5.10 (for 2.6.32.46)
+<5>[77593.483062] Slow work thread pool: Starting up
+<5>[77593.483306] Slow work thread pool: Ready
+<6>[77593.483367] msgmni has been set to 452
+<6>[77593.483673] alg: No test for cipher_null (cipher_null-generic)
+<6>[77593.484191] alg: No test for ecb(cipher_null) (ecb-cipher_null)
+<6>[77593.484405] alg: No test for digest_null (digest_null-generic)
+<6>[77593.484619] alg: No test for compress_null (compress_null-generic)
+<6>[77593.487213] alg: No test for stdrng (krng)
+<6>[77593.546630] alg: No test for ghash (ghash-generic)
+<6>[77593.546752] io scheduler noop registered
+<6>[77593.546905] io scheduler cfq registered (default)
+<6>[77593.548553] OMAP DSS rev 2.0
+<6>[77593.548675] OMAP DISPC rev 3.0
+<6>[77593.548736] OMAP VENC rev 2
+<7>[77593.549682] tl2796_disp_spi spi1.0: setup: speed 375000, sample leading edge, clk normal
+<7>[77593.549774] tl2796_disp_spi spi1.0: setup mode 0, 16 bits/w, 375000 Hz max --> 0
+<6>[77593.711761] Registered led device: lcd-backlight
+<7>[77593.757843]  ****  tl2796_ldi_poweron. IN 
+<7>[77593.963531] tl2796_lcd_brightness_on
+<7>[77593.963562] tl2796_lcd_brightness_setting:6
+<7>[77593.975952]  ****  tl2796_ldi_poweron. OUT 
+<6>[77593.997589] omap-hsuart.0: ttyS0 at MMIO 0x4806a000 (irq = 72) is a OMAP UART0
+<6>[77593.998077] omap-hsuart.1: ttyS1 at MMIO 0x4806c000 (irq = 73) is a OMAP UART1
+<6>[77593.998535] omap-hsuart.2: ttyS2 at MMIO 0x49020000 (irq = 74) is a OMAP UART2
+<6>[77594.011962] brd: module loaded
+<6>[77594.018310] loop: module loaded
+<4>[77594.018859] [BT] disable bt pins[BT] enable bt pins
+<6>[77594.077850] PPP generic driver version 2.4.2
+<6>[77594.078491] PPP Deflate Compression module registered
+<6>[77594.078552] PPP BSD Compression module registered
+<6>[77594.093841] PPP MPPE Compression module registered
+<6>[77594.093872] NET: Registered protocol family 24
+<6>[77594.093994] PPPoL2TP kernel driver, V1.0
+<6>[77594.094024] SLIP: version 0.8.4-NET3.019-NEWTTY (dynamic channels, max=256) (6 bit encapsulation enabled).
+<6>[77594.094085] CSLIP: code copyright 1989 Regents of the University of California.
+<6>[77594.094146] tun: Universal TUN/TAP device driver, 1.6
+<6>[77594.094177] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+<6>[77594.094604] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+<7>[77594.094635] ehci_hcd: block sizes: qh 60 qtd 96 itd 160 sitd 96
+<6>[77594.095062] android init
+<6>[77594.095184] android_probe pdata: c0598bd0
+<6>[77594.095458] android_bind
+<7>[77594.095489] android_bind_config
+<6>[77594.095520] android_usb gadget: android_usb ready
+<6>[77594.095581] musb_hdrc musb_hdrc: MUSB HDRC host driver
+<6>[77594.095642] musb_hdrc musb_hdrc: new USB bus registered, assigned bus number 1
+<7>[77594.095794] usb usb1: default language 0x0409
+<7>[77594.095886] usb usb1: udev 1, busnum 1, minor = 0
+<6>[77594.095916] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+<6>[77594.095947] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+<6>[77594.096008] usb usb1: Product: MUSB HDRC host driver
+<6>[77594.096038] usb usb1: Manufacturer: Linux 2.6.32.9 musb-hcd
+<6>[77594.096099] usb usb1: SerialNumber: musb_hdrc
+<7>[77594.096435] usb usb1: uevent
+<7>[77594.096710] usb usb1: usb_probe_device
+<6>[77594.096771] usb usb1: configuration #1 chosen from 1 choice
+<7>[77594.096832] usb usb1: adding 1-0:1.0 (config #1, interface 0)
+<7>[77594.096984] usb 1-0:1.0: uevent
+<7>[77594.101287] hub 1-0:1.0: usb_probe_interface
+<7>[77594.101348] hub 1-0:1.0: usb_probe_interface - got id
+<6>[77594.101379] hub 1-0:1.0: USB hub found
+<6>[77594.101470] hub 1-0:1.0: 1 port detected
+<7>[77594.101501] hub 1-0:1.0: standalone hub
+<7>[77594.101531] hub 1-0:1.0: individual port power switching
+<7>[77594.101593] hub 1-0:1.0: no over-current protection
+<7>[77594.101623] hub 1-0:1.0: power on to power good time: 10ms
+<7>[77594.101684] hub 1-0:1.0: 100mA bus power budget for each child
+<7>[77594.101715] hub 1-0:1.0: local power source is good
+<7>[77594.101776] hub 1-0:1.0: enabling power on all ports
+<6>[77594.102355] f_acm init
+<6>[77594.102386] android_register_function acm
+<6>[77594.102416] f_adb init
+<6>[77594.102447] android_register_function adb
+<6>[77594.102478] f_mass_storage init
+<6>[77594.102508] android_register_function usb_mass_storage
+<6>[77594.102539] f_rndis init
+<6>[77594.102874] android_register_function rndis
+<6>[77594.102935] mass_storage_bind_config
+<6>[77594.109436] fsg_probe pdata: c0598bf4
+<6>[77594.110229] android_usb gadget: Number of LUNs=2
+<6>[77594.116882] adb_bind_config
+<6>[77594.117828] rndis_function_bind_config MAC: 00:00:00:00:00:00
+<4>[77594.117919] android_usb gadget: using random self ethernet address
+<4>[77594.117980] android_usb gadget: using random host ethernet address
+<6>[77594.118713] usb0: MAC 66:16:6d:67:73:6d
+<6>[77594.118774] usb0: HOST MAC aa:f8:16:5f:0a:59
+<4>[77594.124908] kp->input->name :TWL4030 Keypad 
+<6>[77594.125457] input: TWL4030 Keypad as /devices/platform/i2c_omap.1/i2c-1/1-004a/twl4030_keypad/input/input0
+<4>[77594.127288]  succeeded in initializing touch proc file
+<4>[77594.132873] [TOUCH] enable touch pins
+<6>[77594.201538] input: synaptics_rmi4_i2c as /devices/platform/i2c_omap.3/i2c-3/synaptics/input/input1
+<7>[77594.202911] hub 1-0:1.0: state 7 ports 1 chg 0000 evt 0000
+<6>[77594.203704] input: power_key_driver as /devices/platform/power_key_device/input/input2
+<6>[77594.205993] using rtc device, twl_rtc, for alarms
+<6>[77594.206085] twl_rtc twl_rtc: rtc core: registered twl_rtc as rtc0
+<4>[77594.207855] virtual_rtc_init
+<4>[77594.207977] virtual_rtc_probe, Virtual RTC driver
+<4>[77594.208404] rtc_alarm_add_device, Set virtual rtc
+<6>[77594.208465] virtual_rtc virtual_rtc: rtc core: registered virtual_rtc as rtc1
+<6>[77594.208801] i2c /dev entries driver
+<6>[77594.212310] Linux video capture interface: v2.00
+<6>[77594.214019] omap-previewer omap-previewer: omap-previewer: Registered preview wrapper
+<6>[77594.215576] omap-iommu omap-iommu.0: isp: version 1.1
+<4>[77594.217987] omap_device: dmtimer.6: new worst case activate latency 0: 91552
+<6>[77594.218902] DSP Bridge driver loaded
+<6>[77594.221618] max17040 2-0036: MAX17040 Fuel-Gauge Ver 02
+<6>[77594.223480] OMAP Watchdog Timer Rev 0x31: initial timeout 60 sec
+<3>[77594.223907] twl4030_wdt twl4030_wdt: Failed to register misc device
+<4>[77594.223968] twl4030_wdt: probe of twl4030_wdt failed with error -16
+<6>[77594.224975] device-mapper: ioctl: 4.15.0-ioctl (2009-04-01) initialised: dm-devel@redhat.com
+<6>[77594.225341] device-mapper: multipath: version 1.1.0 loaded
+<6>[77594.225402] device-mapper: multipath round-robin: version 1.0.0 loaded
+<6>[77594.225433] device-mapper: multipath queue-length: version 0.1.0 loaded
+<6>[77594.225494] device-mapper: multipath service-time: version 0.2.0 loaded
+<6>[77594.225738] Bluetooth: HCI UART driver ver 2.2
+<6>[77594.225769] Bluetooth: HCILL protocol initialized
+<6>[77594.226348] cpuidle: using governor ladder
+<6>[77594.226409] cpuidle: using governor menu
+<4>[77594.337554] [twl_mmc] 'twl_iNand_set_power' called, power=0
+<6>[77594.339233] BD2802 2-001a: return 0x00
+<6>[77594.339599] Registered led device: led1_R
+<6>[77594.339935] Registered led device: led1_G
+<6>[77594.340270] Registered led device: led1_B
+<6>[77594.340576] Registered led device: led2_R
+<6>[77594.340881] Registered led device: led2_G
+<6>[77594.341217] Registered led device: led2_B
+<4>[77594.342468] [switch-sio]: initialized
+<6>[77594.343811] usbcore: registered new interface driver usbhid
+<6>[77594.343872] usbhid: v2.6:USB HID core driver
+<6>[77594.344787] logger: created 512K log 'log_main'
+<6>[77594.345153] logger: created 256K log 'log_events'
+<6>[77594.345489] logger: created 256K log 'log_radio'
+<6>[77594.346405] Advanced Linux Sound Architecture Driver Version 1.0.21.
+<4>[77594.347229] No device for DAI twl4030
+<4>[77594.347290] No device for DAI twl4030 Voice
+<4>[77594.347320] No device for DAI twl4030 Clock
+<4>[77594.347656] No device for DAI omap-mcbsp-dai-0
+<4>[77594.347686] No device for DAI omap-mcbsp-dai-1
+<4>[77594.347747] No device for DAI omap-mcbsp-dai-2
+<4>[77594.347778] No device for DAI omap-mcbsp-dai-3
+<4>[77594.347808] No device for DAI omap-mcbsp-dai-4
+<0>[77594.347839]  sound/soc/omap/sdp3430.c : sdp3430_soc_init : 424 ---SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+<6>[77594.347900] SDP3430 SoC init
+<6>[77594.348419] TWL4030 Audio Codec init 
+<6>[77594.349761] asoc: twl4030 <-> omap-mcbsp-dai-0 mapping ok
+<6>[77594.351074] asoc: twl4030 Voice <-> omap-mcbsp-dai-1 mapping ok
+<4>[77594.351348] TSKIM -vociecall mode : mod_no 1 -  44 regiter configured to 0
+<4>[77594.351745] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 0
+<4>[77594.352050] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 0
+<4>[77594.352386] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[77594.352722] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[77594.353027] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 0
+<4>[77594.353363] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 0
+<4>[77594.353668] TSKIM -vociecall mode : mod_no 1 -  1 regiter configured to 91
+<4>[77594.354003] TSKIM -vociecall mode : mod_no 1 -  2 regiter configured to ff
+<4>[77594.354309] TSKIM -vociecall mode : mod_no 1 -  3 regiter configured to 0
+<4>[77594.354644] TSKIM -vociecall mode : mod_no 1 -  4 regiter configured to 3
+<4>[77594.354980] TSKIM -vociecall mode : mod_no 1 -  5 regiter configured to 13
+<4>[77594.355285] TSKIM -vociecall mode : mod_no 1 -  6 regiter configured to 0
+<4>[77594.355621] TSKIM -vociecall mode : mod_no 1 -  7 regiter configured to a
+<4>[77594.355926] TSKIM -vociecall mode : mod_no 1 -  8 regiter configured to 0
+<4>[77594.356262] TSKIM -vociecall mode : mod_no 1 -  9 regiter configured to 30
+<4>[77594.356567] TSKIM -vociecall mode : mod_no 1 -  a regiter configured to c
+<4>[77594.356903] TSKIM -vociecall mode : mod_no 1 -  b regiter configured to c
+<4>[77594.357208] TSKIM -vociecall mode : mod_no 1 -  c regiter configured to 8
+<4>[77594.357543] TSKIM -vociecall mode : mod_no 1 -  d regiter configured to 8
+<4>[77594.357879] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 1
+<4>[77594.358184] TSKIM -vociecall mode : mod_no 1 -  f regiter configured to e1
+<4>[77594.358520] TSKIM -vociecall mode : mod_no 1 -  10 regiter configured to 3f
+<4>[77594.358825] TSKIM -vociecall mode : mod_no 1 -  11 regiter configured to 3f
+<4>[77594.359313] TSKIM -vociecall mode : mod_no 1 -  12 regiter configured to 3f
+<4>[77594.359649] TSKIM -vociecall mode : mod_no 1 -  13 regiter configured to 3f
+<4>[77594.359985] TSKIM -vociecall mode : mod_no 1 -  14 regiter configured to 2e
+<4>[77594.360290] TSKIM -vociecall mode : mod_no 1 -  15 regiter configured to 0
+<4>[77594.360626] TSKIM -vociecall mode : mod_no 1 -  16 regiter configured to 12
+<4>[77594.360931] TSKIM -vociecall mode : mod_no 1 -  17 regiter configured to c
+<4>[77594.361267] TSKIM -vociecall mode : mod_no 1 -  18 regiter configured to 0
+<4>[77594.361572] TSKIM -vociecall mode : mod_no 1 -  19 regiter configured to 32
+<4>[77594.361907] TSKIM -vociecall mode : mod_no 1 -  1a regiter configured to 32
+<4>[77594.362243] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to b
+<4>[77594.362548] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to b
+<4>[77594.362884] TSKIM -vociecall mode : mod_no 1 -  1d regiter configured to 0
+<4>[77594.363189] TSKIM -vociecall mode : mod_no 1 -  1e regiter configured to 0
+<4>[77594.363525] TSKIM -vociecall mode : mod_no 1 -  1f regiter configured to 55
+<4>[77594.363830] TSKIM -vociecall mode : mod_no 1 -  20 regiter configured to 0
+<4>[77594.364166] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 24
+<4>[77594.364501] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[77594.364807] TSKIM -vociecall mode : mod_no 1 -  23 regiter configured to 0
+<4>[77594.365142] TSKIM -vociecall mode : mod_no 1 -  24 regiter configured to 0
+<4>[77594.365447] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 0
+<4>[77594.365783] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 0
+<4>[77594.366088] TSKIM -vociecall mode : mod_no 1 -  27 regiter configured to 0
+<4>[77594.366424] TSKIM -vociecall mode : mod_no 1 -  28 regiter configured to 0
+<4>[77594.366821] TSKIM -vociecall mode : mod_no 1 -  29 regiter configured to 0
+<4>[77594.367156] TSKIM -vociecall mode : mod_no 1 -  2a regiter configured to 0
+<4>[77594.367492] TSKIM -vociecall mode : mod_no 1 -  2b regiter configured to 5
+<4>[77594.367797] TSKIM -vociecall mode : mod_no 1 -  2c regiter configured to 0
+<4>[77594.368133] TSKIM -vociecall mode : mod_no 1 -  2d regiter configured to 0
+<4>[77594.368438] TSKIM -vociecall mode : mod_no 1 -  2e regiter configured to 0
+<4>[77594.368774] TSKIM -vociecall mode : mod_no 1 -  2f regiter configured to 0
+<4>[77594.369079] TSKIM -vociecall mode : mod_no 1 -  30 regiter configured to 13
+<4>[77594.369415] TSKIM -vociecall mode : mod_no 1 -  31 regiter configured to 0
+<4>[77594.369750] TSKIM -vociecall mode : mod_no 1 -  32 regiter configured to 0
+<4>[77594.370056] TSKIM -vociecall mode : mod_no 1 -  33 regiter configured to 0
+<4>[77594.370391] TSKIM -vociecall mode : mod_no 1 -  34 regiter configured to 0
+<4>[77594.370697] TSKIM -vociecall mode : mod_no 1 -  35 regiter configured to 79
+<4>[77594.371032] TSKIM -vociecall mode : mod_no 1 -  36 regiter configured to 11
+<4>[77594.371337] TSKIM -vociecall mode : mod_no 1 -  37 regiter configured to 0
+<4>[77594.371673] TSKIM -vociecall mode : mod_no 1 -  38 regiter configured to 0
+<4>[77594.372009] TSKIM -vociecall mode : mod_no 1 -  39 regiter configured to 0
+<4>[77594.372314] TSKIM -vociecall mode : mod_no 1 -  3a regiter configured to 16
+<4>[77594.372650] TSKIM -vociecall mode : mod_no 1 -  3b regiter configured to 0
+<4>[77594.372955] TSKIM -vociecall mode : mod_no 1 -  3c regiter configured to 44
+<4>[77594.373291] TSKIM -vociecall mode : mod_no 1 -  3d regiter configured to 69
+<4>[77594.373596] TSKIM -vociecall mode : mod_no 1 -  3e regiter configured to 2
+<4>[77594.373931] TSKIM -vociecall mode : mod_no 1 -  3f regiter configured to 0
+<4>[77594.374237] TSKIM -vociecall mode : mod_no 1 -  40 regiter configured to 0
+<4>[77594.374603] TSKIM -vociecall mode : mod_no 1 -  41 regiter configured to 0
+<4>[77594.374938] TSKIM -vociecall mode : mod_no 1 -  42 regiter configured to 0
+<4>[77594.375244] TSKIM -vociecall mode : mod_no 1 -  43 regiter configured to 20
+<4>[77594.375579] TSKIM -vociecall mode : mod_no 1 -  44 regiter configured to 32
+<4>[77594.375915] TSKIM -vociecall mode : mod_no 1 -  45 regiter configured to 0
+<4>[77594.376220] TSKIM -vociecall mode : mod_no 1 -  46 regiter configured to 0
+<4>[77594.376556] TSKIM -vociecall mode : mod_no 1 -  47 regiter configured to 0
+<4>[77594.376861] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 0
+<4>[77594.377197] TSKIM -vociecall mode : mod_no 1 -  49 regiter configured to 8
+<3>[77594.378021] Failed to add route Mic Bias 1->MAINMIC
+<3>[77594.378082] dapm: twl4030: configuring unknown pin EARPIECE
+<3>[77594.378112] dapm: twl4030: configuring unknown pin PREDRIVEL
+<3>[77594.378143] dapm: twl4030: configuring unknown pin PREDRIVER
+<3>[77594.378204] dapm: twl4030: configuring unknown pin AUXL
+<3>[77594.378234] dapm: twl4030: configuring unknown pin AUXR
+<3>[77594.378265] dapm: twl4030: configuring unknown pin CARKITMIC
+<3>[77594.378326] dapm: twl4030: configuring unknown pin DIGIMIC0
+<3>[77594.378356] dapm: twl4030: configuring unknown pin DIGIMIC1
+<3>[77594.378387] dapm: twl4030: configuring unknown pin OUTL
+<3>[77594.378417] dapm: twl4030: configuring unknown pin OUTR
+<3>[77594.378479] dapm: twl4030: configuring unknown pin CARKITL
+<3>[77594.378509] dapm: twl4030: configuring unknown pin CARKITR
+<4>[77594.378570] TSKIM -vociecall mode : mod_no 1 -  f regiter configured to e1
+<0>[77594.381072] RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR---------------SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+<6>[77594.381134] ALSA device list:
+<6>[77594.381164]   #0: SDP3430 (twl4030)
+<4>[77594.381286] TinyBML init registered
+<6>[77594.447723] oprofile: using timer
+<4>[77594.447906] Netfilter messages via NETLINK v0.30.
+<4>[77594.448059] nf_conntrack version 0.5.0 (3621 buckets, 14484 max)
+<4>[77594.448333] CONFIG_NF_CT_ACCT is deprecated and will be removed soon. Please use
+<4>[77594.448394] nf_conntrack.acct=1 kernel parameter, acct=1 nf_conntrack module option or
+<4>[77594.448425] sysctl net.netfilter.nf_conntrack_acct=1 to enable it.
+<6>[77594.448730] xt_time: kernel timezone is -0000
+<6>[77594.448791] IPv4 over IPv4 tunneling driver
+<6>[77594.449584] GRE over IPv4 tunneling driver
+<6>[77594.450500] ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>[77594.450805] TCP cubic registered
+<6>[77594.450836] NET: Registered protocol family 17
+<6>[77594.450897] NET: Registered protocol family 15
+<6>[77594.450988] Bluetooth: L2CAP ver 2.14
+<6>[77594.451019] Bluetooth: L2CAP socket layer initialized
+<6>[77594.451049] Bluetooth: SCO (Voice Link) ver 0.6
+<6>[77594.451110] Bluetooth: SCO socket layer initialized
+<6>[77594.451324] Bluetooth: RFCOMM TTY layer initialized
+<6>[77594.451385] Bluetooth: RFCOMM socket layer initialized
+<6>[77594.451416] Bluetooth: RFCOMM ver 1.11
+<6>[77594.451446] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+<6>[77594.451507] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+<4>[77594.451995] Start config_twl4030_resource_remap
+<3>[77594.455230] Power Management for TI OMAP3.
+<6>[77594.458190] SmartReflex driver initialized
+<7>[77594.465820] Disabling unused clock "gpt9_ick"
+<7>[77594.465911] Disabling unused clock "gpio2_dbck"
+<7>[77594.465942] Disabling unused clock "gpio3_dbck"
+<7>[77594.465972] Disabling unused clock "gpio4_dbck"
+<7>[77594.466033] Disabling unused clock "gpio5_dbck"
+<7>[77594.466064] Disabling unused clock "gpio6_dbck"
+<7>[77594.466125] Disabling unused clock "gpio1_dbck"
+<7>[77594.466186] Disabling unused clock "sad2d_ick"
+<7>[77594.466247] Disabling unused clock "dpll4_m6x2_ck"
+<7>[77594.466308] Disabling unused clock "dpll3_m3x2_ck"
+<6>[77594.466888] VFP support v0.3: implementor 41 architecture 3 part 30 variant c rev 1
+<3>[77594.497131] rotation = 0, var->rotate = 0 Console: switching to colour frame buffer device 60x50
+<7>[77594.516204] OMAP DISPCONTROL read (stallmode)0
+<7>[77594.516418] OMAP DISPCONTROL read (gpout)1
+<7>[77594.516571] OMAP DISPCONTROL read (stallmode)1
+<4>[77594.516815] omapdss DPI: Could not find exact pixel clock. Requested 24284 kHz, got 24000 kHz
+<4>[77594.527404] regulator_init_complete: incomplete constraints, leaving VSIM on
+<4>[77594.528442] regulator_init_complete: incomplete constraints, leaving VPLL2 on
+<6>[77594.530487] twl_rtc twl_rtc: setting system clock to 2005-03-30 22:04:32 UTC (1112220272)
+<6>[77594.581329] omap_vout: registered and initialized video device 0 [v4l2]
+<6>[77594.586883] omap_vout: registered and initialized video device 1 [v4l2]
+<6>[77594.588653] Waiting for root device /dev/mmcblk0p2...
+<4>[77594.991882] [Headset] Headset detached
+<4>[77595.429473] mmc0: host does not support reading read-only switch. assuming write-enable.
+<6>[77595.435333] mmc0: new high speed SD card at address 1234
+<6>[77595.441650] mmcblk0: mmc0:1234 SA02G 1.83 GiB 
+<6>[77595.447631]  mmcblk0: p1 p2
+<4>[77595.456970] [twl_mmc] 'twl_iNand_set_power' called, power=1
+<4>[77595.485046] EXT4-fs (mmcblk0p2): warning: mounting unchecked fs, running e2fsck is recommended
+<6>[77595.715576] EXT4-fs (mmcblk0p2): mounted filesystem without journal
+<4>[77595.727783] VFS: Mounted root (ext4 filesystem) on device 179:2.
+<6>[77595.740264] Freeing init memory: 188K
+<4>[77595.758544] Warning: unable to open an initial console.
+<6>[77595.812286] mmc1: new high speed MMC card at address 0001
+<6>[77595.819946] mmcblk1: mmc1:0001 MAG8DD 15.3 GiB 
+<6>[77595.828643]  mmcblk1: p1 p2 p3
+<7>[77595.889343] usb usb1: uevent
+<7>[77595.896667] usb 1-0:1.0: uevent
+<3>[77596.055084] init: cannot open '/initlogo.rle'
+<6>[77596.164916] CPUFREQ: Per core ondemand sysfs interface is deprecated - up_threshold
+<6>[77596.176239] CPUFREQ: Per core ondemand sysfs interface is deprecated - sampling_rate
+<4>[77596.212036] [OMAP34XXCAM]omap34xxcam_init:2464: in
+<4>[77596.231231] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[77596.237060] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[77596.242523] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[77596.247711] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[77596.252868] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[77596.262786] [CAM_INF] M-4MO: ioctl_s_power called...
+<4>[77596.267883] M-4MO: m4mo_sensor_power_set is called...[1] (0:OFF, 1:ON)
+<4>[77596.277740] ispccdc: isp_configure_interface: CPI
+<4>[77596.324859] [CAM_DBG] M-4MO: pwr on-----!
+<4>[77596.439331] [CAM_DBG] M-4MO:  Sensor is Detected!!!
+<4>[77596.451324] [CAM_DBG] M-4MO:  Fimrware Version: 0xfc 0x03
+<4>[77596.463867] [CAM_INF] M-4MO: ioctl_g_fmt_cap called...
+<4>[77596.468750] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[77596.478332] [CAM_INF] M-4MO: ioctl_s_power called...
+<4>[77596.483184] M-4MO: m4mo_sensor_power_set is called...[0] (0:OFF, 1:ON)
+<6>[77596.496398] android_usb gadget: high speed config #1: android
+<7>[77596.505889] musb_hdrc periph: enabled ep3in for int IN, dma, maxpacket 10
+<7>[77596.515350] musb_hdrc periph: enabled ep2in for bulk IN, dma, maxpacket 512
+<7>[77596.524963] musb_hdrc periph: enabled ep2out for bulk OUT, dma, maxpacket 512
+<7>[77596.534698] musb_hdrc periph: enabled ep4in for bulk IN, dma, maxpacket 512
+<7>[77596.544647] musb_hdrc periph: enabled ep3out for bulk OUT, dma, maxpacket 512
+<7>[77596.555084] musb_hdrc periph: enabled ep1in for bulk IN, dma, maxpacket 512
+<7>[77596.566040] musb_hdrc periph: enabled ep1out for bulk OUT, dma, maxpacket 512
+<4>[77596.590545] [CAM_DBG] M-4MO: pwr off-----!
+<4>[77596.597442] [OMAP34XXCAM]omap34xxcam_vfd_name_update:2222: in
+<6>[77596.609985] video4linux video0: video0 is now omap3/m-4mo//
+<4>[77596.635894] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_init is called...
+<4>[77596.649963] [CAM_INF] S5KA3DFX: s5ka3dfx_probe is called...
+<4>[77596.664428] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[77596.671875] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[77596.686370] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[77596.693756] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[77596.708190] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[77596.715698] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[77596.730804] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[77596.746093] [CAM_INF] S5KA3DFX: ioctl_s_power is called......ON=1, detect= 0
+<4>[77596.761474] S5KA3DFX: s5ka3dfx_sensor_power_set is called...[1] (0:OFF, 1:ON)
+<4>[77596.776916] ispccdc: isp_configure_interface: CPI
+<4>[77596.784729] [CAM_INF] S5KA3DFX: s5ka3dfx_enable_gpio is called...
+<4>[77596.850524] [CAM_DBG] S5KA3DFX: pwr on-----!
+<4>[77596.858489] ----------------------------------------------------
+<4>[77596.874267]    [VGA CAM]   camsensor_s5ka3dfx_check_sensor_rev
+<4>[77596.890014] ----------------------------------------------------
+<4>[77596.906799] S5KA3DFX: s5ka3dfx_i2c_write_read is failed... 0
+<4>[77596.923187] S5KA3DFX: s5ka3dfx_i2c_write_read is failed... 0
+<4>[77596.939056] S5KA3DFX: =================================
+<4>[77596.947082] S5KA3DFX:    [VGA CAM] vendor_id ID : 0xab
+<4>[77596.955078] S5KA3DFX:    [VGA CAM] software version : 0x3
+<4>[77596.962982] S5KA3DFX: =================================
+<4>[77596.970855] S5KA3DFX: ===============================
+<4>[77596.978546] S5KA3DFX:    [VGA CAM] s5ka3dfx  OK!!
+<4>[77596.986206] S5KA3DFX: ===============================
+<4>[77596.993804] [CAM_INF] S5KA3DFX: ioctl_g_fmt_cap is called...
+<4>[77597.008789] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[77597.023742] [CAM_INF] S5KA3DFX: ioctl_s_power is called......ON=0, detect= 1
+<4>[77597.038879] S5KA3DFX: s5ka3dfx_sensor_power_set is called...[0] (0:OFF, 1:ON)
+<4>[77597.054046] [CAM_INF] S5KA3DFX: s5ka3dfx_disable_gpio is called...
+<7>[77597.070220] hub 1-0:1.0: hub_suspend
+<7>[77597.084289] usb usb1: bus auto-suspend
+<4>[77597.100982] [CAM_DBG] S5KA3DFX: pwr off-----!
+<4>[77597.109436] [OMAP34XXCAM]omap34xxcam_vfd_name_update:2222: in
+<6>[77597.124359] video4linux video5: video5 is now omap3/s5ka3dfx//
+<3>[77597.146423] load_param_value: open error
+<3>[77597.154174] param_init -> relocated to default value!
+<4>[77597.178039] [DPRAM] dpram driver is loaded.
+<4>[77597.210540] [UART] enable uart pins
+<4>[77597.233947] KXSD9_dev_init: KXSD9_dev_init, KXSD9_dev.valid == eTRUE, check= 2
+<6>[77597.266418] input: accel as /devices/virtual/input/input3
+<3>[77597.290100] KXSD9_init_calibration: Can't open the file for calibration
+<6>[77597.356475] input: proximity sensor as /devices/virtual/input/input4
+<6>[77597.373565] input: light sensor as /devices/virtual/input/input5
+<4>[77597.425659] [MULTIPDP] [dpram_thread] : BEGIN
+<4>[77597.433441] [MULTIPDP] [dpram_open] : BEGIN
+<4>[77597.441131] [DPRAM] Unknown ioctl: 5405
+<4>[77597.448455] [DPRAM] Unknown ioctl: 5406
+<4>[77597.455627] [MULTIPDP] [dpram_open] : END
+<4>[77597.462707] [MULTIPDP] [dpram_poll] : BEGIN
+<4>[77597.469757] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[77597.476654] [MULTIPDP] [pdp_activate] : id: 1
+<4>[77597.483398] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[77597.490051] [MULTIPDP] [vs_add_dev] : END
+<4>[77597.497406] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[77597.504028] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[77597.510345] [MULTIPDP] [pdp_add_dev] : END
+<4>[77597.516540] [MULTIPDP] [pdp_activate] : ttyCSD(id: 1) serial device is created.
+<4>[77597.528869] [MULTIPDP] [pdp_activate] : END
+<4>[77597.535125] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[77597.541412] [MULTIPDP] [pdp_activate] : id: 8
+<4>[77597.547607] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[77597.553741] [MULTIPDP] [vs_add_dev] : END
+<4>[77597.560394] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[77597.566497] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[77597.572326] [MULTIPDP] [pdp_add_dev] : END
+<4>[77597.578002] [MULTIPDP] [pdp_activate] : ttyEFS(id: 8) serial device is created.
+<4>[77597.589141] [MULTIPDP] [pdp_activate] : END
+<4>[77597.594726] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[77597.600128] [MULTIPDP] [pdp_activate] : id: 5
+<4>[77597.605468] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[77597.610748] [MULTIPDP] [vs_add_dev] : END
+<4>[77597.616516] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[77597.621734] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[77597.626800] [MULTIPDP] [pdp_add_dev] : END
+<4>[77597.631713] [MULTIPDP] [pdp_activate] : ttyGPS(id: 5) serial device is created.
+<4>[77597.641357] [MULTIPDP] [pdp_activate] : END
+<4>[77597.646148] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[77597.650909] [MULTIPDP] [pdp_activate] : id: 6
+<4>[77597.655548] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[77597.660125] [MULTIPDP] [vs_add_dev] : END
+<4>[77597.665222] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[77597.669677] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[77597.674041] [MULTIPDP] [pdp_add_dev] : END
+<4>[77597.678192] [MULTIPDP] [pdp_activate] : ttyXTRA(id: 6) serial device is created.
+<4>[77597.686340] [MULTIPDP] [pdp_activate] : END
+<4>[77597.690490] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[77597.694427] [MULTIPDP] [pdp_activate] : id: 25
+<4>[77597.698272] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[77597.701965] [MULTIPDP] [vs_add_dev] : END
+<4>[77597.706207] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[77597.709869] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[77597.713531] [MULTIPDP] [pdp_add_dev] : END
+<4>[77597.717102] [MULTIPDP] [pdp_activate] : ttySMD(id: 25) serial device is created.
+<4>[77597.724304] [MULTIPDP] [pdp_activate] : END
+<6>[77597.953796] overclock: Motorola Milestone/Droid/DroidX CPU overclocking version 1.4.8
+<6>[77597.963470] overclock: by Tiago Sousa <mirage@kaotik.org>
+<6>[77597.968475] overclock: found mpu_opps_addr at 0xc05d5254
+<6>[77597.973449] overclock: found cpufreq_stats_table_addr at 0xc05c2b30
+<6>[77597.985229] overclock: setting max_rate 600000 and max_vsel 60
+<6>[77597.994323] overclock: setting max_rate 800000 and max_vsel 60
+<4>[77598.894775] [BT] disable bt pins
+<6>[77599.035095] enabling adb
+<6>[77599.050140] adb_open
+<6>[77599.576934] warning: `rild' uses 32-bit capabilities (legacy support in use)
+<6>[77599.662170] TIWLAN: driver init
+<6>[77599.668975] TIWLAN SDIO init
+<6>[77599.672973] TIWLAN SDIO probe: initializing mmc3 device
+<4>[77599.676849] SDIO clock Configuration is now set to 24Mhz
+<4>[77599.713623] wlanDrvIf_Stop
+<6>[77599.746307] proc_load: Processor Loaded /system/lib/dsp/baseimage.dof
+<6>[77599.765716] omap mailbox rev 4.0
+<6>[77599.784179] proc_start: dsp in running state
+<3>[77599.789184] procwrap_detach: deprecated dspbridge ioctl
+<4>[77600.227203] DPRAM_PHONE_POWON
+<3>[77600.235260] [DPRAM] phone power on is called.
+<3>[77600.242614] [DPRAM] phone power on GPIO_LEVEL_LOW
+<4>[77600.649383] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 3
+<4>[77600.667633] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 3
+<4>[77600.677703] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 14
+<4>[77600.688934] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 5
+<4>[77600.701416] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 2d
+<6>[77600.836914] [PHONE ERROR] ->> 1 ModemOff
+<6>[77600.852508] [DPRAM] alarm boot pin status : 1
+<6>[77600.867980] [PHONE ERROR] ->> 2 ModemRESET
+<6>[77600.883544] [DPRAM] alarm boot pin status : 1
+<4>[77600.907379] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 3
+<4>[77600.918212] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 1
+<4>[77600.929382] TSKIM -vociecall mode : mod_no 1 -  3a regiter configured to 16
+<4>[77600.942565] twl4030_set audio_path= Playback Path name=Playback Path 
+<4>[77600.953033] twl4030_set_playback_path value = 2 device= 0 mode = 0 codec_mode = 0 
+<4>[77600.963745] TSKIM -vociecall mode : mod_no 1 -  1 regiter configured to 93
+<4>[77600.975036] TSKIM -vociecall mode : mod_no 1 -  13 regiter configured to 3f
+<4>[77600.986541] TSKIM -vociecall mode : mod_no 1 -  12 regiter configured to 3f
+<4>[77600.999084] TSKIM -vociecall mode : mod_no 1 -  17 regiter configured to c
+<4>[77601.018554] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 23
+<4>[77601.029632] DPRAM_PHONEIMG_LOAD
+<4>[77601.036804] DPRAM_PHONE_BOOTSTART
+<4>[77601.043090] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 23
+<4>[77601.053924] [DPRAM] SMSFIX enabledTSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 0
+<4>[77601.067199] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[77601.079620] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 28
+<4>[77601.093627] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 28
+<4>[77601.107849] TSKIM -vociecall mode : mod_no 1 -  43 regiter configured to 0
+<4>[77601.121063] [DPRAM] Unknown ioctl: 5401
+<4>[77601.127990] [DPRAM] Unknown ioctl: 5401
+<4>[77601.140716] [DPRAM] Unknown ioctl: 5402
+<4>[77601.146545] [DPRAM] Unknown ioctl: 5401
+<4>[77601.152557] [DPRAM] Unknown ioctl: 5402
+<4>[77601.197448] DPRAM_PHONE_POWON
+<3>[77601.206359] [DPRAM] phone power on is called.
+<3>[77601.215515] [DPRAM] phone power on GPIO_LEVEL_HIGH
+<4>[77602.159851] DPRAM_PHONE_ON
+<6>[77602.523834] [PHONE ERROR] ->> 1 ModemOff
+<6>[77602.540252] [DPRAM] alarm boot pin status : 1
+<6>[77602.556365] [PHONE ERROR] ->> 2 ModemRESET
+<6>[77602.572387] [DPRAM] alarm boot pin status : 1
+<4>[77603.181243] DPRAM_PHONEIMG_LOAD
+<4>[77603.202850] DPRAM_PHONE_BOOTSTART
+<4>[77603.232543] [DPRAM] SMSFIX enabledtiwlan: 10 sec os_SignalObjectWait timeout
+<6>[77609.984558] sdioDrv_remove: calling sdiodrv_shutdown
+<6>[77609.992279] TI WLAN: driver unloaded
+<2>[77611.085845] EXT4-fs error (device mmcblk0p2): ext4_mb_generate_buddy: EXT4-fs: group 3: 30286 blocks in bitmap, 30297 in gd
+<4>[77620.145538] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 20
+<3>[77621.032531] state_store: state:0 (on)
+<6>[77621.032592] request_suspend_state: wakeup (3->0) at 29962829659 (2005-03-30 22:04:59.002105705 UTC)
+<6>[77621.032592] nothing is queued, old_sleep: 0, new_state: 0
+<7>[77621.051055] tl2796_lcd_brightness_setting:2
+<4>[77623.727935] [DPRAM] Unknown ioctl: 5401
+<4>[77623.727996] [DPRAM] Unknown ioctl: 5401
+<4>[77623.728027] [DPRAM] Unknown ioctl: 5402
+<4>[77623.728057] [DPRAM] Unknown ioctl: 5401
+<4>[77623.728088] [DPRAM] Unknown ioctl: 5402
+<4>[77627.306365] [ACCEL] KXSD9_timer_enable() Success!!!
+<4>[77627.306427] KXSD9_dev_set_operation_mode: KXSD9_dev_set_operation_mode ONLYACCEL
+<4>[77627.311218] [PROXIMITY] P_ioctl() case P_IOC_SHUTDOWN  
+<4>[77627.311248] [light] L_dev_polling_stop() 
+<4>[77627.311279] [LIGHT] L_ioctl() case L_IOC_POLLING_TIMER_CANCEL 
+<4>[77627.312225] KXSD9_timer_set_polling_time: delay= 200
+<4>[77627.312286] KXSD9_timer_set_polling_time: delay= 200
+<4>[77628.362304] [DPRAM] sms_fix_add_data
+<4>[77628.362335] [DPRAM] SMSFIX: frame start detected, frame length=10
+<4>[77628.362518] [DPRAM] sms_fix_add_data
+<4>[77628.362548] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77628.423034] [DPRAM] sms_fix_add_data
+<4>[77628.423095] [DPRAM] SMSFIX: frame start detected, frame length=138
+<4>[77628.426483] [DPRAM] sms_fix_add_data
+<4>[77628.426544] [DPRAM] SMSFIX: frame start detected, frame length=43
+<4>[77628.451812] [DPRAM] sms_fix_add_data
+<4>[77628.451843] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.477447] [DPRAM] sms_fix_add_data
+<4>[77628.477508] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.485473] [DPRAM] sms_fix_add_data
+<4>[77628.485504] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.486968] [DPRAM] sms_fix_add_data
+<4>[77628.486999] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77628.487915] [DPRAM] sms_fix_add_data
+<4>[77628.487945] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.488830] [DPRAM] sms_fix_add_data
+<4>[77628.488861] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.498657] [DPRAM] sms_fix_add_data
+<4>[77628.498687] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77628.502441] [DPRAM] sms_fix_add_data
+<4>[77628.502471] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77628.578430] [DPRAM] sms_fix_add_data
+<4>[77628.578460] [DPRAM] SMSFIX: frame start detected, frame length=26
+<4>[77628.616058] [DPRAM] sms_fix_add_data
+<4>[77628.616119] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77628.637817] [DPRAM] sms_fix_add_data
+<4>[77628.637847] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77628.673217] [DPRAM] sms_fix_add_data
+<4>[77628.673248] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77628.675598] [DPRAM] sms_fix_add_data
+<4>[77628.675628] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77628.702239] [DPRAM] sms_fix_add_data
+<4>[77628.702331] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77629.120452] [DPRAM] sms_fix_add_data
+<4>[77629.120513] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77629.155151] [DPRAM] sms_fix_add_data
+<4>[77629.155181] [DPRAM] sms_fix_add_data
+<4>[77629.155181] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77629.571014] [DPRAM] sms_fix_add_data
+<4>[77629.571044] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77629.599090] [DPRAM] sms_fix_add_data
+<4>[77629.599121] [DPRAM] SMSFIX: frame start detected, frame length=45
+<4>[77629.627044] [DPRAM] sms_fix_add_data
+<4>[77629.627075] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77629.654846] [DPRAM] sms_fix_add_data
+<4>[77629.654876] [DPRAM] SMSFIX: frame start detected, frame length=49
+<4>[77629.677490] [DPRAM] sms_fix_add_data
+<4>[77629.677551] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77630.116302] [DPRAM] sms_fix_add_data
+<4>[77630.116333] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77630.542572] [DPRAM] sms_fix_add_data
+<4>[77630.542663] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77630.544616] [DPRAM] sms_fix_add_data
+<4>[77630.544677] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77630.548065] [DPRAM] sms_fix_add_data
+<4>[77630.548126] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77630.549530] [DPRAM] sms_fix_add_data
+<4>[77630.549560] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77630.551971] [DPRAM] sms_fix_add_data
+<4>[77630.552032] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77630.555419] [DPRAM] sms_fix_add_data
+<4>[77630.555480] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77630.557189] [DPRAM] sms_fix_add_data
+<4>[77630.557220] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77630.558776] [DPRAM] sms_fix_add_data
+<4>[77630.558837] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77630.560272] [DPRAM] sms_fix_add_data
+<4>[77630.560333] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77630.621978] [DPRAM] sms_fix_add_data
+<4>[77630.622039] [DPRAM] SMSFIX: frame start detected, frame length=23
+<4>[77630.711761] [DPRAM] sms_fix_add_data
+<4>[77630.711822] [DPRAM] SMSFIX: frame start detected, frame length=44
+<4>[77630.745635] [DPRAM] sms_fix_add_data
+<4>[77630.745697] [DPRAM] SMSFIX: frame start detected, frame length=17
+<4>[77630.779449] [DPRAM] sms_fix_add_data
+<4>[77630.779510] [DPRAM] SMSFIX: frame start detected, frame length=18
+<4>[77630.928466] [DPRAM] sms_fix_add_data
+<4>[77630.928497] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77630.928649] [DPRAM] sms_fix_add_data
+<4>[77630.928649] [DPRAM] SMSFIX: frame start detected, frame length=26
+<4>[77630.957000] [DPRAM] sms_fix_add_data
+<4>[77630.957031] [DPRAM] SMSFIX: frame start detected, frame length=29
+<4>[77630.987609] [DPRAM] sms_fix_add_data
+<4>[77630.987640] [DPRAM] SMSFIX: frame start detected, frame length=30
+<4>[77631.015502] [DPRAM] sms_fix_add_data
+<4>[77631.015533] [DPRAM] SMSFIX: frame start detected, frame length=45
+<4>[77631.044189] [DPRAM] sms_fix_add_data
+<4>[77631.044219] [DPRAM] SMSFIX: frame start detected, frame length=30
+<4>[77631.071197] [DPRAM] sms_fix_add_data
+<4>[77631.071258] [DPRAM] SMSFIX: frame start detected, frame length=20
+<4>[77631.072631] [DPRAM] sms_fix_add_data
+<4>[77631.072631] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77631.107238] [DPRAM] sms_fix_add_data
+<4>[77631.107269] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77631.107452] [DPRAM] sms_fix_add_data
+<4>[77631.107482] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.107666] [DPRAM] sms_fix_add_data
+<4>[77631.107696] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.107879] [DPRAM] sms_fix_add_data
+<4>[77631.107879] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.234893] [DPRAM] sms_fix_add_data
+<4>[77631.234924] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77631.236999] [DPRAM] sms_fix_add_data
+<4>[77631.237030] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.239440] [DPRAM] sms_fix_add_data
+<4>[77631.239471] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.240783] [DPRAM] sms_fix_add_data
+<4>[77631.240814] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.242645] [DPRAM] sms_fix_add_data
+<4>[77631.242675] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.244598] [DPRAM] sms_fix_add_data
+<4>[77631.244628] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.245666] [DPRAM] sms_fix_add_data
+<4>[77631.245697] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.247100] [DPRAM] sms_fix_add_data
+<4>[77631.247131] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.248748] [DPRAM] sms_fix_add_data
+<4>[77631.248779] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.252197] [DPRAM] sms_fix_add_data
+<4>[77631.252227] [DPRAM] sms_fix_add_data
+<4>[77631.252227] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.260742] [DPRAM] sms_fix_add_data
+<4>[77631.260772] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.264465] [DPRAM] sms_fix_add_data
+<4>[77631.264495] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.281005] [DPRAM] sms_fix_add_data
+<4>[77631.281036] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.388732] [DPRAM] sms_fix_add_data
+<4>[77631.388763] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77631.715484] [DPRAM] sms_fix_add_data
+<4>[77631.715545] [DPRAM] SMSFIX: frame start detected, frame length=44
+<4>[77631.740112] [DPRAM] sms_fix_add_data
+<4>[77631.740142] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.751403] [DPRAM] sms_fix_add_data
+<4>[77631.751434] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.755706] [DPRAM] sms_fix_add_data
+<4>[77631.755737] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.758850] [DPRAM] sms_fix_add_data
+<4>[77631.758880] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.762115] [DPRAM] sms_fix_add_data
+<4>[77631.762145] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.768768] [DPRAM] sms_fix_add_data
+<4>[77631.768798] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.774200] [DPRAM] sms_fix_add_data
+<4>[77631.774230] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77631.778717] [DPRAM] sms_fix_add_data
+<4>[77631.778778] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77631.802124] [DPRAM] sms_fix_add_data
+<4>[77631.802154] [DPRAM] SMSFIX: frame start detected, frame length=26
+<4>[77631.825164] [DPRAM] sms_fix_add_data
+<4>[77631.825195] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77631.848510] [DPRAM] sms_fix_add_data
+<4>[77631.848541] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77631.871673] [DPRAM] sms_fix_add_data
+<4>[77631.871704] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77631.873748] [DPRAM] sms_fix_add_data
+<4>[77631.873779] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77631.896789] [DPRAM] sms_fix_add_data
+<4>[77631.896820] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77632.324188] [DPRAM] sms_fix_add_data
+<4>[77632.324218] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77632.348052] [DPRAM] sms_fix_add_data
+<4>[77632.348083] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77632.777496] [DPRAM] sms_fix_add_data
+<4>[77632.777526] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77632.865142] [DPRAM] sms_fix_add_data
+<4>[77632.865173] [DPRAM] SMSFIX: frame start detected, frame length=45
+<4>[77632.944122] [DPRAM] sms_fix_add_data
+<4>[77632.944152] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77632.967132] [DPRAM] sms_fix_add_data
+<4>[77632.967163] [DPRAM] SMSFIX: frame start detected, frame length=49
+<4>[77632.989227] [DPRAM] sms_fix_add_data
+<4>[77632.989257] [DPRAM] SMSFIX: frame start detected, frame length=46
+<4>[77633.415802] [DPRAM] sms_fix_add_data
+<4>[77633.415863] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77633.956573] [DPRAM] sms_fix_add_data
+<4>[77633.956604] [DPRAM] SMSFIX: frame start detected, frame length=13
+<4>[77633.956848] [DPRAM] sms_fix_add_data
+<4>[77633.956878] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77633.958312] [DPRAM] sms_fix_add_data
+<4>[77633.958343] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77633.958953] [DPRAM] sms_fix_add_data
+<4>[77633.958953] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77633.959167] [DPRAM] sms_fix_add_data
+<4>[77633.959197] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77633.964904] [DPRAM] sms_fix_add_data
+<4>[77633.964935] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77633.974395] [DPRAM] sms_fix_add_data
+<4>[77633.974426] [DPRAM] SMSFIX: frame start detected, frame length=12
+<4>[77634.039306] [DPRAM] sms_fix_add_data
+<4>[77634.039337] [DPRAM] SMSFIX: frame start detected, frame length=23
+<4>[77634.118225] [DPRAM] sms_fix_add_data
+<4>[77634.118286] [DPRAM] SMSFIX: frame start detected, frame length=44
+<4>[77634.144165] [DPRAM] sms_fix_add_data
+<4>[77634.144195] [DPRAM] sms_fix_add_data
+<4>[77634.144226] [DPRAM] SMSFIX: frame start detected, frame length=17
+<4>[77634.172973] [DPRAM] sms_fix_add_data
+<4>[77634.173004] [DPRAM] SMSFIX: frame start detected, frame length=18
+<4>[77634.200073] [DPRAM] sms_fix_add_data
+<4>[77634.200103] [DPRAM] SMSFIX: frame start detected, frame length=29
+<4>[77634.226379] [DPRAM] sms_fix_add_data
+<4>[77634.226440] [DPRAM] SMSFIX: frame start detected, frame length=30
+<4>[77634.253997] [DPRAM] sms_fix_add_data
+<4>[77634.254028] [DPRAM] SMSFIX: frame start detected, frame length=45
+<4>[77634.280944] [DPRAM] sms_fix_add_data
+<4>[77634.280975] [DPRAM] SMSFIX: frame start detected, frame length=30
+<4>[77634.306671] [DPRAM] sms_fix_add_data
+<4>[77634.306701] [DPRAM] SMSFIX: frame start detected, frame length=20
+<4>[77634.307739] [DPRAM] sms_fix_add_data
+<4>[77634.307769] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.309570] [DPRAM] sms_fix_add_data
+<4>[77634.309600] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.310943] [DPRAM] sms_fix_add_data
+<4>[77634.310943] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.312164] [DPRAM] sms_fix_add_data
+<4>[77634.312194] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77634.314453] [DPRAM] sms_fix_add_data
+<4>[77634.314453] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.315429] [DPRAM] sms_fix_add_data
+<4>[77634.315460] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.316314] [DPRAM] sms_fix_add_data
+<4>[77634.316345] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.317291] [DPRAM] sms_fix_add_data
+<4>[77634.317321] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77634.318145] [DPRAM] sms_fix_add_data
+<4>[77634.318176] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.319091] [DPRAM] sms_fix_add_data
+<4>[77634.319122] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.320007] [DPRAM] sms_fix_add_data
+<4>[77634.320037] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.322387] [DPRAM] sms_fix_add_data
+<4>[77634.322418] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77634.344024] [DPRAM] sms_fix_add_data
+<4>[77634.344055] [DPRAM] SMSFIX: frame start detected, frame length=48
+<4>[77634.369476] [DPRAM] sms_fix_add_data
+<4>[77634.369506] [DPRAM] SMSFIX: frame start detected, frame length=44
+<4>[77634.859832] [DPRAM] sms_fix_add_data
+<4>[77634.859863] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77634.860107] [DPRAM] sms_fix_add_data
+<4>[77634.860107] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77634.860290] [DPRAM] sms_fix_add_data
+<4>[77634.860321] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77634.860504] [DPRAM] sms_fix_add_data
+<4>[77634.860534] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.212402] [DPRAM] sms_fix_add_data
+<4>[77635.212432] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.215179] [DPRAM] sms_fix_add_data
+<4>[77635.215209] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.218078] [DPRAM] sms_fix_add_data
+<4>[77635.218109] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.231506] [DPRAM] sms_fix_add_data
+<4>[77635.231536] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77635.236785] [DPRAM] sms_fix_add_data
+<4>[77635.236816] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.241882] [DPRAM] sms_fix_add_data
+<4>[77635.241912] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.252929] [DPRAM] sms_fix_add_data
+<4>[77635.252960] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.255920] [DPRAM] sms_fix_add_data
+<4>[77635.255950] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77635.259277] [DPRAM] sms_fix_add_data
+<4>[77635.259307] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.262207] [DPRAM] sms_fix_add_data
+<4>[77635.262237] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.266387] [DPRAM] sms_fix_add_data
+<4>[77635.266418] [DPRAM] SMSFIX: frame start detected, frame length=21
+<4>[77635.270172] [DPRAM] sms_fix_add_data
+<4>[77635.270202] [DPRAM] SMSFIX: frame start detected, frame length=11
+<4>[77639.917114] [DPRAM] sms_fix_add_data
+<4>[77639.917175] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77642.473541] [DPRAM] sms_fix_add_data
+<4>[77642.473602] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77642.812255] select 1386 (d.process.acore), adj 8, size 6132, to kill
+<4>[77642.812286] select 1401 (ogenmod.cmparts), adj 13, size 4504, to kill
+<4>[77642.812316] send sigkill to 1401 (ogenmod.cmparts), adj 13, size 4504
+<4>[77642.812377] fsck_msdos invoked lmk: pid=0x5d8, tgid=0x5d8, oom_adj=-16
+<4>[77652.931243] omap_device: i2c_omap.2: new worst case deactivate latency 0: 122070
+<7>[77685.697021] tl2796_lcd_brightness_setting:0
+<4>[77688.339416] omap_device: i2c_omap.2: new worst case deactivate latency 0: 152586
+<3>[77692.706726] state_store: state:3 (mem)
+<6>[77692.706787] request_suspend_state: sleep (0->3) at 101637023951 (2005-03-30 22:06:09.341674742 UTC)
+<6>[77692.706817] early_suspend_work is queued
+<7>[77692.706848] early_suspend: debug #1
+<6>[77692.706878] early_suspend: call handlers
+<4>[77692.711578] [TOUCH] disable touch pins
+<4>[77692.731903] [ACCEL] KXSD9_timer_disable() Success!!!
+<4>[77692.731933] KXSD9_dev_set_operation_mode: KXSD9_dev_set_operation_mode STANDBY
+<6>[77692.819061] early: -
+<4>[77692.820037] Timer OFF already!!!
+<4>[77692.820068] KXSD9_early_suspend: Early suspend sleep success!!!
+<6>[77692.820068] early: -
+<4>[77692.820068] L_dev_early_suspend: Early suspend sleep success!!!
+<6>[77692.820098] early: -
+<4>[77693.677581] [DPRAM] sms_fix_add_data
+<4>[77693.677673] [DPRAM] SMSFIX: frame start detected, frame length=15
+<4>[77693.820190] stop_drawing_early_suspend: timeout waiting for userspace to stop drawing
+<6>[77693.820281] early: -
+<4>[77694.132873] 
+<4>[77694.132904]  **** tl2796_panel_suspend
+<7>[77694.132995] tl2796_disp_spi spi1.0: setup: speed 375000, sample leading edge, clk normal
+<7>[77694.133056] tl2796_disp_spi spi1.0: setup mode 0, 16 bits/w, 375000 Hz max --> 0
+<4>[77694.133087] 
+<4>[77694.133117]  **** tl2796_ldi_poweroff
+<6>[77694.492309] early: -
+<4>[77694.492340] omaplfb: **** SUSPEND
+<6>[77694.492370] early: -
+<6>[77694.492401] early_suspend: sync
+<6>[77694.539154] early_suspend: Done.
+<7>[77694.539184] early_suspend: debug #2
+<6>[77694.539245] active wake lock mmc_delayed_work
+<6>[77694.539276] active wake lock usb_transceiver
+<6>[77694.539306] wake lock DPRAM, expired
+<7>[77694.539367] early_suspend: debug #3
+<4>[77701.354095] [DPRAM] sms_fix_add_data
+<4>[77701.354156] [DPRAM] SMSFIX: frame start detected, frame length=15

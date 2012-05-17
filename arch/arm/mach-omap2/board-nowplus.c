@@ -524,17 +524,29 @@ static	struct	platform_device	nowplus_dss_device	=	{
 
 #ifdef	CONFIG_PM
 static	struct	omap_volt_vc_data	vc_config	=	{
-	/*	MPU	*/
-	.vdd0_on	=	1200000,	/*	1.2v	*/
-	.vdd0_onlp	=	975000,	//1000000,	/*	1.0v	*/
-	.vdd0_ret	=	975000,	/*	0.975v	*/
-	.vdd0_off	=	1200000,//600000,	/*	0.6v	*/
-	/*	CORE	*/
-	.vdd1_on	=	1150000,	/*	1.15v	*/
-	.vdd1_onlp	=	975000,	//1000000,	/*	1.0v	*/
-	.vdd1_ret	=	975000,	/*	0.975v	*/
-	.vdd1_off	=	1150000,//600000,	/*	0.6v	*/
-
+#if 0
+	/* MPU / IVA / ARM */
+	.vdd0_on	= 1200000, /* 1.2v */
+	.vdd0_onlp	= 1000000, /* 1.0v */
+	.vdd0_ret	=  975000, /* 0.975v */
+	.vdd0_off	=  600000, /* 0.6v */
+	/* CORE */
+	.vdd1_on	= 1150000, /* 1.15v */
+	.vdd1_onlp	= 1000000, /* 1.0v */
+	.vdd1_ret	=  975000, /* 0.975v */
+	.vdd1_off	=  600000, /* 0.6v */
+#else //Samsung
+	/* MPU */
+	.vdd0_on	= 1200000, /* 1.2v */
+	.vdd0_onlp	=  975000, //1000000, /* 1.0v */
+	.vdd0_ret	=  975000, /* 0.975v */
+	.vdd0_off	= 1200000,//600000, /* 0.6v */
+	/* CORE */
+	.vdd1_on	= 1150000, /* 1.15v */
+	.vdd1_onlp	=  975000, //1000000, /* 1.0v */
+	.vdd1_ret	=  975000, /* 0.975v */
+	.vdd1_off	= 1150000,//600000, /* 0.6v */
+#endif
 	.clksetup	=	0xff,
 	.voltoffset	=	0xff,
 	.voltsetup2	=	0xff,
@@ -548,7 +560,7 @@ static	struct	omap_volt_pmic_info	omap_pmic_mpu	=	{	/*	and	iva	*/
 	.slew_rate	=	4000,
 	.step_size	=	12500,
 	.i2c_addr	=	0x12,
-	.i2c_vreg	=	0x0,	/*	(vdd0)	VDD1	->	VDD1_CORE	->	VDD_MPU	*/
+	.i2c_vreg	=	0x0,	/*	(vdd0)	VDD1	->	VDD1_CORE	->	VDD_MPU (MPU / ARM / IVA)	*/
 	.vsel_to_uv	=	omap_twl_vsel_to_uv,
 	.uv_to_vsel	=	omap_twl_uv_to_vsel,
 	.onforce_cmd	=	omap_twl_onforce_cmd,
@@ -568,7 +580,7 @@ static	struct	omap_volt_pmic_info	omap_pmic_core	=	{
 	.slew_rate	=	4000,
 	.step_size	=	12500,
 	.i2c_addr	=	0x12,
-	.i2c_vreg	=	0x1,	/*	(vdd1)	VDD2	->	VDD2_CORE	->	VDD_CORE	*/
+	.i2c_vreg	=	0x1,	/*	(vdd1)	VDD2	->	VDD2_CORE	->	VDD_CORE (L3)	*/
 	.vsel_to_uv	=	omap_twl_vsel_to_uv,
 	.uv_to_vsel	=	omap_twl_uv_to_vsel,
 	.onforce_cmd	=	omap_twl_onforce_cmd,
@@ -768,6 +780,33 @@ static	inline	void	__init	nowplus_init_power_key(void)
 
 static	inline	void	__init	nowplus_init_battery(void)
 {
+	if	(gpio_request(OMAP_GPIO_USBSW_NINT,	"OMAP_GPIO_USBSW_NINT")	<	0)	{
+		printk(KERN_ERR	"	request	OMAP_GPIO_USBSW_NINT	failed\n");
+		return;
+	}
+	gpio_direction_input(OMAP_GPIO_USBSW_NINT);
+
+	if(gpio_request(OMAP_GPIO_CHG_ING_N,	"OMAP_GPIO_CHG_ING_N")	<	0	){
+			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_CHG_ING_N);
+			return;
+		}
+	gpio_direction_input(OMAP_GPIO_CHG_ING_N);
+
+	if(gpio_request(OMAP_GPIO_CHG_EN,	"OMAP_GPIO_CHG_EN")	<	0	){
+			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_CHG_EN);
+			return;
+		}
+
+	/*CHG_EN	low	or	high	depend	on	bootloader	configuration*/
+	if(gpio_get_value(OMAP_GPIO_CHG_EN))
+	{
+		gpio_direction_output(OMAP_GPIO_CHG_EN,	1);
+	}
+	else
+	{
+		gpio_direction_output(OMAP_GPIO_CHG_EN,	0);
+	}
+    
 	//	Line	903:		KUSB_CONN_IRQ	=	platform_get_irq(	pdev,	0	);
 	//	Line	923:		KTA_NCONN_IRQ	=	platform_get_irq(	pdev,	1	);
 	//	Line	938:		KCHG_ING_IRQ	=	platform_get_irq(	pdev,	2	);
@@ -776,15 +815,42 @@ static	inline	void	__init	nowplus_init_battery(void)
 	//	samsung_charger_resources[0].start	=	IH_USBIC_BASE;			//	is	usb	cable	connected	?
 	//	samsung_charger_resources[1].start	=	IH_USBIC_BASE	+	1;		//	is	charger	connected	?
 
-	samsung_charger_resources[0].start	=	OMAP_GPIO_IRQ(OMAP_GPIO_USBSW_NINT);	//	is	usb	cable	connected	?
-	samsung_charger_resources[1].start	=	OMAP_GPIO_IRQ(58);	//	NC,	set	dummy	value	//	is	charger	connected	?
+    
+   
+  
+	if (gpio_request(OMAP_GPIO_USBSW_NINT, "usb switch irq") < 0) {
+		printk(KERN_ERR "Failed to request GPIO%d for usb switch IRQ\n",
+		       OMAP_GPIO_USBSW_NINT);
+		samsung_charger_resources[0].start = -1;
+	}
+	else {
+		samsung_charger_resources[0].start = gpio_to_irq(OMAP_GPIO_USBSW_NINT);
+		//omap_set_gpio_debounce( OMAP_GPIO_TA_NCONNECTED, 3 );
+		gpio_set_debounce( OMAP_GPIO_USBSW_NINT, 3 );
+	}
 
+	samsung_charger_resources[1].start	=	-1;	//	NC,	set	dummy	value	//	is	charger	connected	?
 
-	//	samsung_charger_resources[0].start	=	0;
-	//	samsung_charger_resources[1].start	=	OMAP_GPIO_IRQ(OMAP_GPIO_USB_TRIGGER);
+    
+    if (gpio_request(OMAP_GPIO_CHG_ING_N, "charge full irq") < 0) {
+        printk(KERN_ERR "Failed to request GPIO%d for charge full IRQ\n",
+               OMAP_GPIO_CHG_ING_N);
+        samsung_charger_resources[2].start = -1;
+	}
+	else {
+		samsung_charger_resources[2].start = gpio_to_irq(OMAP_GPIO_CHG_ING_N);
+		//omap_set_gpio_debounce( OMAP_GPIO_CHG_ING_N, 3 );
+		gpio_set_debounce( OMAP_GPIO_CHG_ING_N, 3 );
+	}
 
-	samsung_charger_resources[2].start	=	OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N);	//	is	charging
-	samsung_charger_resources[3].start	=	OMAP_GPIO_IRQ(OMAP_GPIO_CHG_EN);		//	charge	enable
+	if (gpio_request(OMAP_GPIO_CHG_EN, "Charge enable gpio") < 0) {
+		printk(KERN_ERR "Failed to request GPIO%d for charge enable gpio\n",
+		       OMAP_GPIO_CHG_EN);
+		samsung_charger_resources[3].start = -1;
+ 	}
+	else {
+		samsung_charger_resources[3].start = gpio_to_irq(OMAP_GPIO_CHG_EN);
+	}
 }
 
 static	inline	void	__init	nowplus_init_ear_key(void)
@@ -1376,36 +1442,7 @@ static	struct	fsa9480_platform_data	fsa9480_pdata	=	{
 };
 #endif
 
-#ifdef	CONFIG_OPTICAL_GP2A
-static	void	gp2a_gpio_init(void)
-{
-	//	int	ret	=	gpio_request(GPIO_PS_ON,	"gp2a_power_supply_on");
-	int	ret	=	gpio_request(OMAP_GPIO_PS_OUT,	"gp2a_power_supply_on");
-	if	(ret)
-		printk(KERN_ERR	"Failed	to	request	gpio	gp2a	power	supply.\n");
-}
 
-static	int	gp2a_power(bool	on)
-{
-	/*	this	controls	the	power	supply	rail	to	the	gp2a	IC	*/
-	//	gpio_direction_output(GPIO_PS_ON,	on);
-	gpio_direction_output(OMAP_GPIO_PS_OUT,	on);
-	return	0;
-}
-
-static	int	gp2a_light_adc_value(void)
-{
-	//	return	s3c_adc_get_adc_data(9);
-	//	Should	be	change	for	TI	Chip
-	return	1;
-}
-
-static	struct	gp2a_platform_data	gp2a_pdata	=	{
-	.power	=	gp2a_power,
-	.p_out	=	OMAP_GPIO_PS_OUT,	//	GPIO_PS_VOUT,
-	.light_adc_value	=	gp2a_light_adc_value
-};
-#endif
 
 static	struct	i2c_board_info	__initdata	nowplus_i2c1_boardinfo[]	=	{
 	{
@@ -1438,41 +1475,25 @@ static	struct	i2c_board_info	__initdata	nowplus_i2c2_boardinfo[]	=	{
 		I2C_BOARD_INFO("BD2802",	0x1A),
 		.platform_data	=	&nowplus_led_data,
 	},
-/*	{
-		I2C_BOARD_INFO("akm8976",	0x1c),
-	},*/
-#if	defined(CONFIG_USB_SWITCH_FSA9480)
 	{
 		I2C_BOARD_INFO("fsa9480",	0x4A	>>	1),
 		.platform_data	=	&fsa9480_pdata,
 		.irq	=	OMAP_GPIO_IRQ(OMAP_GPIO_USBSW_NINT),
 	},
-#elif	defined(CONFIG_MICROUSBIC_INTR)
-	{
-		I2C_BOARD_INFO("microusbic",	0x25),
-	},
-#endif
-
 	{
 #ifdef	CONFIG_BATTERY_MAX17040
 			I2C_BOARD_INFO("max17040",	0x36),
 		.platform_data	=	&nowplus_max17040_data,
-#else
-		//	use	samsung	driver
+#else   //	use	Samsung	driver
 		I2C_BOARD_INFO("secFuelgaugeDev",	0x36),
-#if	0	//(CONFIG_ARCHER_REV	>=	ARCHER_REV11)
-		.flags	=	I2C_CLIENT_WAKE,
-		.irq	=	OMAP_GPIO_IRQ(OMAP_GPIO_FUEL_INT_N),
+#if	1	//(CONFIG_ARCHER_REV	>=	ARCHER_REV11)
+		//.flags	=	I2C_CLIENT_WAKE,
+		//.irq	=	OMAP_GPIO_IRQ(OMAP_GPIO_FUEL_INT_N),
 #endif
 #endif
 	},
 	{
-#ifdef	CONFIG_OPTICAL_GP2A
-		I2C_BOARD_INFO("gp2a",		0x44),
-		.platform_data	=	&gp2a_pdata,
-#else
 		I2C_BOARD_INFO("PL_driver",	0x44),
-#endif
 	},
 	{
 		I2C_BOARD_INFO("max9877",	0x4d),
@@ -1959,49 +1980,6 @@ static	inline	void	__init	nowplus_init_earphone(void)
 
 static	inline	void	__init	nowplus_init_platform(void)
 {
-
-//test	gpio58	for	connection
-	//printk("test	gpio58	for	connection:\n");
-	//omap34xx_pad_set_config_lcd(0x0bc,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT_PULLUP	);
-#if	0
-		if	(gpio_request(OMAP_GPIO_USB_TRIGGER,	"OMAP_GPIO_USB_TRIGGER")	<	0)	{
-		printk(KERN_ERR	"	request	OMAP_GPIO_USB_TRIGGER	failed\n");
-		return;
-	}
-	gpio_direction_output(OMAP_GPIO_USB_TRIGGER,	1);
-#endif
-	//	printk("OMAP_GPIO_USB_TRIGGER:	pullup=%d\n",	gpio_get_value(OMAP_GPIO_USB_TRIGGER));
-	//	omap34xx_pad_set_config_lcd(0x0bc,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT_PULLDOWN	);
-	//	printk("OMAP_GPIO_USB_TRIGGER:	pulldown=%d\n",	gpio_get_value(OMAP_GPIO_USB_TRIGGER));
-	//	omap34xx_pad_set_config_lcd(0x0bc,	OMAP34XX_MUX_MODE7	|	OMAP34XX_PIN_INPUT_PULLUP	);
-
-	if	(gpio_request(OMAP_GPIO_USBSW_NINT,	"OMAP_GPIO_USBSW_NINT")	<	0)	{
-		printk(KERN_ERR	"	request	OMAP_GPIO_USBSW_NINT	failed\n");
-		return;
-	}
-	gpio_direction_input(OMAP_GPIO_USBSW_NINT);
-
-	if(gpio_request(OMAP_GPIO_CHG_ING_N,	"OMAP_GPIO_CHG_ING_N")	<	0	){
-			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_CHG_ING_N);
-			return;
-		}
-	gpio_direction_input(OMAP_GPIO_CHG_ING_N);
-
-	if(gpio_request(OMAP_GPIO_CHG_EN,	"OMAP_GPIO_CHG_EN")	<	0	){
-			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_CHG_EN);
-			return;
-		}
-
-	/*CHG_EN	low	or	high	depend	on	bootloader	configuration*/
-	if(gpio_get_value(OMAP_GPIO_CHG_EN))
-	{
-		gpio_direction_output(OMAP_GPIO_CHG_EN,	1);
-	}
-	else
-	{
-		gpio_direction_output(OMAP_GPIO_CHG_EN,	0);
-	}
-
 	/*NAND	INT_GPIO*/
 	if(gpio_request(OMAP_GPIO_AP_NAND_INT,	"OMAP_GPIO_AP_NAND_INT")	<	0	){
 			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_AP_NAND_INT);

@@ -290,7 +290,7 @@ static void max17040_work(struct work_struct *work)
 	max17040_get_soc(chip->client);
 	max17040_get_status(chip->client);
 	
-	printk("MAX17040: soc=%d %%, vbat=%d mV", chip->soc,  chip->vcell);
+	//printk("MAX17040: soc=%d %%, vbat=%d mV", chip->soc,  chip->vcell);
 
 	if((old_vcell != chip->vcell) || (old_soc != chip->soc))
 		power_supply_changed(&chip->battery);

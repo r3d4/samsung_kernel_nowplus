@@ -1,0 +1,1093 @@
+E/RIL     ( 1123): [*] RIL initialized: TID(1123)
+E/RIL     ( 1123): [RIL_Init] RILD-Silent flag :: 
+D/RIL     ( 1123): dload_test start. 
+I/RIL     ( 1123): Opening tty device /dev/ttyS0
+D/RILC    ( 1123): startMultiClientSocket() START
+D/RILC    ( 1123): startMultiClientSocket() fd=14 END
+D/RIL     ( 1123): dload_test start. 
+I/PHONE   ( 1318): Network Mode set to 1
+I/PHONE   ( 1318): Cdma Subscription set to 1
+I/PHONE   ( 1318): RILClassname is 
+I/PHONE   ( 1318): Creating GSMPhone
+D/RILC    ( 1123): removeWatch: fd=10
+I/RILC    ( 1123): libril: new connection=0
+I/RILC    ( 1123): RIL Daemon version: Samsung RIL(IPC) v1.0
+I/RILJ    ( 1318): Connected to 'rild' socket
+D/RIL     ( 1123): dload_test start. 
+D/RIL     ( 1123): phone on failed!. Not a typewriter
+D/RIL     ( 1123): memory init failed! Not a typewriter.
+E/RILJ    ( 1318): Hit EOS reading message length
+I/RILJ    ( 1318): Disconnected from 'rild' socket
+D/PHONE   ( 1318): mDoesRilSendMultipleCallRing=false
+D/PHONE   ( 1318): mCallRingDelay=3000
+E/RIL     ( 1371): [*] RIL initialized: TID(1371)
+E/RIL     ( 1371): [RIL_Init] RILD-Silent flag :: 1
+I/RIL     ( 1371): Opening tty device /dev/ttyS0
+D/RILC    ( 1371): startMultiClientSocket() START
+D/RILC    ( 1371): startMultiClientSocket() fd=15 END
+W/GSM     ( 1318): Can't open /system/etc/voicemail-conf.xml
+D/GSM     ( 1318): [DSAC DEB] registerForPsRestrictedEnabled 
+D/GSM     ( 1318): [DSAC DEB] registerForPsRestrictedDisabled 
+D/GSM     ( 1318): [GsmDataConnection-1] DataConnection constructor E
+D/GSM     ( 1318): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1318): [GsmDataConnection-1] DataConnection constructor X
+D/GSM     ( 1318): [GsmDataConnection-1] Made GsmDataConnection-1
+D/RILJ    ( 1318): [0000]> RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING
+D/RILJ    ( 1318): [0000]< RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/STK     ( 1318): StkService: StkService: is running
+D/STK     ( 1318): StkService: NEW sInstance
+I/RIL     ( 1371): setRadioState: sState 0, s_closed 0
+I/RIL     ( 1371): setRadioState: sState 0, s_closed 0
+D/RILJ    ( 1318): [0001]> GET_CURRENT_CALLS
+D/RILJ    ( 1318): [0001]< GET_CURRENT_CALLS error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+E/GSM     ( 1318): Wrong network type: 0
+E/GSM     ( 1318): Wrong network type: 0
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[1 home null null null  Unknown CSS not supported 0 0RoamInd: 0DefRoamInd: 0EmergOnly: false] newSS=[1 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=1 oldType=unknown newType=unknown
+D/GSM     ( 1318): [GsmDataConnection-1] DcInactiveState: msg.what=EVENT_RESET, ignore we're already reset
+D/GSM     ( 1318): [GsmDataConnection-1] NotifyDisconnectCompleted
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/GSM     ( 1318): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/GSM     ( 1318): [DSAC DEB] trySetupData with mIsPsRestricted=false
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED NOT_READY reason null
+D/RILJ    ( 1318): [0002]> SCREEN_STATE: true
+D/RILJ    ( 1318): [0002]< SCREEN_STATE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+I/RILJ    ( 1318): Connected to 'rild' socket
+D/RILC    ( 1371): removeWatch: fd=10
+I/RILC    ( 1371): libril: new connection=21
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_OFF}
+I/RILC    ( 1371): RIL Daemon version: Samsung RIL(IPC) v1.0
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED RADIO_OFF
+D/RILB    ( 1318): Notifying: radio available
+D/RILJ    ( 1318): [0003]> SCREEN_STATE: true
+D/RILJ    ( 1318): [0004]> REQUEST_SET_PREFERRED_NETWORK_TYPE : 1
+D/RILJ    ( 1318): [0005]> RIL_REQUEST_CDMA_SET_SUBSCRIPTION : 1
+D/RILJ    ( 1318): [0006]> RADIO_POWER
+E/GSM     ( 1318): Wrong network type: 0
+E/GSM     ( 1318): Wrong network type: 0
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[1 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=1 oldType=unknown newType=unknown
+D/RILC    ( 1371): [0003]> SCREEN_STATE (1)
+D/RILC    ( 1371): [0003]< SCREEN_STATE fails by E_RAIDO_NOT_AVAILABLE
+D/RILC    ( 1371): [0004]> SET_PREFERRED_NETWORK_TYPE (1)
+D/RILC    ( 1371): [0004]< SET_PREFERRED_NETWORK_TYPE fails by E_RAIDO_NOT_AVAILABLE
+D/RILC    ( 1371): [0005]> CDMA_SET_SUBSCRIPTION (1)
+D/RILC    ( 1371): [0005]< CDMA_SET_SUBSCRIPTION fails by E_RAIDO_NOT_AVAILABLE
+D/RILC    ( 1371): [0006]> RADIO_POWER (1)
+D/RILJ    ( 1318): [0003]< SCREEN_STATE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/RILJ    ( 1318): [0004]< REQUEST_SET_PREFERRED_NETWORK_TYPE error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/RILJ    ( 1318): [0005]< RIL_REQUEST_CDMA_SET_SUBSCRIPTION error: com.android.internal.telephony.CommandException: RADIO_NOT_AVAILABLE
+D/RILJ    ( 1318): [0007]> BASEBAND_VERSION
+D/RILC    ( 1371): [0007]> BASEBAND_VERSION 
+D/RILJ    ( 1318): [0008]> GET_IMEI
+D/RILJ    ( 1318): [0009]> GET_IMEISV
+D/RILC    ( 1371): [0008]> GET_IMEI 
+D/RILC    ( 1371): [0009]> GET_IMEISV 
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=-1,bitErrorRate=99,                CDMA_SignalStrength.dbm=-1,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =-1,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [UNSL]< UNSOL_STK_PROACTIVE_COMMAND {d051810301250082028182050d73696d796f204469656e7374658f0d014b756e64656e6469656e73748f0e025370726163686469656e7374658f0c03534d532d4469656e7374658f0a05426f6f6b6d61726b73}
+D/RILJ    ( 1318): [UNSL]< UNSOL_STK_PROACTIVE_COMMAND d051810301250082028182050d73696d796f204469656e7374658f0d014b756e64656e6469656e73748f0e025370726163686469656e7374658f0c03534d532d4469656e7374658f0a05426f6f6b6d61726b73
+D/RILC    ( 1371): [0006]< RADIO_POWER
+D/RILJ    ( 1318): [0006]< RADIO_POWER 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_SIM_READY}
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_READY
+D/RILB    ( 1318): Notifying: SIM ready
+D/RILB    ( 1318): Notifying: Radio On
+I/RIL     ( 1371): setRadioState: sState 4, s_closed 0
+E/RIL     ( 1371): wifi addr file open failed.
+E/RIL     ( 1371): csc ver file open failed.
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_SIM_NOT_READY}
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_NOT_READY
+I/RIL     ( 1371): setRadioState: sState 2, s_closed 0
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [0007]< BASEBAND_VERSION {i8320BUJA2}
+D/RILJ    ( 1318): [0007]< BASEBAND_VERSION i8320BUJA2
+D/STK     ( 1318): StkService: ril message arrived
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [0008]< GET_IMEI {353629030345598}
+D/RILJ    ( 1318): [0008]< GET_IMEI 
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [0009]< GET_IMEISV {01}
+D/RILJ    ( 1318): [0009]< GET_IMEISV 
+D/RILJ    ( 1318): [0010]> OPERATOR
+D/RILC    ( 1371): [0010]> OPERATOR 
+D/STK     ( 1318): CommandParamsFactory: process SelectItem
+D/RILC    ( 1371): [0010]< OPERATOR {(null),(null),(null)}
+D/RILJ    ( 1318): [0011]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0011]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0010]< OPERATOR {null, null, null}
+D/RILJ    ( 1318): [0012]> REGISTRATION_STATE
+D/RILC    ( 1371): [0011]< GPRS_REGISTRATION_STATE {2,ffff,00000000,0}
+D/RILJ    ( 1318): [0011]< GPRS_REGISTRATION_STATE {2, ffff, 00000000, 0}
+D/RILJ    ( 1318): [0013]> QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): [0014]> OPERATOR
+D/RILC    ( 1371): [0012]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0012]< REGISTRATION_STATE {2,ffff,00000000}
+D/RILJ    ( 1318): [0015]> GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): [0016]> REGISTRATION_STATE
+D/RILJ    ( 1318): [0017]> QUERY_NETWORK_SELECTION_MODE
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED READY reason null
+V/GSM     ( 1318): SIMRecords:fetchSimRecords 0
+D/RILJ    ( 1318): [0018]> getIMSI:RIL_REQUEST_GET_IMSI 11 GET_IMSI
+D/RILJ    ( 1318): [0019]> iccIO: SIM_IO 0xc0 0x2fe2  path: 3F00,0,0,15
+D/RILJ    ( 1318): [0020]> iccIO: SIM_IO 0xc0 0x6f40  path: 3F007F10,0,0,15
+D/RILJ    ( 1318): [0021]> iccIO: SIM_IO 0xc0 0x6fc9  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0022]> iccIO: SIM_IO 0xc0 0x6fad  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0023]> iccIO: SIM_IO 0xc0 0x6fca  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0024]> iccIO: SIM_IO 0xc0 0x6f11  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0025]> iccIO: SIM_IO 0xc0 0x6fcb  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0026]> iccIO: SIM_IO 0xc0 0x6f13  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0027]> iccIO: SIM_IO 0xc0 0x6f46  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0028]> iccIO: SIM_IO 0xc0 0x6fcd  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0029]> iccIO: SIM_IO 0xc0 0x6fc5  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0030]> iccIO: SIM_IO 0xc0 0x6f38  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0031]> iccIO: SIM_IO 0xc0 0x6f16  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0032]> iccIO: SIM_IO 0xc0 0x6f15  path: 3F007F20,0,0,15
+D/RILJ    ( 1318): [0033]> GET_SIM_STATUS
+D/RILJ    ( 1318): [0034]> QUERY_FACILITY_LOCK
+D/RILJ    ( 1318): [0035]> QUERY_FACILITY_LOCK
+D/RILJ    ( 1318): [0036]> GET_CURRENT_CALLS
+D/RILJ    ( 1318): [0037]> OPERATOR
+D/RILJ    ( 1318): [0038]> GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): [0039]> REGISTRATION_STATE
+D/RILJ    ( 1318): [0040]> QUERY_NETWORK_SELECTION_MODE
+D/GSM     ( 1318): Baseband version: i8320BUJA2
+D/STK     ( 1318): StkService: SET_UP_MENU
+D/STK     ( 1318): StkService: TERMINAL RESPONSE: 810301250082028281830100
+D/RILJ    ( 1318): [0041]> REQUEST_STK_SEND_TERMINAL_RESPONSE
+D/RILJ    ( 1318): [0012]< REGISTRATION_STATE {2, ffff, 00000000}
+D/RILC    ( 1371): [0013]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0014]> OPERATOR 
+D/RILC    ( 1371): [0013]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0014]< OPERATOR {(null),(null),(null)}
+D/RILC    ( 1371): [0015]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0015]< GPRS_REGISTRATION_STATE {2,ffff,00000000,0}
+D/RILC    ( 1371): [0016]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0013]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0016]< REGISTRATION_STATE {2,ffff,00000000}
+D/RILC    ( 1371): [0017]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0018]> GET_IMSI 
+D/RILC    ( 1371): [0017]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0014]< OPERATOR {null, null, null}
+D/RILC    ( 1371): [0019]> SIM_IO (cmd=0xC0,efid=0x2FE2,path=3F00,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0020]> SIM_IO (cmd=0xC0,efid=0x6F40,path=3F007F10,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0015]< GPRS_REGISTRATION_STATE {2, ffff, 00000000, 0}
+D/RILC    ( 1371): [0021]> SIM_IO (cmd=0xC0,efid=0x6FC9,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0022]> SIM_IO (cmd=0xC0,efid=0x6FAD,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0016]< REGISTRATION_STATE {2, ffff, 00000000}
+D/RILC    ( 1371): [0023]> SIM_IO (cmd=0xC0,efid=0x6FCA,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0024]> SIM_IO (cmd=0xC0,efid=0x6F11,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0025]> SIM_IO (cmd=0xC0,efid=0x6FCB,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0026]> SIM_IO (cmd=0xC0,efid=0x6F13,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0027]> SIM_IO (cmd=0xC0,efid=0x6F46,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0017]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0028]> SIM_IO (cmd=0xC0,efid=0x6FCD,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0029]> SIM_IO (cmd=0xC0,efid=0x6FC5,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0030]> SIM_IO (cmd=0xC0,efid=0x6F38,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0031]> SIM_IO (cmd=0xC0,efid=0x6F16,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0032]> SIM_IO (cmd=0xC0,efid=0x6F15,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0033]> GET_SIM_STATUS 
+D/RILC    ( 1371): [0034]> QUERY_FACILITY_LOCK (SC,,7)
+D/RILC    ( 1371): [0035]> QUERY_FACILITY_LOCK (FD,,7)
+D/RILC    ( 1371): [0036]> GET_CURRENT_CALLS 
+D/RILC    ( 1371): [0037]> OPERATOR 
+D/RILC    ( 1371): [0038]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0039]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0040]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0041]> STK_SEND_TERMINAL_RESPONSE (810301250082028281830100)
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [0018]< GET_IMSI {262032761592186}
+D/RILJ    ( 1318): [0018]< GET_IMSI 
+D/GSM     ( 1318): IMSI: 262032xxxxxxx
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED IMSI reason null
+D/RILC    ( 1371): [0019]< SIM_IO {sw1=0x90,sw2=0x0,0000000a2fe2040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000000a2fe2040000ffff01020002
+D/RILC    ( 1371): [0020]< SIM_IO {sw1=0x90,sw2=0x0,0000007c6f40040000ffff0102011f}
+D/RILC    ( 1371): [0021]< SIM_IO {sw1=0x90,sw2=0x0,000000106fc9040000ffff01020104}
+D/RILC    ( 1371): [0022]< SIM_IO {sw1=0x94,sw2=0x8,(null)}
+D/RILJ    ( 1318): [0019]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000007c6f40040000ffff0102011f
+D/RILJ    ( 1318): [0020]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000106fc9040000ffff01020104
+D/RILJ    ( 1318): [0021]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): < iccIO:  0x94 0x8 null
+D/RILJ    ( 1318): [0022]< SIM_IO IccIoResponse sw1:0x94 sw2:0x8
+D/RILC    ( 1371): [0023]< SIM_IO {sw1=0x90,sw2=0x0,000000146fca040000ffff01020105}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000146fca040000ffff01020105
+D/RILJ    ( 1318): [0023]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0024]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0024]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0025]< SIM_IO {sw1=0x90,sw2=0x0,000000406fcb040000ffff01020110}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000406fcb040000ffff01020110
+D/RILJ    ( 1318): [0025]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0042]> iccIO: SIM_IO 0xb0 0x2fe2  path: 3F00,0,0,10
+D/RILJ    ( 1318): [0043]> iccIO: SIM_IO 0xb2 0x6f40  path: 3F007F10,1,4,31
+D/RILC    ( 1371): [0042]> SIM_IO (cmd=0xB0,efid=0x2FE2,path=3F00,0,0,10,(null),pin2=(null))
+D/RILJ    ( 1318): [0044]> iccIO: SIM_IO 0xb2 0x6fc9  path: 3F007F20,1,4,4
+D/RILC    ( 1371): [0043]> SIM_IO (cmd=0xB2,efid=0x6F40,path=3F007F10,1,4,31,(null),pin2=(null))
+D/RILC    ( 1371): [0044]> SIM_IO (cmd=0xB2,efid=0x6FC9,path=3F007F20,1,4,4,(null),pin2=(null))
+D/RILJ    ( 1318): [0045]> iccIO: SIM_IO 0xb2 0x6fca  path: 3F007F20,1,4,5
+D/RILC    ( 1371): [0045]> SIM_IO (cmd=0xB2,efid=0x6FCA,path=3F007F20,1,4,5,(null),pin2=(null))
+D/RILJ    ( 1318): [0046]> iccIO: SIM_IO 0xb2 0x6fcb  path: 3F007F20,1,4,16
+D/RILC    ( 1371): [0046]> SIM_IO (cmd=0xB2,efid=0x6FCB,path=3F007F20,1,4,16,(null),pin2=(null))
+D/RILC    ( 1371): [0026]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=16,bitErrorRate=99,                CDMA_SignalStrength.dbm=16,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =16,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0026]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILC    ( 1371): [0027]< SIM_IO {sw1=0x90,sw2=0x0,000000116f46040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000116f46040000ffff01020002
+D/RILJ    ( 1318): [0027]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+I/RIL     ( 1371): setRadioState: sState 0, s_closed 0
+D/RILC    ( 1371): [0028]< SIM_IO {sw1=0x90,sw2=0x0,000000206fcd040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000206fcd040000ffff01020002
+D/RILJ    ( 1318): [0028]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0029]< SIM_IO {sw1=0x90,sw2=0x0,000000556fc5040000ffff01020111}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000556fc5040000ffff01020111
+D/RILJ    ( 1318): [0029]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0030]< SIM_IO {sw1=0x90,sw2=0x0,000000076f38040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000076f38040000ffff01020002
+D/RILJ    ( 1318): [0030]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0047]> OPERATOR
+D/RILJ    ( 1318): [0048]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0047]> OPERATOR 
+D/RILJ    ( 1318): [0049]> REGISTRATION_STATE
+D/RILJ    ( 1318): [0050]> QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): [0051]> OPERATOR
+D/RILC    ( 1371): [0048]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0049]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0050]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0051]> OPERATOR 
+D/RILJ    ( 1318): [0052]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0052]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0053]> REGISTRATION_STATE
+D/RILC    ( 1371): [0053]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0054]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0054]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0055]> OPERATOR
+D/RILC    ( 1371): [0055]> OPERATOR 
+D/RILJ    ( 1318): [0056]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0056]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0057]> REGISTRATION_STATE
+D/RILC    ( 1371): [0057]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0058]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0058]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0059]> iccIO: SIM_IO 0xb0 0x6f46  path: 3F007F20,0,0,17
+D/RILC    ( 1371): [0059]> SIM_IO (cmd=0xB0,efid=0x6F46,path=3F007F20,0,0,17,(null),pin2=(null))
+D/RILJ    ( 1318): [0060]> iccIO: SIM_IO 0xb0 0x6fcd  path: 3F007F20,0,0,32
+D/RILC    ( 1371): [0060]> SIM_IO (cmd=0xB0,efid=0x6FCD,path=3F007F20,0,0,32,(null),pin2=(null))
+D/RILJ    ( 1318): [0061]> iccIO: SIM_IO 0xb2 0x6fc5  path: 3F007F20,1,4,17
+D/RILC    ( 1371): [0061]> SIM_IO (cmd=0xB2,efid=0x6FC5,path=3F007F20,1,4,17,(null),pin2=(null))
+D/RILJ    ( 1318): [0062]> iccIO: SIM_IO 0xb0 0x6f38  path: 3F007F20,0,0,7
+D/RILC    ( 1371): [0062]> SIM_IO (cmd=0xB0,efid=0x6F38,path=3F007F20,0,0,7,(null),pin2=(null))
+D/RILC    ( 1371): [0031]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0031]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0032]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILC    ( 1371): [0033]< GET_SIM_STATUS {[app_type=2,app_state=5,perso_substate=0,                aid_ptr=(null),app_label_ptr=(null),pin1_replaced=0,pin1=2,pin2=0],}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0032]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0034]< QUERY_FACILITY_LOCK {0}
+D/RILC    ( 1371): [0035]< QUERY_FACILITY_LOCK {0}
+D/RILJ    ( 1318): [0033]< GET_SIM_STATUS com.android.internal.telephony.IccCardStatus@405d5470
+D/RILJ    ( 1318): [0034]< QUERY_FACILITY_LOCK {0}
+D/RILC    ( 1371): [0036]< GET_CURRENT_CALLS
+D/RILJ    ( 1318): [0035]< QUERY_FACILITY_LOCK {0}
+D/RILC    ( 1371): [0037]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0038]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILC    ( 1371): [0039]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0036]< GET_CURRENT_CALLS  
+D/RILC    ( 1371): [0040]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0037]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0038]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/RILJ    ( 1318): [0039]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0040]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_SIM_READY}
+I/RIL     ( 1371): setRadioState: sState 4, s_closed 0
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_READY
+D/RILB    ( 1318): Notifying: SIM ready
+D/RILC    ( 1371): [0041]< STK_SEND_TERMINAL_RESPONSE
+D/RILJ    ( 1318): [0041]< REQUEST_STK_SEND_TERMINAL_RESPONSE 
+D/RILC    ( 1371): [0042]< SIM_IO {sw1=0x90,sw2=0x0,989412006159770216ff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 989412006159770216ff
+D/RILJ    ( 1318): [0042]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): [IccCard] Query facility lock : false
+D/GSM     ( 1318): [IccCard] Query facility lock : false
+D/RILJ    ( 1318): [0063]> OPERATOR
+D/RILC    ( 1371): [0063]> OPERATOR 
+D/RILJ    ( 1318): [0064]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0064]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0065]> REGISTRATION_STATE
+D/RILC    ( 1371): [0065]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0066]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0043]< SIM_IO {sw1=0x90,sw2=0x0,ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0043]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0066]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0067]> OPERATOR
+D/RILC    ( 1371): [0067]> OPERATOR 
+D/RILJ    ( 1318): [0068]> GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): [0069]> REGISTRATION_STATE
+D/RILC    ( 1371): [0068]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0070]> QUERY_NETWORK_SELECTION_MODE
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED READY reason null
+D/RILC    ( 1371): [0069]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0070]> QUERY_NETWORK_SELECTION_MODE 
+V/GSM     ( 1318): SIMRecords:fetchSimRecords 10
+D/RILJ    ( 1318): [0071]> getIMSI:RIL_REQUEST_GET_IMSI 11 GET_IMSI
+D/RILJ    ( 1318): [0072]> iccIO: SIM_IO 0xc0 0x2fe2  path: 3F00,0,0,15
+D/RILC    ( 1371): [0071]> GET_IMSI 
+D/RILJ    ( 1318): [0073]> iccIO: SIM_IO 0xc0 0x6f40  path: 3F007F10,0,0,15
+D/RILJ    ( 1318): [0074]> iccIO: SIM_IO 0xc0 0x6fc9  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0072]> SIM_IO (cmd=0xC0,efid=0x2FE2,path=3F00,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0073]> SIM_IO (cmd=0xC0,efid=0x6F40,path=3F007F10,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0074]> SIM_IO (cmd=0xC0,efid=0x6FC9,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0075]> iccIO: SIM_IO 0xc0 0x6fad  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0075]> SIM_IO (cmd=0xC0,efid=0x6FAD,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0076]> iccIO: SIM_IO 0xc0 0x6fca  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0076]> SIM_IO (cmd=0xC0,efid=0x6FCA,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0077]> iccIO: SIM_IO 0xc0 0x6f11  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0044]< SIM_IO {sw1=0x90,sw2=0x0,01010101}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 01010101
+D/RILJ    ( 1318): [0044]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0077]> SIM_IO (cmd=0xC0,efid=0x6F11,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0078]> iccIO: SIM_IO 0xc0 0x6fcb  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0078]> SIM_IO (cmd=0xC0,efid=0x6FCB,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0079]> iccIO: SIM_IO 0xc0 0x6f13  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0079]> SIM_IO (cmd=0xC0,efid=0x6F13,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0080]> iccIO: SIM_IO 0xc0 0x6f46  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0080]> SIM_IO (cmd=0xC0,efid=0x6F46,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0081]> iccIO: SIM_IO 0xc0 0x6fcd  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0081]> SIM_IO (cmd=0xC0,efid=0x6FCD,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0082]> iccIO: SIM_IO 0xc0 0x6fc5  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0082]> SIM_IO (cmd=0xC0,efid=0x6FC5,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0083]> iccIO: SIM_IO 0xc0 0x6f38  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0083]> SIM_IO (cmd=0xC0,efid=0x6F38,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0084]> iccIO: SIM_IO 0xc0 0x6f16  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0084]> SIM_IO (cmd=0xC0,efid=0x6F16,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0085]> iccIO: SIM_IO 0xc0 0x6f15  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0085]> SIM_IO (cmd=0xC0,efid=0x6F15,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0086]> GET_SIM_STATUS
+D/RILC    ( 1371): [0086]> GET_SIM_STATUS 
+D/RILJ    ( 1318): [0087]> QUERY_FACILITY_LOCK
+D/RILC    ( 1371): [0087]> QUERY_FACILITY_LOCK (SC,,7)
+D/RILJ    ( 1318): [0088]> QUERY_FACILITY_LOCK
+D/RILC    ( 1371): [0088]> QUERY_FACILITY_LOCK (FD,,7)
+D/STK     ( 1318): StkService: Return current sInstance
+D/RILC    ( 1371): [0045]< SIM_IO {sw1=0x90,sw2=0x0,0000000000}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000000000
+D/RILJ    ( 1318): [0045]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0046]< SIM_IO {sw1=0x90,sw2=0x0,0100ffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0100ffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0046]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0047]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0047]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0048]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILJ    ( 1318): [0048]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/RILC    ( 1371): [0049]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0049]< REGISTRATION_STATE {1, 9c75, 0805930b}
+E/GSM     ( 1318): Exception in fetching EF_CSP data com.android.internal.telephony.IccException: sw1:106 sw2:130
+D/GSM     ( 1318): iccid: 894921001695772061
+D/GSM     ( 1318): EF_MBI: 01010101
+D/GSM     ( 1318): Got valid mailbox number for MBDN
+D/RILJ    ( 1318): [0089]> iccIO: SIM_IO 0xc0 0x6fc7  path: 3F007F20,0,0,15
+D/STK     ( 1318): StkAppService: SET_UP_MENU
+D/STK     ( 1318): StkAppService: Install App
+D/RILC    ( 1371): [0050]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0050]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0051]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0052]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILC    ( 1371): [0053]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0051]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0052]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/RILC    ( 1371): [0054]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0053]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0055]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0054]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0055]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0056]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILC    ( 1371): [0057]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0058]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0089]> SIM_IO (cmd=0xC0,efid=0x6FC7,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILJ    ( 1318): [0056]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/GSM     ( 1318): EF_MWIS: 0000000000
+D/RILJ    ( 1318): [0057]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/GSM     ( 1318): EF_CFIS: 0100ffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0058]< QUERY_NETWORK_SELECTION_MODE {0}
+D/GSM     ( 1318): MSISDN: xxxxxxx
+D/RILC    ( 1371): [0059]< SIM_IO {sw1=0x90,sw2=0x0,0073696d796fffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0073696d796fffffffffffffffffffffff
+D/RILJ    ( 1318): [0059]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0060]< SIM_IO {sw1=0x90,sw2=0x0,ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0060]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): [SIMRecords] Load EF_SPN: simyo spnDisplayCondition: 0
+D/RILC    ( 1371): [0061]< SIM_IO {sw1=0x90,sw2=0x0,430685f3743bff06ffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 430685f3743bff06ffffffffffffffffff
+D/RILJ    ( 1318): [0061]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0062]< SIM_IO {sw1=0x90,sw2=0x0,9e3b140c27fe5d}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 9e3b140c27fe5d
+D/RILJ    ( 1318): [0062]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [UNSL]< UNSOL_STK_PROACTIVE_COMMAND {d00c810301050082028182990103}
+D/RILJ    ( 1318): [UNSL]< UNSOL_STK_PROACTIVE_COMMAND d00c810301050082028182990103
+D/STK     ( 1318): StkService: ril message arrived
+D/RILC    ( 1371): [0063]< OPERATOR {E-Plus,E-Plus,26203}
+D/STK     ( 1318): StkService: TERMINAL RESPONSE: 810301050082028281830131
+D/RILJ    ( 1318): [0090]> REQUEST_STK_SEND_TERMINAL_RESPONSE
+D/RILC    ( 1371): [0064]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILC    ( 1371): [0090]> STK_SEND_TERMINAL_RESPONSE (810301050082028281830131)
+D/RILC    ( 1371): [0065]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0063]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0064]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/RILJ    ( 1318): [0065]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0066]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0066]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0067]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0067]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0068]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,3}
+D/RILC    ( 1371): [0069]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0068]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 3}
+D/RILC    ( 1371): [0070]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0069]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0070]< QUERY_NETWORK_SELECTION_MODE {0}
+E/GSM     ( 1318): Wrong network type: 0
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  UMTS CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=1 newGprs=0 oldType=unknown newType=UMTS
+E/GSM     ( 1318): Wrong network type: 0
+D/GSM     ( 1318): RAT switched unknown -> UMTS at cell 134583051
+D/RILC    ( 1371): responseString()
+D/RILC    ( 1371): [0071]< GET_IMSI {262032761592186}
+D/RILJ    ( 1318): [0071]< GET_IMSI 
+D/RILC    ( 1371): [0072]< SIM_IO {sw1=0x90,sw2=0x0,0000000a2fe2040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000000a2fe2040000ffff01020002
+D/RILJ    ( 1318): [0072]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0073]< SIM_IO {sw1=0x90,sw2=0x0,0000007c6f40040000ffff0102011f}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000007c6f40040000ffff0102011f
+D/RILJ    ( 1318): [0073]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): IMSI: 262032xxxxxxx
+D/RILC    ( 1371): [0074]< SIM_IO {sw1=0x90,sw2=0x0,000000106fc9040000ffff01020104}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000106fc9040000ffff01020104
+D/RILJ    ( 1318): [0074]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0075]< SIM_IO {sw1=0x94,sw2=0x8,(null)}
+D/RILJ    ( 1318): < iccIO:  0x94 0x8 null
+D/RILJ    ( 1318): [0075]< SIM_IO IccIoResponse sw1:0x94 sw2:0x8
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED IMSI reason null
+D/RILJ    ( 1318): [0091]> iccIO: SIM_IO 0xb0 0x2fe2  path: 3F00,0,0,10
+D/RILC    ( 1371): [0076]< SIM_IO {sw1=0x90,sw2=0x0,000000146fca040000ffff01020105}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000146fca040000ffff01020105
+D/RILJ    ( 1318): [0076]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0091]> SIM_IO (cmd=0xB0,efid=0x2FE2,path=3F00,0,0,10,(null),pin2=(null))
+D/GSM     ( 1318): [DSAC DEB] trySetupData with mIsPsRestricted=false
+D/RILJ    ( 1318): [0092]> iccIO: SIM_IO 0xb2 0x6f40  path: 3F007F10,1,4,31
+D/RILJ    ( 1318): [0093]> iccIO: SIM_IO 0xb2 0x6fc9  path: 3F007F20,1,4,4
+D/RILC    ( 1371): [0092]> SIM_IO (cmd=0xB2,efid=0x6F40,path=3F007F10,1,4,31,(null),pin2=(null))
+D/RILJ    ( 1318): [0094]> iccIO: SIM_IO 0xb2 0x6fca  path: 3F007F20,1,4,5
+D/RILC    ( 1371): [0093]> SIM_IO (cmd=0xB2,efid=0x6FC9,path=3F007F20,1,4,4,(null),pin2=(null))
+D/RILC    ( 1371): [0094]> SIM_IO (cmd=0xB2,efid=0x6FCA,path=3F007F20,1,4,5,(null),pin2=(null))
+D/RILC    ( 1371): [0077]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0077]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0078]< SIM_IO {sw1=0x90,sw2=0x0,000000406fcb040000ffff01020110}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000406fcb040000ffff01020110
+D/RILJ    ( 1318): [0078]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0095]> iccIO: SIM_IO 0xb2 0x6fcb  path: 3F007F20,1,4,16
+D/RILC    ( 1371): [0095]> SIM_IO (cmd=0xB2,efid=0x6FCB,path=3F007F20,1,4,16,(null),pin2=(null))
+D/RILC    ( 1371): [0079]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0079]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0080]< SIM_IO {sw1=0x90,sw2=0x0,000000116f46040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000116f46040000ffff01020002
+D/RILJ    ( 1318): [0080]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0096]> iccIO: SIM_IO 0xb0 0x6f46  path: 3F007F20,0,0,17
+D/RILC    ( 1371): [0096]> SIM_IO (cmd=0xB0,efid=0x6F46,path=3F007F20,0,0,17,(null),pin2=(null))
+D/RILC    ( 1371): [0081]< SIM_IO {sw1=0x90,sw2=0x0,000000206fcd040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000206fcd040000ffff01020002
+D/RILJ    ( 1318): [0081]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0097]> iccIO: SIM_IO 0xb0 0x6fcd  path: 3F007F20,0,0,32
+D/RILC    ( 1371): [0097]> SIM_IO (cmd=0xB0,efid=0x6FCD,path=3F007F20,0,0,32,(null),pin2=(null))
+D/RILC    ( 1371): [0082]< SIM_IO {sw1=0x90,sw2=0x0,000000556fc5040000ffff01020111}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000556fc5040000ffff01020111
+D/RILJ    ( 1318): [0082]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0098]> iccIO: SIM_IO 0xb2 0x6fc5  path: 3F007F20,1,4,17
+D/RILC    ( 1371): [0098]> SIM_IO (cmd=0xB2,efid=0x6FC5,path=3F007F20,1,4,17,(null),pin2=(null))
+D/RILC    ( 1371): [0083]< SIM_IO {sw1=0x90,sw2=0x0,000000076f38040000ffff01020002}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 000000076f38040000ffff01020002
+D/RILJ    ( 1318): [0083]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0099]> iccIO: SIM_IO 0xb0 0x6f38  path: 3F007F20,0,0,7
+D/RILC    ( 1371): [0099]> SIM_IO (cmd=0xB0,efid=0x6F38,path=3F007F20,0,0,7,(null),pin2=(null))
+D/RILC    ( 1371): [0084]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILJ    ( 1318): [0084]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+D/RILC    ( 1371): [0085]< SIM_IO {sw1=0x6A,sw2=0x82,(null)}
+D/RILJ    ( 1318): < iccIO:  0x6a 0x82 null
+D/RILC    ( 1371): [0086]< GET_SIM_STATUS {[app_type=2,app_state=5,perso_substate=0,                aid_ptr=(null),app_label_ptr=(null),pin1_replaced=0,pin1=2,pin2=0],}
+D/RILC    ( 1371): [0087]< QUERY_FACILITY_LOCK {0}
+D/RILJ    ( 1318): [0085]< SIM_IO IccIoResponse sw1:0x6a sw2:0x82
+E/GSM     ( 1318): Exception in fetching EF_CSP data com.android.internal.telephony.IccException: sw1:106 sw2:130
+D/RILC    ( 1371): [0088]< QUERY_FACILITY_LOCK {0}
+D/RILJ    ( 1318): [0086]< GET_SIM_STATUS com.android.internal.telephony.IccCardStatus@40574488
+D/RILJ    ( 1318): [0087]< QUERY_FACILITY_LOCK {0}
+D/GSM     ( 1318): [IccCard] Query facility lock : false
+D/RILJ    ( 1318): [0088]< QUERY_FACILITY_LOCK {0}
+D/GSM     ( 1318): [IccCard] Query facility lock : false
+D/RILC    ( 1371): [0089]< SIM_IO {sw1=0x90,sw2=0x0,0000007c6fc7040000ffff0102011f}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000007c6fc7040000ffff0102011f
+D/RILJ    ( 1318): [0089]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [0100]> iccIO: SIM_IO 0xb2 0x6fc7  path: 3F007F20,1,4,31
+D/RILC    ( 1371): [0100]> SIM_IO (cmd=0xB2,efid=0x6FC7,path=3F007F20,1,4,31,(null),pin2=(null))
+D/RILC    ( 1371): [UNSL]< UNSOL_STK_SESSION_END 
+D/RILC    ( 1371): [0090]< STK_SEND_TERMINAL_RESPONSE
+D/RILJ    ( 1318): [UNSL]< UNSOL_STK_SESSION_END
+D/RILJ    ( 1318): [0090]< REQUEST_STK_SEND_TERMINAL_RESPONSE 
+D/STK     ( 1318): StkService: ril message arrived
+D/STK     ( 1318): StkService: SESSION END
+D/RILC    ( 1371): [0091]< SIM_IO {sw1=0x90,sw2=0x0,989412006159770216ff}
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 989412006159770216ff
+D/RILJ    ( 1318): [0091]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0101]> OPERATOR
+D/RILJ    ( 1318): [0102]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0101]> OPERATOR 
+D/RILC    ( 1371): [0102]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0103]> REGISTRATION_STATE
+D/RILC    ( 1371): [0103]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0104]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0092]< SIM_IO {sw1=0x90,sw2=0x0,ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0092]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0104]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0105]> OPERATOR
+D/RILC    ( 1371): [0105]> OPERATOR 
+D/RILJ    ( 1318): [0106]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0106]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0107]> REGISTRATION_STATE
+D/RILC    ( 1371): [0107]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0108]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0108]> QUERY_NETWORK_SELECTION_MODE 
+D/GSM     ( 1318): iccid: 894921001695772061
+D/GSM     ( 1318): MSISDN: xxxxxxx
+D/RILC    ( 1371): [0093]< SIM_IO {sw1=0x90,sw2=0x0,01010101}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 01010101
+D/RILJ    ( 1318): [0093]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): EF_MBI: 01010101
+D/GSM     ( 1318): Got valid mailbox number for MBDN
+D/RILJ    ( 1318): [0109]> iccIO: SIM_IO 0xc0 0x6fc7  path: 3F007F20,0,0,15
+D/RILC    ( 1371): [0109]> SIM_IO (cmd=0xC0,efid=0x6FC7,path=3F007F20,0,0,15,(null),pin2=(null))
+D/RILC    ( 1371): [0094]< SIM_IO {sw1=0x90,sw2=0x0,0000000000}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000000000
+D/RILJ    ( 1318): [0094]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): EF_MWIS: 0000000000
+D/RILC    ( 1371): [0095]< SIM_IO {sw1=0x90,sw2=0x0,0100ffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0100ffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0095]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): EF_CFIS: 0100ffffffffffffffffffffffffffff
+D/RILC    ( 1371): [0096]< SIM_IO {sw1=0x90,sw2=0x0,0073696d796fffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0073696d796fffffffffffffffffffffff
+D/RILJ    ( 1318): [0096]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0097]< SIM_IO {sw1=0x90,sw2=0x0,ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+D/RILJ    ( 1318): [0097]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0098]< SIM_IO {sw1=0x90,sw2=0x0,430685f3743bff06ffffffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 430685f3743bff06ffffffffffffffffff
+D/RILJ    ( 1318): [0098]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0099]< SIM_IO {sw1=0x90,sw2=0x0,9e3b140c27fe5d}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 9e3b140c27fe5d
+D/RILJ    ( 1318): [0099]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/RILC    ( 1371): [0100]< SIM_IO {sw1=0x90,sw2=0x0,4d61696c626f78ffffffffffffffffffff069194719719f1ffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 4d61696c626f78ffffffffffffffffffff069194719719f1ffffffffffffff
+D/RILJ    ( 1318): [0100]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): VM: ADN Record 'Mailbox' '+491779911 null' EF[MBDN]
+D/RILC    ( 1371): [0101]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0102]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0101]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0102]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0103]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0103]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0104]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0105]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0104]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0106]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0105]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0107]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0106]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0108]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0107]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0108]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0109]< SIM_IO {sw1=0x90,sw2=0x0,0000007c6fc7040000ffff0102011f}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 0000007c6fc7040000ffff0102011f
+D/RILJ    ( 1318): [0109]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[0 home E-Plus E-Plus 26203  UMTS CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=UMTS newType=HSDPA
+D/GSM     ( 1318): RAT switched UMTS -> HSDPA at cell 134583051
+D/RILJ    ( 1318): [0110]> iccIO: SIM_IO 0xb2 0x6fc7  path: 3F007F20,1,4,31
+D/RILC    ( 1371): [0110]> SIM_IO (cmd=0xB2,efid=0x6FC7,path=3F007F20,1,4,31,(null),pin2=(null))
+D/RILC    ( 1371): [0110]< SIM_IO {sw1=0x90,sw2=0x0,4d61696c626f78ffffffffffffffffffff069194719719f1ffffffffffffff}
+D/RILJ    ( 1318): < iccIO:  0x90 0x0 4d61696c626f78ffffffffffffffffffff069194719719f1ffffffffffffff
+D/RILJ    ( 1318): [0110]< SIM_IO IccIoResponse sw1:0x90 sw2:0x0
+D/GSM     ( 1318): VM: ADN Record 'Mailbox' '+491779911 null' EF[MBDN]
+D/GSM     ( 1318): SIMRecords: record load complete
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED LOADED reason null
+D/GSM     ( 1318): Get PreferredAPN
+D/GSM     ( 1318): [DSAC DEB] trySetupData with mIsPsRestricted=false
+D/STK     ( 1318): StkAppService$ServiceHandler: OP_BOOT_COMPLETED
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=8,bitErrorRate=99,                CDMA_SignalStrength.dbm=8,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =8,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=16,bitErrorRate=99,                CDMA_SignalStrength.dbm=16,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =16,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILJ    ( 1318): [0111]> SCREEN_STATE: false
+D/RILC    ( 1371): [0111]> SCREEN_STATE (0)
+D/RILC    ( 1371): [0111]< SCREEN_STATE
+D/RILJ    ( 1318): [0111]< SCREEN_STATE 
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=8,bitErrorRate=99,                CDMA_SignalStrength.dbm=8,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =8,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILJ    ( 1318): [0112]> SCREEN_STATE: true
+D/RILC    ( 1371): [0112]> SCREEN_STATE (1)
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [0112]< SCREEN_STATE
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0112]< SCREEN_STATE 
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/RILJ    ( 1318): [0113]> OPERATOR
+D/RILJ    ( 1318): [0114]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0113]> OPERATOR 
+D/RILC    ( 1371): [0114]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0115]> REGISTRATION_STATE
+D/RILC    ( 1371): [0113]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0113]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0114]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0114]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0116]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0115]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0115]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0115]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0116]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0116]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0116]< QUERY_NETWORK_SELECTION_MODE {0}
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=HSDPA newType=HSDPA
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0117]> OPERATOR
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0118]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0117]> OPERATOR 
+D/RILJ    ( 1318): [0119]> REGISTRATION_STATE
+D/RILJ    ( 1318): [0120]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0117]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0118]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0119]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0117]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0120]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0118]< GPRS_REGISTRATION_STATE {1,9c75,0805e3e7,9}
+D/RILC    ( 1371): [0119]< REGISTRATION_STATE {1,9c75,0805e3e7}
+D/RILJ    ( 1318): [0118]< GPRS_REGISTRATION_STATE {1, 9c75, 0805e3e7, 9}
+D/RILJ    ( 1318): [0119]< REGISTRATION_STATE {1, 9c75, 0805e3e7}
+D/RILC    ( 1371): [0120]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0120]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0121]> OPERATOR
+D/RILC    ( 1371): [0121]> OPERATOR 
+D/RILJ    ( 1318): [0122]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0121]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0121]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0122]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0123]> REGISTRATION_STATE
+D/RILC    ( 1371): [0122]< GPRS_REGISTRATION_STATE {1,9c75,0805e3e7,9}
+D/RILJ    ( 1318): [0122]< GPRS_REGISTRATION_STATE {1, 9c75, 0805e3e7, 9}
+D/RILC    ( 1371): [0123]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0123]< REGISTRATION_STATE {1,9c75,0805e3e7}
+D/RILJ    ( 1318): [0124]> QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): [0123]< REGISTRATION_STATE {1, 9c75, 0805e3e7}
+D/RILC    ( 1371): [0124]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0124]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0125]> OPERATOR
+D/RILC    ( 1371): [0125]> OPERATOR 
+D/RILC    ( 1371): [0125]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0124]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0126]> GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): [0125]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0126]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0126]< GPRS_REGISTRATION_STATE {1,9c75,0805e3e7,9}
+D/RILJ    ( 1318): [0127]> REGISTRATION_STATE
+D/RILC    ( 1371): [0127]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0127]< REGISTRATION_STATE {1,9c75,0805e3e7}
+D/RILJ    ( 1318): [0126]< GPRS_REGISTRATION_STATE {1, 9c75, 0805e3e7, 9}
+D/RILJ    ( 1318): [0128]> QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): [0127]< REGISTRATION_STATE {1, 9c75, 0805e3e7}
+D/RILC    ( 1371): [0128]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0128]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0128]< QUERY_NETWORK_SELECTION_MODE {0}
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=HSDPA newType=HSDPA
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0129]> OPERATOR
+D/RILJ    ( 1318): [0130]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0129]> OPERATOR 
+D/RILJ    ( 1318): [0131]> REGISTRATION_STATE
+D/RILC    ( 1371): [0130]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0131]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0132]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0129]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0129]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0132]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0133]> OPERATOR
+D/RILC    ( 1371): [0130]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILC    ( 1371): [0131]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0130]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0132]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0133]> OPERATOR 
+D/RILC    ( 1371): [0133]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0131]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0132]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0134]> GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): [0133]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0134]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0134]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0135]> REGISTRATION_STATE
+D/RILJ    ( 1318): [0134]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0135]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0135]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0136]> QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): [0135]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0136]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0136]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0136]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0137]> OPERATOR
+D/RILC    ( 1371): [0137]> OPERATOR 
+D/RILJ    ( 1318): [0138]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0137]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0137]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0138]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0138]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0138]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0139]> REGISTRATION_STATE
+D/RILC    ( 1371): [0139]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0140]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0139]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0139]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0140]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [0140]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0140]< QUERY_NETWORK_SELECTION_MODE {0}
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=HSDPA newType=HSDPA
+D/GSM     ( 1318): Data shutdown complete.
+D/RILJ    ( 1318): [0141]> RADIO_POWER
+D/RILC    ( 1371): [0141]> RADIO_POWER (0)
+D/GSM     ( 1318): [GsmDataConnection-1] DcInactiveState nothandled msg.what=6
+D/GSM     ( 1318): [GsmDataConnection-1] DcDefaultState: msg.what=EVENT_DISCONNECT
+D/GSM     ( 1318): [GsmDataConnection-1] NotifyDisconnectCompleted
+D/GSM     ( 1318): [GsmDataConnection-1] msg.what=25 msg.obj=radioTurnedOff
+D/GSM     ( 1318): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/RILC    ( 1371): [0141]< RADIO_POWER
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_OFF}
+I/RIL     ( 1371): setRadioState: sState 0, s_closed 0
+D/RILJ    ( 1318): [0141]< RADIO_POWER 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED RADIO_OFF
+D/RILB    ( 1318): Notifying: radio off or not available
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=HSDPA newType=HSDPA
+D/GSM     ( 1318): [GsmDataConnection-1] DcInactiveState: msg.what=EVENT_RESET, ignore we're already reset
+D/GSM     ( 1318): [GsmDataConnection-1] NotifyDisconnectCompleted
+D/GSM     ( 1318): [GsmDataConnection-1] clearSettings
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/GSM     ( 1318): [IccCard] Broadcasting intent ACTION_SIM_STATE_CHANGED NOT_READY reason null
+D/RILJ    ( 1318): [0142]> RADIO_POWER
+D/RILC    ( 1371): [0142]> RADIO_POWER (1)
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED  {RADIO_SIM_NOT_READY}
+I/RIL     ( 1371): setRadioState: sState 2, s_closed 0
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_RADIO_STATE_CHANGED SIM_NOT_READY
+D/RILB    ( 1318): Notifying: Radio On
+D/RILJ    ( 1318): [0143]> OPERATOR
+D/RILJ    ( 1318): [0144]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0143]> OPERATOR 
+D/RILJ    ( 1318): [0145]> REGISTRATION_STATE
+D/RILC    ( 1371): [0144]> GPRS_REGISTRATION_STATE 
+D/RILC    ( 1371): [0145]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0146]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0146]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0147]> GET_CURRENT_CALLS
+D/RILC    ( 1371): [0147]> GET_CURRENT_CALLS 
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=-1,bitErrorRate=99,                CDMA_SignalStrength.dbm=-1,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =-1,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0148]> OPERATOR
+D/RILJ    ( 1318): [0149]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0148]> OPERATOR 
+D/RILJ    ( 1318): [0150]> REGISTRATION_STATE
+D/RILC    ( 1371): [0149]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0151]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0150]> REGISTRATION_STATE 
+D/RILC    ( 1371): [0151]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0152]> OPERATOR
+D/RILC    ( 1371): [0152]> OPERATOR 
+D/RILJ    ( 1318): [0153]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0153]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0154]> REGISTRATION_STATE
+D/RILC    ( 1371): [0154]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0155]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0155]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=4,bitErrorRate=99,                CDMA_SignalStrength.dbm=4,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =4,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0156]> OPERATOR
+D/RILC    ( 1371): [0156]> OPERATOR 
+D/RILJ    ( 1318): [0157]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0157]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0158]> REGISTRATION_STATE
+D/RILC    ( 1371): [0158]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0159]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0159]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0160]> OPERATOR
+D/RILC    ( 1371): [0160]> OPERATOR 
+D/RILJ    ( 1318): [0161]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0161]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0162]> REGISTRATION_STATE
+D/RILC    ( 1371): [0162]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0163]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0163]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0164]> OPERATOR
+D/RILC    ( 1371): [0164]> OPERATOR 
+D/RILJ    ( 1318): [0165]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0165]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0166]> REGISTRATION_STATE
+D/RILC    ( 1371): [0166]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0167]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0167]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0168]> OPERATOR
+D/RILJ    ( 1318): [0169]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0168]> OPERATOR 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILC    ( 1371): [0169]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0170]> REGISTRATION_STATE
+D/RILC    ( 1371): [0170]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0171]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0171]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0172]> OPERATOR
+D/RILC    ( 1371): [0172]> OPERATOR 
+D/RILJ    ( 1318): [0173]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0173]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0174]> REGISTRATION_STATE
+D/RILC    ( 1371): [0174]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0175]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0175]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0176]> OPERATOR
+D/RILC    ( 1371): [0176]> OPERATOR 
+D/RILJ    ( 1318): [0177]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0177]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0178]> REGISTRATION_STATE
+D/RILC    ( 1371): [0178]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0179]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0179]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILC    ( 1371): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED 
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [UNSL]< UNSOL_RESPONSE_NETWORK_STATE_CHANGED
+D/RILJ    ( 1318): [0180]> OPERATOR
+D/RILC    ( 1371): [0180]> OPERATOR 
+D/RILJ    ( 1318): [0181]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0181]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0182]> REGISTRATION_STATE
+D/RILC    ( 1371): [0182]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0183]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0183]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0184]> OPERATOR
+D/RILC    ( 1371): [0184]> OPERATOR 
+D/RILJ    ( 1318): [0185]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0185]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0186]> REGISTRATION_STATE
+D/RILC    ( 1371): [0186]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0187]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0187]> QUERY_NETWORK_SELECTION_MODE 
+D/RILJ    ( 1318): [0188]> OPERATOR
+D/RILC    ( 1371): [0188]> OPERATOR 
+D/RILJ    ( 1318): [0189]> GPRS_REGISTRATION_STATE
+D/RILC    ( 1371): [0189]> GPRS_REGISTRATION_STATE 
+D/RILJ    ( 1318): [0190]> REGISTRATION_STATE
+D/RILC    ( 1371): [0190]> REGISTRATION_STATE 
+D/RILJ    ( 1318): [0191]> QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0191]> QUERY_NETWORK_SELECTION_MODE 
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=8,bitErrorRate=99,                CDMA_SignalStrength.dbm=8,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =8,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=16,bitErrorRate=99,                CDMA_SignalStrength.dbm=16,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =16,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILJ    ( 1318): NOTE: mReqWaiting is NOT 0 but50 at TIMEOUT, reset! There still msg waitng for response
+D/RILJ    ( 1318): WAKE_LOCK_TIMEOUT  mRequestList=50
+D/RILJ    ( 1318): 0: [142] RADIO_POWER
+D/RILJ    ( 1318): 1: [143] OPERATOR
+D/RILJ    ( 1318): 2: [144] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 3: [145] REGISTRATION_STATE
+D/RILJ    ( 1318): 4: [146] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 5: [147] GET_CURRENT_CALLS
+D/RILJ    ( 1318): 6: [148] OPERATOR
+D/RILJ    ( 1318): 7: [149] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 8: [150] REGISTRATION_STATE
+D/RILJ    ( 1318): 9: [151] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 10: [152] OPERATOR
+D/RILJ    ( 1318): 11: [153] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 12: [154] REGISTRATION_STATE
+D/RILJ    ( 1318): 13: [155] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 14: [156] OPERATOR
+D/RILJ    ( 1318): 15: [157] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 16: [158] REGISTRATION_STATE
+D/RILJ    ( 1318): 17: [159] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 18: [160] OPERATOR
+D/RILJ    ( 1318): 19: [161] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 20: [162] REGISTRATION_STATE
+D/RILJ    ( 1318): 21: [163] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 22: [164] OPERATOR
+D/RILJ    ( 1318): 23: [165] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 24: [166] REGISTRATION_STATE
+D/RILJ    ( 1318): 25: [167] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 26: [168] OPERATOR
+D/RILJ    ( 1318): 27: [169] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 28: [170] REGISTRATION_STATE
+D/RILJ    ( 1318): 29: [171] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 30: [172] OPERATOR
+D/RILJ    ( 1318): 31: [173] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 32: [174] REGISTRATION_STATE
+D/RILJ    ( 1318): 33: [175] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 34: [176] OPERATOR
+D/RILJ    ( 1318): 35: [177] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 36: [178] REGISTRATION_STATE
+D/RILJ    ( 1318): 37: [179] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 38: [180] OPERATOR
+D/RILJ    ( 1318): 39: [181] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 40: [182] REGISTRATION_STATE
+D/RILJ    ( 1318): 41: [183] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 42: [184] OPERATOR
+D/RILJ    ( 1318): 43: [185] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 44: [186] REGISTRATION_STATE
+D/RILJ    ( 1318): 45: [187] QUERY_NETWORK_SELECTION_MODE
+D/RILJ    ( 1318): 46: [188] OPERATOR
+D/RILJ    ( 1318): 47: [189] GPRS_REGISTRATION_STATE
+D/RILJ    ( 1318): 48: [190] REGISTRATION_STATE
+D/RILJ    ( 1318): 49: [191] QUERY_NETWORK_SELECTION_MODE
+D/RILC    ( 1371): [0142]< RADIO_POWER fails by E_GENERIC_FAILURE
+D/RILJ    ( 1318): [0142]< RADIO_POWER error: com.android.internal.telephony.CommandException: GENERIC_FAILURE
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=16,bitErrorRate=99,                CDMA_SignalStrength.dbm=16,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =16,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}
+D/RILC    ( 1371): [0143]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0144]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0143]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0145]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0144]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0146]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0147]< GET_CURRENT_CALLS
+D/RILJ    ( 1318): [0145]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0148]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0146]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0149]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILC    ( 1371): [0150]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0151]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0147]< GET_CURRENT_CALLS  
+D/RILC    ( 1371): [0152]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0153]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0148]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0154]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0155]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0149]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0156]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0150]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0157]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0151]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0158]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0159]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0160]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0161]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0152]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0162]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0163]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0153]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0164]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0154]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0165]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0155]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0166]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0167]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0156]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0168]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0157]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0169]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0158]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0170]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0171]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0159]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0172]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0160]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0173]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0161]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0174]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0175]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0162]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0176]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0177]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0163]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0178]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0179]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0164]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0180]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0181]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0165]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0182]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0166]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0183]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0167]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0184]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILC    ( 1371): [0185]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0168]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0186]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILC    ( 1371): [0187]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0169]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILC    ( 1371): [0188]< OPERATOR {E-Plus,E-Plus,26203}
+D/RILJ    ( 1318): [0170]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILC    ( 1371): [0189]< GPRS_REGISTRATION_STATE {1,9c75,0805930b,9}
+D/RILJ    ( 1318): [0171]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILC    ( 1371): [0190]< REGISTRATION_STATE {1,9c75,0805930b}
+D/RILJ    ( 1318): [0172]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILC    ( 1371): [0191]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0173]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0174]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0175]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0176]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0177]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0178]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0179]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0180]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0181]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0182]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0183]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0184]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0185]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0186]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0187]< QUERY_NETWORK_SELECTION_MODE {0}
+D/RILJ    ( 1318): [0188]< OPERATOR {E-Plus, E-Plus, 26203}
+D/RILJ    ( 1318): [0189]< GPRS_REGISTRATION_STATE {1, 9c75, 0805930b, 9}
+D/RILJ    ( 1318): [0190]< REGISTRATION_STATE {1, 9c75, 0805930b}
+D/RILJ    ( 1318): [0191]< QUERY_NETWORK_SELECTION_MODE {0}
+D/GSM     ( 1318): Poll ServiceState done:  oldSS=[3 home null null null  Unknown CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] newSS=[0 home E-Plus E-Plus 26203  HSDPA CSS not supported -1 -1RoamInd: -1DefRoamInd: -1EmergOnly: false] oldGprs=0 newGprs=0 oldType=HSDPA newType=HSDPA
+D/RILJ    ( 1318): [0192]> SCREEN_STATE: false
+D/RILC    ( 1371): [0192]> SCREEN_STATE (0)
+D/RILC    ( 1371): [0192]< SCREEN_STATE
+D/RILJ    ( 1318): [0192]< SCREEN_STATE 
+D/GSM     ( 1318): [DataConnection] Stop poll NetStat
+D/RILC    ( 1371): [UNSL]< UNSOL_SIGNAL_STRENGTH {[signalStrength=16,bitErrorRate=99,                CDMA_SignalStrength.dbm=16,CDMA_SignalStrength.ecio=200,                EVDO_SignalStrength.dbm =16,EVDO_SignalStrength.ecio=200,                EVDO_SignalStrength.signalNoiseRatio=0]}

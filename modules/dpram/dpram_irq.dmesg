@@ -1,0 +1,661 @@
+<6>[    0.000000] Initializing cgroup subsys cpu
+<5>[    0.000000] Linux version 2.6.32.9 (i8320@h1droid) (gcc version 4.3.3 (Sourcery G++ Lite 2009q1-203) ) #223 PREEMPT Fri Dec 2 15:23:49 CET 2011
+<4>[    0.000000] CPU: ARMv7 Processor [411fc083] revision 3 (ARMv7), cr=10c53c7f
+<4>[    0.000000] CPU: VIPT nonaliasing data cache, VIPT nonaliasing instruction cache
+<4>[    0.000000] Machine: Samsung NOWPLUS board
+<4>[    0.000000] parse_tag_cmdline: root=139:7 rootfstype=cramfs console=ttyS2,115200 mem=256M quiet version=Sbl(1.0.0) 2010-01-26 12:54:26 switch_sel=1 lcd_level=6
+<4>[    0.000000] Memory policy: ECC disabled, Data cache writeback
+<7>[    0.000000] On node 0 totalpages: 65536
+<7>[    0.000000] free_area_init_node: node 0, pgdat c05cee80, node_mem_map c074d000
+<7>[    0.000000]   Normal zone: 512 pages used for memmap
+<7>[    0.000000]   Normal zone: 0 pages reserved
+<7>[    0.000000]   Normal zone: 65024 pages, LIFO batch:15
+<4>[    0.000000] L2 CACHE is not enabled in bootloader
+<4>[    0.000000] Enable the L2 Cache here
+<6>[    0.000000] OMAP3430/3530 ES3.1 (l2cache iva sgx neon isp )
+<6>[    0.000000] omap_sam_base (VA) == 0xfe400000
+<6>[    0.000000] omap_sram_start (PA) == 0x40200000
+<6>[    0.000000] omap_sram_size (SIZE) == 0x10000
+<6>[    0.000000] SRAM: Mapped pa 0x40200000 to va 0xfe400000 size: 0x100000
+<6>[    0.000000] Reserving 14745600 bytes SDRAM for VRAM
+<4>[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 65024
+<5>[    0.000000] Kernel command line: root=/dev/mmcblk0p2 rw mem=256M init=/init  rootwait videoout=omap_vout omap_vout.video1_numbuffers=6 omap_vout.vid1_static_vrfb_alloc=y omapfb.vram="0:4M"
+<6>[    0.000000] PID hash table entries: 1024 (order: 0, 4096 bytes)
+<6>[    0.000000] Dentry cache hash table entries: 32768 (order: 5, 131072 bytes)
+<6>[    0.000000] Inode-cache hash table entries: 16384 (order: 4, 65536 bytes)
+<6>[    0.000000] Memory: 256MB = 256MB total
+<5>[    0.000000] Memory: 231552KB available (5320K code, 1802K data, 188K init, 0K highmem)
+<5>[    0.000000] Virtual kernel memory layout:
+<5>[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+<5>[    0.000000]     fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+<5>[    0.000000]     vmalloc : 0xd0800000 - 0xf8000000   ( 632 MB)
+<5>[    0.000000]     lowmem  : 0xc0000000 - 0xd0000000   ( 256 MB)
+<5>[    0.000000]     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+<5>[    0.000000]       .init : 0xc0008000 - 0xc0037000   ( 188 kB)
+<5>[    0.000000]       .text : 0xc0037000 - 0xc0569000   (5320 kB)
+<5>[    0.000000]       .data : 0xc0588000 - 0xc05d30f8   ( 301 kB)
+<6>[    0.000000] Hierarchical RCU implementation.
+<6>[    0.000000] NR_IRQS:402
+<6>[    0.000000] IRQ: Found an INTC at 0xfa200000 (revision 4.0) with 96 interrupts
+<6>[    0.000000] Total of 96 interrupts on 1 active controller
+<6>[    0.000000] Clocking rate (Crystal/Core/MPU): 26.0/332/600 MHz
+<6>[    0.000000] GPMC revision 5.0
+<6>[    0.000000] OMAP GPIO hardware version 2.5
+<6>[    0.000000] OMAP clockevent source: GPTIMER1 at 32768 Hz
+<4>[    0.000000] Console: colour dummy device 80x30
+<6>[    0.000000] console [tty0] enabled
+<6>[    0.000000] Calibrating delay loop... 597.64 BogoMIPS (lpj=2334720)
+<4>[    0.000000] Mount-cache hash table entries: 512
+<6>[    0.000000] Initializing cgroup subsys debug
+<6>[    0.000000] Initializing cgroup subsys cpuacct
+<6>[    0.000000] Initializing cgroup subsys freezer
+<6>[    0.000000] CPU: Testing write buffer coherency: ok
+<6>[    0.000000] regulator: core version 0.5
+<6>[    0.000000] NET: Registered protocol family 16
+<4>[    0.000000] 
+<4>[    0.000000] .....[Nowplus] Initializing...
+<4>[    0.000000] Gpio Output Setting Done
+<4>[    0.000000] 
+<4>[    0.000000]  <Powerup Reason : >
+<4>[    0.000000] 
+<6>[    0.000000] ram_console: got buffer at 8e000000, size 20000
+<6>[    0.000000] ram_console: no valid data in buffer (sig = 0x7fffffff)
+<6>[    0.000000] console [ram-1] enabled
+<3>[    0.000000] 
+<3>[    0.000000] nowplus_init_lcd
+<4>[    0.000000] BOARD HW REV : 2
+<6>[    5.511993] OMAP DMA hardware revision 4.0
+<4>[    5.538482] bio: create slab <bio-0> at 0
+<7>[    5.540985] omap2_mcspi omap2_mcspi.1: registered master spi1
+<7>[    5.541076] spi spi1.0: setup: speed 375000, sample leading edge, clk normal
+<7>[    5.541107] spi spi1.0: setup mode 0, 8 bits/w, 375000 Hz max --> 0
+<7>[    5.541442] omap2_mcspi omap2_mcspi.1: registered child spi1.0
+<7>[    5.541839] omap2_mcspi omap2_mcspi.2: registered master spi2
+<7>[    5.542205] omap2_mcspi omap2_mcspi.3: registered master spi3
+<7>[    5.542572] omap2_mcspi omap2_mcspi.4: registered master spi4
+<6>[    5.543731] usbcore: registered new interface driver usbfs
+<6>[    5.544036] usbcore: registered new interface driver hub
+<6>[    5.544372] usbcore: registered new device driver usb
+<4>[    5.544952] omap_device: i2c_omap.2: new worst case activate latency 0: 30517
+<6>[    5.545074] i2c_omap i2c_omap.2: bus 2 rev3.12 at 200 kHz
+<4>[    5.545135] omap_device: i2c_omap.2: new worst case deactivate latency 0: 30517
+<6>[    5.548980] i2c_omap i2c_omap.1: bus 1 rev3.12 at 400 kHz
+<6>[    5.573486] twl4030: PIH (irq 7) chaining IRQs 368..375
+<6>[    5.573547] twl4030: power (irq 373) chaining IRQs 376..383
+<6>[    5.574035] twl4030: gpio (irq 368) chaining IRQs 384..401
+<6>[    5.577301] regulator: VUSB1V5: 1500 mV normal standby
+<6>[    5.578094] regulator: VUSB1V8: 1800 mV normal standby
+<6>[    5.578948] regulator: VUSB3V1: 3100 mV normal standby
+<6>[    7.657348] twl4030_usb twl4030_usb: Initialized TWL4030 USB module
+<6>[    7.658477] regulator: VMMC1: 1850 <--> 3150 mV at 3000 mV normal standby
+<6>[    7.659240] regulator: VDAC: 1800 mV normal standby
+<6>[    7.660491] regulator: VAUX2: 2800 mV normal standby
+<6>[    7.661651] regulator: VPLL2: 1800 mV normal standby
+<6>[    7.662567] regulator: VMMC2: 1800 mV normal standby
+<6>[    7.663726] regulator: VSIM: 1800 mV normal standby
+<6>[    7.664489] regulator: VAUX1: 3000 mV normal standby
+<4>[    7.664642] omap_device: i2c_omap.1: new worst case activate latency 0: 61035
+<6>[    7.665802] regulator: VAUX3: 1800 mV normal standby
+<6>[    7.666961] regulator: VAUX4: 2800 mV normal standby
+<6>[    7.680358] i2c_omap i2c_omap.3: bus 3 rev3.12 at 100 kHz
+<6>[    7.683654] Bluetooth: Core ver 2.15
+<6>[    7.684051] NET: Registered protocol family 31
+<6>[    7.684112] Bluetooth: HCI device and connection manager initialized
+<6>[    7.684143] Bluetooth: HCI socket layer initialized
+<6>[    7.684722] Switching to clocksource 32k_counter
+<6>[    7.696533] musb_hdrc: version 6.0, musb-dma, otg (peripheral+host), debug=0
+<7>[    7.696807] HS USB OTG: revision 0x33, sysconfig 0x2000, sysstatus 0x1, intrfsel 0x1, simenable  0x0
+<7>[    7.696929] musb_hdrc: ConfigData=0xde (UTMI-8, dyn FIFOs, bulk combine (X), bulk split (X), HB-ISO Rx, HB-ISO Tx, SoftConn)
+<7>[    7.696990] musb_hdrc: MHDRC RTL version 1.400 
+<7>[    7.697021] musb_hdrc: setup fifo_mode 4
+<7>[    7.697082] musb_hdrc: 28/31 max ep, 16384/16384 memory
+<6>[    7.697143] musb_hdrc: USB OTG mode controller at fa0ab000 using DMA, IRQ 92
+<6>[    7.697814] NET: Registered protocol family 2
+<6>[    7.698028] IP route cache hash table entries: 2048 (order: 1, 8192 bytes)
+<6>[    7.698547] TCP established hash table entries: 8192 (order: 4, 65536 bytes)
+<6>[    7.698822] TCP bind hash table entries: 8192 (order: 3, 32768 bytes)
+<6>[    7.699005] TCP: Hash tables configured (established 8192 bind 8192)
+<6>[    7.699035] TCP reno registered
+<6>[    7.699249] NET: Registered protocol family 1
+<6>[    7.702178] dspbridge_init: 600000 bytes @ 81800000
+<6>[    7.702850] omap-iommu omap-iommu.0: isp registered
+<4>[    7.703796] NetWinder Floating Point Emulator V0.97 (double precision)
+<6>[    7.712860] ashmem: initialized
+<5>[    7.713409] VFS: Disk quotas dquot_6.5.2
+<4>[    7.713531] Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+<6>[    7.714233] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+<6>[    7.714355] Registering unionfs 2.5.10 (for 2.6.32.46)
+<5>[    7.714843] Slow work thread pool: Starting up
+<5>[    7.715057] Slow work thread pool: Ready
+<6>[    7.715118] msgmni has been set to 452
+<6>[    7.715484] alg: No test for cipher_null (cipher_null-generic)
+<6>[    7.715728] alg: No test for ecb(cipher_null) (ecb-cipher_null)
+<6>[    7.715911] alg: No test for digest_null (digest_null-generic)
+<6>[    7.716339] alg: No test for compress_null (compress_null-generic)
+<6>[    7.718994] alg: No test for stdrng (krng)
+<6>[    7.778442] alg: No test for ghash (ghash-generic)
+<6>[    7.778564] io scheduler noop registered
+<6>[    7.778778] io scheduler cfq registered (default)
+<6>[    7.780426] OMAP DSS rev 2.0
+<6>[    7.780548] OMAP DISPC rev 3.0
+<6>[    7.780609] OMAP VENC rev 2
+<7>[    7.781555] tl2796_disp_spi spi1.0: setup: speed 375000, sample leading edge, clk normal
+<7>[    7.781646] tl2796_disp_spi spi1.0: setup mode 0, 16 bits/w, 375000 Hz max --> 0
+<6>[    7.943969] Registered led device: lcd-backlight
+<7>[    7.990051]  ****  tl2796_ldi_poweron. IN 
+<7>[    8.195678] tl2796_lcd_brightness_on
+<7>[    8.195739] tl2796_lcd_brightness_setting:6
+<7>[    8.208099]  ****  tl2796_ldi_poweron. OUT 
+<6>[    8.229766] omap-hsuart.0: ttyS0 at MMIO 0x4806a000 (irq = 72) is a OMAP UART0
+<6>[    8.230285] omap-hsuart.1: ttyS1 at MMIO 0x4806c000 (irq = 73) is a OMAP UART1
+<6>[    8.230712] omap-hsuart.2: ttyS2 at MMIO 0x49020000 (irq = 74) is a OMAP UART2
+<6>[    8.244201] brd: module loaded
+<6>[    8.250488] loop: module loaded
+<4>[    8.251037] [BT] disable bt pins[BT] enable bt pins
+<6>[    8.310058] PPP generic driver version 2.4.2
+<6>[    8.310729] PPP Deflate Compression module registered
+<6>[    8.310791] PPP BSD Compression module registered
+<6>[    8.326049] PPP MPPE Compression module registered
+<6>[    8.326080] NET: Registered protocol family 24
+<6>[    8.326202] PPPoL2TP kernel driver, V1.0
+<6>[    8.326232] SLIP: version 0.8.4-NET3.019-NEWTTY (dynamic channels, max=256) (6 bit encapsulation enabled).
+<6>[    8.326293] CSLIP: code copyright 1989 Regents of the University of California.
+<6>[    8.326354] tun: Universal TUN/TAP device driver, 1.6
+<6>[    8.326385] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+<6>[    8.326812] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+<7>[    8.326843] ehci_hcd: block sizes: qh 60 qtd 96 itd 160 sitd 96
+<6>[    8.327270] android init
+<6>[    8.327392] android_probe pdata: c0598bd0
+<6>[    8.327667] android_bind
+<7>[    8.327697] android_bind_config
+<6>[    8.327728] android_usb gadget: android_usb ready
+<6>[    8.327789] musb_hdrc musb_hdrc: MUSB HDRC host driver
+<6>[    8.327850] musb_hdrc musb_hdrc: new USB bus registered, assigned bus number 1
+<7>[    8.328002] usb usb1: default language 0x0409
+<7>[    8.328094] usb usb1: udev 1, busnum 1, minor = 0
+<6>[    8.328125] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+<6>[    8.328155] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+<6>[    8.328216] usb usb1: Product: MUSB HDRC host driver
+<6>[    8.328247] usb usb1: Manufacturer: Linux 2.6.32.9 musb-hcd
+<6>[    8.328308] usb usb1: SerialNumber: musb_hdrc
+<7>[    8.328643] usb usb1: uevent
+<7>[    8.328948] usb usb1: usb_probe_device
+<6>[    8.328979] usb usb1: configuration #1 chosen from 1 choice
+<7>[    8.329071] usb usb1: adding 1-0:1.0 (config #1, interface 0)
+<7>[    8.329223] usb 1-0:1.0: uevent
+<7>[    8.333496] hub 1-0:1.0: usb_probe_interface
+<7>[    8.333557] hub 1-0:1.0: usb_probe_interface - got id
+<6>[    8.333587] hub 1-0:1.0: USB hub found
+<6>[    8.333679] hub 1-0:1.0: 1 port detected
+<7>[    8.333740] hub 1-0:1.0: standalone hub
+<7>[    8.333770] hub 1-0:1.0: individual port power switching
+<7>[    8.333801] hub 1-0:1.0: no over-current protection
+<7>[    8.333831] hub 1-0:1.0: power on to power good time: 10ms
+<7>[    8.333892] hub 1-0:1.0: 100mA bus power budget for each child
+<7>[    8.333923] hub 1-0:1.0: local power source is good
+<7>[    8.333984] hub 1-0:1.0: enabling power on all ports
+<6>[    8.334564] f_acm init
+<6>[    8.334594] android_register_function acm
+<6>[    8.334625] f_adb init
+<6>[    8.334655] android_register_function adb
+<6>[    8.334686] f_mass_storage init
+<6>[    8.334716] android_register_function usb_mass_storage
+<6>[    8.334747] f_rndis init
+<6>[    8.335083] android_register_function rndis
+<6>[    8.335144] mass_storage_bind_config
+<6>[    8.341644] fsg_probe pdata: c0598bf4
+<6>[    8.342437] android_usb gadget: Number of LUNs=2
+<6>[    8.349090] adb_bind_config
+<6>[    8.350036] rndis_function_bind_config MAC: 00:00:00:00:00:00
+<4>[    8.350128] android_usb gadget: using random self ethernet address
+<4>[    8.350189] android_usb gadget: using random host ethernet address
+<6>[    8.350921] usb0: MAC 6a:fa:89:81:a2:13
+<6>[    8.350952] usb0: HOST MAC 9e:9b:1e:6f:2b:bd
+<4>[    8.357147] kp->input->name :TWL4030 Keypad 
+<6>[    8.357696] input: TWL4030 Keypad as /devices/platform/i2c_omap.1/i2c-1/1-004a/twl4030_keypad/input/input0
+<4>[    8.359527]  succeeded in initializing touch proc file
+<4>[    8.365112] [TOUCH] enable touch pins
+<6>[    8.433715] input: synaptics_rmi4_i2c as /devices/platform/i2c_omap.3/i2c-3/synaptics/input/input1
+<7>[    8.435058] hub 1-0:1.0: state 7 ports 1 chg 0000 evt 0000
+<6>[    8.435882] input: power_key_driver as /devices/platform/power_key_device/input/input2
+<6>[    8.438110] using rtc device, twl_rtc, for alarms
+<6>[    8.438201] twl_rtc twl_rtc: rtc core: registered twl_rtc as rtc0
+<4>[    8.438476] twl_rtc twl_rtc: Power up reset detected.
+<6>[    8.439605] twl_rtc twl_rtc: Enabling TWL-RTC.
+<4>[    8.440216] virtual_rtc_init
+<4>[    8.440307] virtual_rtc_probe, Virtual RTC driver
+<4>[    8.440734] rtc_alarm_add_device, Set virtual rtc
+<6>[    8.440795] virtual_rtc virtual_rtc: rtc core: registered virtual_rtc as rtc1
+<6>[    8.441131] i2c /dev entries driver
+<6>[    8.444641] Linux video capture interface: v2.00
+<6>[    8.446350] omap-previewer omap-previewer: omap-previewer: Registered preview wrapper
+<6>[    8.447875] omap-iommu omap-iommu.0: isp: version 1.1
+<4>[    8.450286] omap_device: dmtimer.6: new worst case activate latency 0: 91552
+<6>[    8.451202] DSP Bridge driver loaded
+<6>[    8.453887] max17040 2-0036: MAX17040 Fuel-Gauge Ver 02
+<6>[    8.455780] OMAP Watchdog Timer Rev 0x31: initial timeout 60 sec
+<3>[    8.456207] twl4030_wdt twl4030_wdt: Failed to register misc device
+<4>[    8.456268] twl4030_wdt: probe of twl4030_wdt failed with error -16
+<6>[    8.457275] device-mapper: ioctl: 4.15.0-ioctl (2009-04-01) initialised: dm-devel@redhat.com
+<6>[    8.457641] device-mapper: multipath: version 1.1.0 loaded
+<6>[    8.457702] device-mapper: multipath round-robin: version 1.0.0 loaded
+<6>[    8.457763] device-mapper: multipath queue-length: version 0.1.0 loaded
+<6>[    8.457794] device-mapper: multipath service-time: version 0.2.0 loaded
+<6>[    8.458068] Bluetooth: HCI UART driver ver 2.2
+<6>[    8.458099] Bluetooth: HCILL protocol initialized
+<6>[    8.458679] cpuidle: using governor ladder
+<6>[    8.458709] cpuidle: using governor menu
+<4>[    8.569091] [twl_mmc] 'twl_iNand_set_power' called, power=0
+<6>[    8.570739] BD2802 2-001a: return 0x00
+<6>[    8.571105] Registered led device: led1_R
+<6>[    8.571441] Registered led device: led1_G
+<6>[    8.571777] Registered led device: led1_B
+<6>[    8.572082] Registered led device: led2_R
+<6>[    8.572418] Registered led device: led2_G
+<6>[    8.572723] Registered led device: led2_B
+<4>[    8.573974] [switch-sio]: initialized
+<6>[    8.575225] usbcore: registered new interface driver usbhid
+<6>[    8.575286] usbhid: v2.6:USB HID core driver
+<6>[    8.576324] logger: created 512K log 'log_main'
+<6>[    8.576660] logger: created 256K log 'log_events'
+<6>[    8.576995] logger: created 256K log 'log_radio'
+<6>[    8.577911] Advanced Linux Sound Architecture Driver Version 1.0.21.
+<4>[    8.578765] No device for DAI twl4030
+<4>[    8.578796] No device for DAI twl4030 Voice
+<4>[    8.578826] No device for DAI twl4030 Clock
+<4>[    8.579193] No device for DAI omap-mcbsp-dai-0
+<4>[    8.579223] No device for DAI omap-mcbsp-dai-1
+<4>[    8.579254] No device for DAI omap-mcbsp-dai-2
+<4>[    8.579284] No device for DAI omap-mcbsp-dai-3
+<4>[    8.579345] No device for DAI omap-mcbsp-dai-4
+<0>[    8.579376]  sound/soc/omap/sdp3430.c : sdp3430_soc_init : 424 ---SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+<6>[    8.579437] SDP3430 SoC init
+<6>[    8.579956] TWL4030 Audio Codec init 
+<6>[    8.581298] asoc: twl4030 <-> omap-mcbsp-dai-0 mapping ok
+<6>[    8.582580] asoc: twl4030 Voice <-> omap-mcbsp-dai-1 mapping ok
+<4>[    8.582641] TSKIM -vociecall mode : mod_no 1 -  44 regiter configured to 0
+<4>[    8.583007] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 0
+<4>[    8.583679] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 0
+<4>[    8.584014] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[    8.584320] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[    8.584655] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 0
+<4>[    8.584991] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 0
+<4>[    8.585296] TSKIM -vociecall mode : mod_no 1 -  1 regiter configured to 91
+<4>[    8.585632] TSKIM -vociecall mode : mod_no 1 -  2 regiter configured to ff
+<4>[    8.585937] TSKIM -vociecall mode : mod_no 1 -  3 regiter configured to 0
+<4>[    8.586273] TSKIM -vociecall mode : mod_no 1 -  4 regiter configured to 3
+<4>[    8.586578] TSKIM -vociecall mode : mod_no 1 -  5 regiter configured to 13
+<4>[    8.586914] TSKIM -vociecall mode : mod_no 1 -  6 regiter configured to 0
+<4>[    8.587219] TSKIM -vociecall mode : mod_no 1 -  7 regiter configured to a
+<4>[    8.587554] TSKIM -vociecall mode : mod_no 1 -  8 regiter configured to 0
+<4>[    8.587890] TSKIM -vociecall mode : mod_no 1 -  9 regiter configured to 30
+<4>[    8.588195] TSKIM -vociecall mode : mod_no 1 -  a regiter configured to c
+<4>[    8.588531] TSKIM -vociecall mode : mod_no 1 -  b regiter configured to c
+<4>[    8.588836] TSKIM -vociecall mode : mod_no 1 -  c regiter configured to 8
+<4>[    8.589172] TSKIM -vociecall mode : mod_no 1 -  d regiter configured to 8
+<4>[    8.589477] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 1
+<4>[    8.589813] TSKIM -vociecall mode : mod_no 1 -  f regiter configured to e1
+<4>[    8.590118] TSKIM -vociecall mode : mod_no 1 -  10 regiter configured to 3f
+<4>[    8.590454] TSKIM -vociecall mode : mod_no 1 -  11 regiter configured to 3f
+<4>[    8.590789] TSKIM -vociecall mode : mod_no 1 -  12 regiter configured to 3f
+<4>[    8.591094] TSKIM -vociecall mode : mod_no 1 -  13 regiter configured to 3f
+<4>[    8.591522] TSKIM -vociecall mode : mod_no 1 -  14 regiter configured to 2e
+<4>[    8.591827] TSKIM -vociecall mode : mod_no 1 -  15 regiter configured to 0
+<4>[    8.592163] TSKIM -vociecall mode : mod_no 1 -  16 regiter configured to 12
+<4>[    8.592498] TSKIM -vociecall mode : mod_no 1 -  17 regiter configured to c
+<4>[    8.592803] TSKIM -vociecall mode : mod_no 1 -  18 regiter configured to 0
+<4>[    8.593139] TSKIM -vociecall mode : mod_no 1 -  19 regiter configured to 32
+<4>[    8.593444] TSKIM -vociecall mode : mod_no 1 -  1a regiter configured to 32
+<4>[    8.593780] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to b
+<4>[    8.594085] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to b
+<4>[    8.594421] TSKIM -vociecall mode : mod_no 1 -  1d regiter configured to 0
+<4>[    8.594757] TSKIM -vociecall mode : mod_no 1 -  1e regiter configured to 0
+<4>[    8.595062] TSKIM -vociecall mode : mod_no 1 -  1f regiter configured to 55
+<4>[    8.595397] TSKIM -vociecall mode : mod_no 1 -  20 regiter configured to 0
+<4>[    8.595703] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 24
+<4>[    8.596038] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[    8.596343] TSKIM -vociecall mode : mod_no 1 -  23 regiter configured to 0
+<4>[    8.596679] TSKIM -vociecall mode : mod_no 1 -  24 regiter configured to 0
+<4>[    8.596984] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 0
+<4>[    8.597320] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 0
+<4>[    8.597656] TSKIM -vociecall mode : mod_no 1 -  27 regiter configured to 0
+<4>[    8.597961] TSKIM -vociecall mode : mod_no 1 -  28 regiter configured to 0
+<4>[    8.598297] TSKIM -vociecall mode : mod_no 1 -  29 regiter configured to 0
+<4>[    8.598602] TSKIM -vociecall mode : mod_no 1 -  2a regiter configured to 0
+<4>[    8.598937] TSKIM -vociecall mode : mod_no 1 -  2b regiter configured to 5
+<4>[    8.599334] TSKIM -vociecall mode : mod_no 1 -  2c regiter configured to 0
+<4>[    8.599639] TSKIM -vociecall mode : mod_no 1 -  2d regiter configured to 0
+<4>[    8.599975] TSKIM -vociecall mode : mod_no 1 -  2e regiter configured to 0
+<4>[    8.600280] TSKIM -vociecall mode : mod_no 1 -  2f regiter configured to 0
+<4>[    8.600616] TSKIM -vociecall mode : mod_no 1 -  30 regiter configured to 13
+<4>[    8.600921] TSKIM -vociecall mode : mod_no 1 -  31 regiter configured to 0
+<4>[    8.601257] TSKIM -vociecall mode : mod_no 1 -  32 regiter configured to 0
+<4>[    8.601562] TSKIM -vociecall mode : mod_no 1 -  33 regiter configured to 0
+<4>[    8.601898] TSKIM -vociecall mode : mod_no 1 -  34 regiter configured to 0
+<4>[    8.602233] TSKIM -vociecall mode : mod_no 1 -  35 regiter configured to 79
+<4>[    8.602539] TSKIM -vociecall mode : mod_no 1 -  36 regiter configured to 11
+<4>[    8.602874] TSKIM -vociecall mode : mod_no 1 -  37 regiter configured to 0
+<4>[    8.603179] TSKIM -vociecall mode : mod_no 1 -  38 regiter configured to 0
+<4>[    8.603515] TSKIM -vociecall mode : mod_no 1 -  39 regiter configured to 0
+<4>[    8.603820] TSKIM -vociecall mode : mod_no 1 -  3a regiter configured to 16
+<4>[    8.604156] TSKIM -vociecall mode : mod_no 1 -  3b regiter configured to 0
+<4>[    8.604492] TSKIM -vociecall mode : mod_no 1 -  3c regiter configured to 44
+<4>[    8.604797] TSKIM -vociecall mode : mod_no 1 -  3d regiter configured to 69
+<4>[    8.605133] TSKIM -vociecall mode : mod_no 1 -  3e regiter configured to 2
+<4>[    8.605438] TSKIM -vociecall mode : mod_no 1 -  3f regiter configured to 0
+<4>[    8.605773] TSKIM -vociecall mode : mod_no 1 -  40 regiter configured to 0
+<4>[    8.606079] TSKIM -vociecall mode : mod_no 1 -  41 regiter configured to 0
+<4>[    8.606414] TSKIM -vociecall mode : mod_no 1 -  42 regiter configured to 0
+<4>[    8.606781] TSKIM -vociecall mode : mod_no 1 -  43 regiter configured to 20
+<4>[    8.607086] TSKIM -vociecall mode : mod_no 1 -  44 regiter configured to 32
+<4>[    8.607421] TSKIM -vociecall mode : mod_no 1 -  45 regiter configured to 0
+<4>[    8.607757] TSKIM -vociecall mode : mod_no 1 -  46 regiter configured to 0
+<4>[    8.608062] TSKIM -vociecall mode : mod_no 1 -  47 regiter configured to 0
+<4>[    8.608398] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 0
+<4>[    8.608703] TSKIM -vociecall mode : mod_no 1 -  49 regiter configured to 8
+<3>[    8.609558] Failed to add route Mic Bias 1->MAINMIC
+<3>[    8.609588] dapm: twl4030: configuring unknown pin EARPIECE
+<3>[    8.609649] dapm: twl4030: configuring unknown pin PREDRIVEL
+<3>[    8.609680] dapm: twl4030: configuring unknown pin PREDRIVER
+<3>[    8.609710] dapm: twl4030: configuring unknown pin AUXL
+<3>[    8.609741] dapm: twl4030: configuring unknown pin AUXR
+<3>[    8.609802] dapm: twl4030: configuring unknown pin CARKITMIC
+<3>[    8.609832] dapm: twl4030: configuring unknown pin DIGIMIC0
+<3>[    8.609863] dapm: twl4030: configuring unknown pin DIGIMIC1
+<3>[    8.609893] dapm: twl4030: configuring unknown pin OUTL
+<3>[    8.609954] dapm: twl4030: configuring unknown pin OUTR
+<3>[    8.609985] dapm: twl4030: configuring unknown pin CARKITL
+<3>[    8.610015] dapm: twl4030: configuring unknown pin CARKITR
+<4>[    8.610076] TSKIM -vociecall mode : mod_no 1 -  f regiter configured to e1
+<0>[    8.612548] RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR---------------SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+<6>[    8.612640] ALSA device list:
+<6>[    8.612670]   #0: SDP3430 (twl4030)
+<4>[    8.612762] TinyBML init registered
+<6>[    8.679351] oprofile: using timer
+<4>[    8.679534] Netfilter messages via NETLINK v0.30.
+<4>[    8.679687] nf_conntrack version 0.5.0 (3621 buckets, 14484 max)
+<4>[    8.679962] CONFIG_NF_CT_ACCT is deprecated and will be removed soon. Please use
+<4>[    8.680023] nf_conntrack.acct=1 kernel parameter, acct=1 nf_conntrack module option or
+<4>[    8.680084] sysctl net.netfilter.nf_conntrack_acct=1 to enable it.
+<6>[    8.680358] xt_time: kernel timezone is -0000
+<6>[    8.680450] IPv4 over IPv4 tunneling driver
+<6>[    8.681243] GRE over IPv4 tunneling driver
+<6>[    8.682159] ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    8.682464] TCP cubic registered
+<6>[    8.682495] NET: Registered protocol family 17
+<6>[    8.682556] NET: Registered protocol family 15
+<6>[    8.682617] Bluetooth: L2CAP ver 2.14
+<6>[    8.682647] Bluetooth: L2CAP socket layer initialized
+<6>[    8.682708] Bluetooth: SCO (Voice Link) ver 0.6
+<6>[    8.682739] Bluetooth: SCO socket layer initialized
+<6>[    8.682983] Bluetooth: RFCOMM TTY layer initialized
+<6>[    8.683044] Bluetooth: RFCOMM socket layer initialized
+<6>[    8.683074] Bluetooth: RFCOMM ver 1.11
+<6>[    8.683105] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+<6>[    8.683135] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+<4>[    8.683563] Start config_twl4030_resource_remap
+<3>[    8.686737] Power Management for TI OMAP3.
+<6>[    8.689727] SmartReflex driver initialized
+<7>[    8.697357] Disabling unused clock "gpt9_ick"
+<7>[    8.697448] Disabling unused clock "gpio2_dbck"
+<7>[    8.697509] Disabling unused clock "gpio3_dbck"
+<7>[    8.697540] Disabling unused clock "gpio4_dbck"
+<7>[    8.697570] Disabling unused clock "gpio5_dbck"
+<7>[    8.697601] Disabling unused clock "gpio6_dbck"
+<7>[    8.697662] Disabling unused clock "gpio1_dbck"
+<7>[    8.697753] Disabling unused clock "sad2d_ick"
+<7>[    8.697814] Disabling unused clock "dpll4_m6x2_ck"
+<7>[    8.697845] Disabling unused clock "dpll3_m3x2_ck"
+<7>[    8.697906] Disabling unused clock "sys_clkout1"
+<6>[    8.698486] VFP support v0.3: implementor 41 architecture 3 part 30 variant c rev 1
+<3>[    8.728271] rotation = 0, var->rotate = 0 Console: switching to colour frame buffer device 60x50
+<7>[    8.748382] OMAP DISPCONTROL read (stallmode)0
+<7>[    8.748596] OMAP DISPCONTROL read (gpout)1
+<7>[    8.748779] OMAP DISPCONTROL read (stallmode)1
+<4>[    8.749023] omapdss DPI: Could not find exact pixel clock. Requested 24284 kHz, got 24000 kHz
+<4>[    8.759613] regulator_init_complete: incomplete constraints, leaving VSIM on
+<4>[    8.760498] regulator_init_complete: incomplete constraints, leaving VPLL2 on
+<6>[    8.763641] twl_rtc twl_rtc: setting system clock to 2000-01-01 00:00:00 UTC (946684800)
+<6>[    8.814514] omap_vout: registered and initialized video device 0 [v4l2]
+<6>[    8.820007] omap_vout: registered and initialized video device 1 [v4l2]
+<6>[    8.821716] Waiting for root device /dev/mmcblk0p2...
+<4>[    9.224090] [Headset] Headset detached
+<4>[    9.638153] mmc0: host does not support reading read-only switch. assuming write-enable.
+<6>[    9.643920] mmc0: new high speed SD card at address 1234
+<6>[    9.650115] mmcblk0: mmc0:1234 SA02G 1.83 GiB 
+<6>[    9.656036]  mmcblk0: p1 p2
+<4>[    9.665405] [twl_mmc] 'twl_iNand_set_power' called, power=1
+<4>[    9.708648] EXT4-fs (mmcblk0p2): warning: mounting unchecked fs, running e2fsck is recommended
+<6>[    9.733245] EXT4-fs (mmcblk0p2): mounted filesystem without journal
+<4>[    9.745819] VFS: Mounted root (ext4 filesystem) on device 179:2.
+<6>[    9.758697] Freeing init memory: 188K
+<4>[    9.778808] Warning: unable to open an initial console.
+<7>[    9.886535] usb usb1: uevent
+<7>[    9.894287] usb 1-0:1.0: uevent
+<6>[    9.982482] mmc1: new high speed MMC card at address 0001
+<6>[    9.992706] mmcblk1: mmc1:0001 MAG8DD 15.3 GiB 
+<6>[   10.001373]  mmcblk1: p1 p2 p3
+<3>[   10.075378] init: cannot open '/initlogo.rle'
+<6>[   10.190307] CPUFREQ: Per core ondemand sysfs interface is deprecated - up_threshold
+<6>[   10.202270] CPUFREQ: Per core ondemand sysfs interface is deprecated - sampling_rate
+<4>[   10.237762] [OMAP34XXCAM]omap34xxcam_init:2464: in
+<4>[   10.257171] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[   10.263336] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[   10.268920] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[   10.274353] [CAM_INF] M-4MO: ioctl_g_priv called...
+<4>[   10.279754] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[   10.290313] [CAM_INF] M-4MO: ioctl_s_power called...
+<4>[   10.295654] M-4MO: m4mo_sensor_power_set is called...[1] (0:OFF, 1:ON)
+<4>[   10.306060] ispccdc: isp_configure_interface: CPI
+<4>[   10.353424] [CAM_DBG] M-4MO: pwr on-----!
+<4>[   10.468444] [CAM_DBG] M-4MO:  Sensor is Detected!!!
+<4>[   10.480895] [CAM_DBG] M-4MO:  Fimrware Version: 0xfc 0x03
+<4>[   10.493865] [CAM_INF] M-4MO: ioctl_g_fmt_cap called...
+<4>[   10.498962] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[   10.509063] [CAM_INF] M-4MO: ioctl_s_power called...
+<4>[   10.514251] M-4MO: m4mo_sensor_power_set is called...[0] (0:OFF, 1:ON)
+<4>[   10.540374] [CAM_DBG] M-4MO: pwr off-----!
+<4>[   10.546356] [OMAP34XXCAM]omap34xxcam_vfd_name_update:2222: in
+<6>[   10.556427] video4linux video0: video0 is now omap3/m-4mo//
+<4>[   10.579040] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_init is called...
+<4>[   10.589660] [CAM_INF] S5KA3DFX: s5ka3dfx_probe is called...
+<4>[   10.600158] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[   10.605468] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[   10.616149] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[   10.621704] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[   10.633148] [CAM_INF] S5KA3DFX: ioctl_g_priv is called...
+<4>[   10.639251] [CAM_INF] S5KA3DFX: s5ka3dfx_sensor_set_prv_data is called...
+<4>[   10.651489] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[   10.664672] [CAM_INF] S5KA3DFX: ioctl_s_power is called......ON=1, detect= 0
+<4>[   10.678588] S5KA3DFX: s5ka3dfx_sensor_power_set is called...[1] (0:OFF, 1:ON)
+<4>[   10.692932] ispccdc: isp_configure_interface: CPI
+<4>[   10.700286] [CAM_INF] S5KA3DFX: s5ka3dfx_enable_gpio is called...
+<4>[   10.765136] [CAM_DBG] S5KA3DFX: pwr on-----!
+<4>[   10.772552] ----------------------------------------------------
+<4>[   10.787170]    [VGA CAM]   camsensor_s5ka3dfx_check_sensor_rev
+<4>[   10.802062] ----------------------------------------------------
+<4>[   10.818542] S5KA3DFX: s5ka3dfx_i2c_write_read is failed... 0
+<4>[   10.834808] S5KA3DFX: s5ka3dfx_i2c_write_read is failed... 0
+<4>[   10.850585] S5KA3DFX: =================================
+<4>[   10.858612] S5KA3DFX:    [VGA CAM] vendor_id ID : 0xab
+<4>[   10.866577] S5KA3DFX:    [VGA CAM] software version : 0x3
+<4>[   10.874542] S5KA3DFX: =================================
+<4>[   10.882507] S5KA3DFX: ===============================
+<4>[   10.890350] S5KA3DFX:    [VGA CAM] s5ka3dfx  OK!!
+<4>[   10.898254] S5KA3DFX: ===============================
+<4>[   10.906097] [CAM_INF] S5KA3DFX: ioctl_g_fmt_cap is called...
+<4>[   10.921600] [OMAP34XXCAM]omap34xxcam_slave_power_set:141: in
+<4>[   10.937103] [CAM_INF] S5KA3DFX: ioctl_s_power is called......ON=0, detect= 1
+<4>[   10.952850] S5KA3DFX: s5ka3dfx_sensor_power_set is called...[0] (0:OFF, 1:ON)
+<4>[   10.968566] [CAM_INF] S5KA3DFX: s5ka3dfx_disable_gpio is called...
+<4>[   11.000396] [CAM_DBG] S5KA3DFX: pwr off-----!
+<4>[   11.009124] [OMAP34XXCAM]omap34xxcam_vfd_name_update:2222: in
+<6>[   11.024871] video4linux video5: video5 is now omap3/s5ka3dfx//
+<3>[   11.047576] load_param_value: open error
+<3>[   11.055725] param_init -> relocated to default value!
+<4>[   11.067810] [UART] enable uart pins
+<4>[   11.108093] [DPRAM] dpram driver is loaded.
+<4>[   11.175323] KXSD9_dev_init: KXSD9_dev_init, KXSD9_dev.valid == eTRUE, check= 2
+<6>[   11.192474] input: accel as /devices/virtual/input/input3
+<3>[   11.203643] KXSD9_init_calibration: Can't open the file for calibration
+<4>[   11.241394] omap_device: dmtimer.8: new worst case deactivate latency 0: 30517
+<6>[   11.276397] input: proximity sensor as /devices/virtual/input/input4
+<7>[   11.292480] hub 1-0:1.0: hub_suspend
+<7>[   11.300231] usb usb1: bus auto-suspend
+<6>[   11.310150] input: light sensor as /devices/virtual/input/input5
+<4>[   11.363281] [MULTIPDP] [dpram_thread] : BEGIN
+<4>[   11.371093] [MULTIPDP] [dpram_open] : BEGIN
+<4>[   11.378753] [DPRAM] Unknown ioctl: 5405
+<4>[   11.386108] [DPRAM] Unknown ioctl: 5406
+<4>[   11.393249] [MULTIPDP] [dpram_open] : END
+<4>[   11.400360] [MULTIPDP] [dpram_poll] : BEGIN
+<4>[   11.407409] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[   11.414581] [MULTIPDP] [pdp_activate] : id: 1
+<4>[   11.421661] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[   11.428619] [MULTIPDP] [vs_add_dev] : END
+<4>[   11.436218] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[   11.443115] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[   11.449768] [MULTIPDP] [pdp_add_dev] : END
+<4>[   11.456390] [MULTIPDP] [pdp_activate] : ttyCSD(id: 1) serial device is created.
+<4>[   11.469573] [MULTIPDP] [pdp_activate] : END
+<4>[   11.476348] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[   11.483032] [MULTIPDP] [pdp_activate] : id: 8
+<4>[   11.489562] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[   11.495971] [MULTIPDP] [vs_add_dev] : END
+<4>[   11.502899] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[   11.509155] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[   11.515258] [MULTIPDP] [pdp_add_dev] : END
+<4>[   11.521240] [MULTIPDP] [pdp_activate] : ttyEFS(id: 8) serial device is created.
+<4>[   11.532867] [MULTIPDP] [pdp_activate] : END
+<4>[   11.538665] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[   11.544372] [MULTIPDP] [pdp_activate] : id: 5
+<4>[   11.549896] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[   11.555328] [MULTIPDP] [vs_add_dev] : END
+<4>[   11.561340] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[   11.566589] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[   11.571777] [MULTIPDP] [pdp_add_dev] : END
+<4>[   11.576843] [MULTIPDP] [pdp_activate] : ttyGPS(id: 5) serial device is created.
+<4>[   11.586791] [MULTIPDP] [pdp_activate] : END
+<4>[   11.591888] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[   11.596771] [MULTIPDP] [pdp_activate] : id: 6
+<4>[   11.601593] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[   11.606201] [MULTIPDP] [vs_add_dev] : END
+<4>[   11.611297] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[   11.615966] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[   11.620269] [MULTIPDP] [pdp_add_dev] : END
+<4>[   11.624542] [MULTIPDP] [pdp_activate] : ttyXTRA(id: 6) serial device is created.
+<4>[   11.632751] [MULTIPDP] [pdp_activate] : END
+<4>[   11.636840] [MULTIPDP] [pdp_activate] : BEGIN
+<4>[   11.640960] [MULTIPDP] [pdp_activate] : id: 25
+<4>[   11.644897] [MULTIPDP] [vs_add_dev] : BEGIN
+<4>[   11.648773] [MULTIPDP] [vs_add_dev] : END
+<4>[   11.653137] [MULTIPDP] [pdp_add_dev] : BEGIN
+<4>[   11.657043] [MULTIPDP] [pdp_get_dev] : BEGIN
+<4>[   11.660736] [MULTIPDP] [pdp_add_dev] : END
+<4>[   11.664550] [MULTIPDP] [pdp_activate] : ttySMD(id: 25) serial device is created.
+<4>[   11.672058] [MULTIPDP] [pdp_activate] : END
+<6>[   11.888854] overclock: Motorola Milestone/Droid/DroidX CPU overclocking version 1.4.8
+<6>[   11.898498] overclock: by Tiago Sousa <mirage@kaotik.org>
+<6>[   11.903442] overclock: found mpu_opps_addr at 0xc05d5254
+<6>[   11.908477] overclock: found cpufreq_stats_table_addr at 0xc05c2b30
+<6>[   11.919738] overclock: setting max_rate 600000 and max_vsel 60
+<6>[   11.931091] overclock: setting max_rate 800000 and max_vsel 60
+<4>[   17.261505] [BT] disable bt pins
+<6>[   17.402862] enabling adb
+<6>[   17.410888] adb_open
+<6>[   17.825775] TIWLAN: driver init
+<6>[   17.831268] TIWLAN SDIO init
+<6>[   17.845031] TIWLAN SDIO probe: initializing mmc3 device
+<4>[   17.848907] SDIO clock Configuration is now set to 24Mhz
+<6>[   17.904663] warning: `rild' uses 32-bit capabilities (legacy support in use)
+<4>[   17.936614] wlanDrvIf_Stop
+<6>[   18.089904] proc_load: Processor Loaded /system/lib/dsp/baseimage.dof
+<6>[   18.123199] omap mailbox rev 4.0
+<6>[   18.141876] proc_start: dsp in running state
+<3>[   18.146148] procwrap_detach: deprecated dspbridge ioctl
+<4>[   18.664276] DPRAM_PHONE_POWON
+<4>[   18.668609] [OneDram] phone power on.
+<3>[   18.673034] [DPRAM] phone power on is called.
+<3>[   18.677703] [DPRAM] phone power on GPIO_LEVEL_LOW
+<4>[   19.082275] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 3
+<4>[   19.097351] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 3
+<4>[   19.109558] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 14
+<4>[   19.119934] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 5
+<4>[   19.129882] TSKIM -vociecall mode : mod_no 1 -  48 regiter configured to 2d
+<4>[   19.181121] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 3
+<4>[   19.198211] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 1
+<4>[   19.211395] TSKIM -vociecall mode : mod_no 1 -  3a regiter configured to 16
+<4>[   19.224884] twl4030_set audio_path= Playback Path name=Playback Path 
+<4>[   19.235351] twl4030_set_playback_path value = 2 device= 0 mode = 0 codec_mode = 0 
+<4>[   19.245880] TSKIM -vociecall mode : mod_no 1 -  1 regiter configured to 93
+<4>[   19.259552] TSKIM -vociecall mode : mod_no 1 -  13 regiter configured to 3f
+<4>[   19.271789] TSKIM -vociecall mode : mod_no 1 -  12 regiter configured to 3f
+<4>[   19.285430] TSKIM -vociecall mode : mod_no 1 -  17 regiter configured to c
+<4>[   19.297088] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 23
+<4>[   19.309936] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 23
+<4>[   19.321899] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 0
+<4>[   19.334075] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[   19.346466] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 28
+<4>[   19.359008] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 28
+<4>[   19.371520] TSKIM -vociecall mode : mod_no 1 -  43 regiter configured to 0
+<4>[   19.458770] DPRAM_PHONEIMG_LOAD
+<4>[   19.487304] DPRAM_PHONE_BOOTSTART
+<4>[   19.527984] [DPRAM] Unknown ioctl: 5401
+<4>[   19.534271] [DPRAM] Unknown ioctl: 5401
+<4>[   19.541290] [DPRAM] Unknown ioctl: 5402
+<4>[   19.547088] [DPRAM] Unknown ioctl: 5401
+<4>[   19.552795] [DPRAM] Unknown ioctl: 5402
+<4>[   20.560119] DPRAM_PHONE_ON
+<2>[   27.393859] EXT4-fs error (device mmcblk0p2): ext4_mb_generate_buddy: EXT4-fs: group 3: 30545 blocks in bitmap, 30556 in gd
+<4>[   27.942871] tiwlan: 10 sec os_SignalObjectWait timeout
+<6>[   28.202117] sdioDrv_remove: calling sdiodrv_shutdown
+<6>[   28.203338] TI WLAN: driver unloaded
+<6>[   34.676940] alarm_release: clear alarm, pending 0
+<3>[   34.687469] state_store: state:0 (on)
+<6>[   34.687500] request_suspend_state: wakeup (3->0) at 29401184119 (2005-03-29 03:25:24.094421336 UTC)
+<6>[   34.687530] nothing is queued, old_sleep: 0, new_state: 0
+<3>[   34.691314] init: untracked pid 1116 exited
+<3>[   34.692901] init: untracked pid 1112 exited
+<4>[   35.091461] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 3
+<4>[   35.091857] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 3
+<4>[   35.092254] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 10
+<4>[   35.116546] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 3
+<4>[   35.122680] TSKIM -vociecall mode : mod_no 1 -  e regiter configured to 1
+<4>[   35.123016] TSKIM -vociecall mode : mod_no 1 -  3a regiter configured to 16
+<4>[   35.123474] twl4030_set audio_path= Playback Path name=Playback Path 
+<4>[   35.123504] twl4030_set_playback_path value = 2 device= 2 mode = 0 codec_mode = 0 
+<4>[   35.123504] TSKIM -vociecall mode : mod_no 1 -  1 regiter configured to 93
+<4>[   35.123840] TSKIM -vociecall mode : mod_no 1 -  13 regiter configured to 3f
+<4>[   35.124114] TSKIM -vociecall mode : mod_no 1 -  12 regiter configured to 3f
+<4>[   35.124420] TSKIM -vociecall mode : mod_no 1 -  17 regiter configured to c
+<4>[   35.124725] TSKIM -vociecall mode : mod_no 1 -  1b regiter configured to 23
+<4>[   35.125030] TSKIM -vociecall mode : mod_no 1 -  1c regiter configured to 23
+<4>[   35.125335] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 0
+<4>[   35.125640] TSKIM -vociecall mode : mod_no 1 -  22 regiter configured to 0
+<4>[   35.125915] TSKIM -vociecall mode : mod_no 1 -  26 regiter configured to 28
+<4>[   35.126220] TSKIM -vociecall mode : mod_no 1 -  25 regiter configured to 28
+<4>[   35.126525] TSKIM -vociecall mode : mod_no 1 -  43 regiter configured to 0
+<4>[   43.962371] TSKIM -vociecall mode : mod_no 1 -  21 regiter configured to 20
+<3>[   44.645172] state_store: state:0 (on)
+<6>[   44.645202] request_suspend_state: wakeup (0->0) at 39358886751 (2005-03-29 03:25:34.052123968 UTC)
+<6>[   44.645233] nothing is queued, old_sleep: 0, new_state: 0
+<7>[   44.648529] tl2796_lcd_brightness_setting:2
+<4>[   47.922485] [ACCEL] KXSD9_timer_enable() Success!!!
+<4>[   47.922546] KXSD9_dev_set_operation_mode: KXSD9_dev_set_operation_mode ONLYACCEL
+<4>[   47.965393] [PROXIMITY] P_ioctl() case P_IOC_SHUTDOWN  
+<4>[   47.965454] [light] L_dev_polling_stop() 
+<4>[   47.965454] [LIGHT] L_ioctl() case L_IOC_POLLING_TIMER_CANCEL 
+<4>[   48.069915] KXSD9_timer_set_polling_time: delay= 200
+<4>[   48.069976] KXSD9_timer_set_polling_time: delay= 200
+<4>[   48.576202] omap_device: i2c_omap.2: new worst case deactivate latency 0: 61035
+<4>[   61.626586] omap_device: i2c_omap.2: new worst case activate latency 0: 3875732
+<4>[   68.389648] omap_device: i2c_omap.3: new worst case deactivate latency 0: 396728
+<4>[   71.144592] No context was lost. Not restoring.
+<6>[   73.615020] android_usb gadget: high speed config #1: android
+<7>[   73.615081] musb_hdrc periph: enabled ep3in for int IN, dma, maxpacket 10
+<7>[   73.615112] musb_hdrc periph: enabled ep2in for bulk IN, dma, maxpacket 512
+<7>[   73.615112] musb_hdrc periph: enabled ep2out for bulk OUT, dma, maxpacket 512
+<7>[   73.615173] musb_hdrc periph: enabled ep4in for bulk IN, dma, maxpacket 512
+<7>[   73.615173] musb_hdrc periph: enabled ep3out for bulk OUT, dma, maxpacket 512
+<7>[   73.615234] musb_hdrc periph: enabled ep1in for bulk IN, dma, maxpacket 512
+<7>[   73.615264] musb_hdrc periph: enabled ep1out for bulk OUT, dma, maxpacket 512
