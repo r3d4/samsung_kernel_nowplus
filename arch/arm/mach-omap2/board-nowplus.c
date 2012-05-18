@@ -49,6 +49,7 @@
 #include	<plat/common.h>
 #include	<plat/dma.h>
 #include	<plat/gpmc.h>
+#include    <plat/onenand.h>
 #include	<plat/display.h>
 #include 	<plat/opp_twl_tps.h>
 #include	<plat/control.h>
@@ -1027,8 +1028,9 @@ static	struct	regulator_init_data	nowplus_vsim	=	{
 	.constraints	=	{
 		.min_uV			=	1800000,
 		.max_uV			=	1800000,
-		//.apply_uV				=	true,
+		.apply_uV				=	true,
 		.boot_on		=	true,
+        .always_on		=	true,   // always enable until mmc sdio driver is fixed
 		.valid_modes_mask	=	REGULATOR_MODE_NORMAL
 					|	REGULATOR_MODE_STANDBY,
 		.valid_ops_mask		=	REGULATOR_CHANGE_VOLTAGE
@@ -1266,6 +1268,9 @@ static	struct	twl4030_resconfig	twl4030_rconfig[]	=	{
 	{	.resource	=	RES_REGEN,	.devgroup	=	DEV_GRP_NULL,	.type	=	-1,	.type2	=	-1	},
 	{	.resource	=	RES_VINTANA1,	.devgroup	=	DEV_GRP_P1,	.type	=	-1,	.type2	=	-1	},
 	{	.resource	=	RES_VINTDIG,	.devgroup	=	DEV_GRP_P1,	.type	=	-1,	.type2	=	-1	},
+
+    {	.resource	=	RES_VSIM,	.devgroup	=	DEV_GRP_P1,	.type	=	-1,	.type2	=	-1	},
+
 #else
 	{	.resource	=	RES_HFCLKOUT,	.devgroup	=	DEV_GRP_P3,	.type	=	-1,	.type2	=	-1	},
 #ifdef	TWL4030_USING_BROADCAST_MSG
@@ -1531,6 +1536,74 @@ static	int	__init	nowplus_i2c_init(void)
 	omap_register_i2c_bus(3, 400, NULL, nowplus_i2c3_boardinfo,	ARRAY_SIZE(nowplus_i2c3_boardinfo));
 	return	0;
 }
+
+#if defined(CONFIG_MTD_ONENAND_OMAP2) || \
+	defined(CONFIG_MTD_ONENAND_OMAP2_MODULE)
+/*
+Adresses of the BML partitions
+
+minor position size blocks id
+
+  1: 0x00000000-0x00040000 0x00040000      2        0
+  2: 0x00040000-0x00640000 0x00600000     48        1
+  3: 0x00640000-0x00780000 0x00140000     10        2
+  4: 0x00780000-0x008c0000 0x00140000     10        3
+  5: 0x008c0000-0x00dc0000 0x00500000     40        4
+  6: 0x00dc0000-0x012c0000 0x00500000     40        5
+  7: 0x012c0000-0x02640000 0x01380000    156        6   initrd
+  8: 0x02640000-0x0da40000 0x0b400000   1440        7   factoryfs
+  9: 0x0da40000-0x1f280000 0x11840000   2242        8   datafs
+ 10: 0x1f280000-0x1f380000 0x00100000      8        9
+ 11: 0x1f380000-0x1f480000 0x00100000      8       10
+*/
+static struct mtd_partition onenand_partitions[] = {
+	{
+		.name           = "initrd",
+		.offset         = 0x012c0000,
+		.size           = 0x01380000,
+		//.mask_flags     = MTD_WRITEABLE,	/* Force read-only */
+	},
+	{
+		.name           = "system",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x0b400000,
+	},
+	{
+		.name           = "data",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x11340000,
+		//.size           = 0x0e640000,
+	},
+    {
+		.name           = "cache",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x00500000,
+		//.size           = 0x03200000,
+	},
+
+};
+
+static struct omap_onenand_platform_data board_onenand_data = {
+	.cs		= 0,
+	//.gpio_irq	= OMAP_GPIO_AP_NAND_INT,
+    .dma_channel = -1,  /* disable DMA in OMAP OneNAND driver */
+	.parts		= onenand_partitions,
+	.nr_parts	= ARRAY_SIZE(onenand_partitions),
+	.flags		= ONENAND_SYNC_READWRITE,
+};
+
+static void __init board_onenand_init(void)
+{
+	gpmc_onenand_init(&board_onenand_data);
+}
+
+#else
+
+static inline void board_onenand_init(void)
+{
+}
+
+#endif
 
 static	struct	omap_uart_port_info	omap_serial_platform_data[]	=	{
 	{
@@ -2183,7 +2256,7 @@ void	__init	nowplus_peripherals_init(void)
 {
 	/*	For	Display	*/
 
-
+	board_onenand_init();
 	synaptics_dev_init();
 	omap_serial_init(omap_serial_platform_data);
 	usb_musb_init(&musb_board_data);
