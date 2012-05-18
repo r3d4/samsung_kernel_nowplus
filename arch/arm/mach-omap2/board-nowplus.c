@@ -1092,13 +1092,13 @@ static	struct	omap2_hsmmc_info	nowplus_mmc[]	=	{
 		// .nonremovable	=	true,
 		// .power_saving	=	true,
 	// },
-	// {
-		// .mmc			=	3,
-		// .caps			=	MMC_CAP_4_BIT_DATA,
-		// .gpio_cd		=	-EINVAL,
-		// .gpio_wp		=	-EINVAL,
-	// },
-	// {}	/*	Terminator	*/
+	{
+		.mmc			=	3,
+		.caps			=	MMC_CAP_4_BIT_DATA,
+		.gpio_cd		=	-EINVAL,
+		.gpio_wp		=	-EINVAL,
+	},
+	{}	/*	Terminator	*/
 };
 
 
@@ -1113,7 +1113,7 @@ static	int	__init	nowplus_twl_gpio_setup(struct	device	*dev,
 // #ifdef	ENABLE_EMMC
 	// nowplus_vmmc2_supply.dev	=	nowplus_mmc[1].dev;
 // #endif
-	// nowplus_vsim_supply.dev	=	nowplus_mmc[2].dev;
+	nowplus_vsim_supply.dev	=	nowplus_mmc[2].dev;
 
 	return	0;
 }
@@ -2299,6 +2299,14 @@ static	void	__init	nowplus_init(void)
 
 	get_powerup_reason(str_powerup_reason);
 	printk(	"\n\n	<Powerup	Reason	:	%s>\n\n",	str_powerup_reason);
+
+// debug: get video ram addres from SBL
+// 0x4805 0480+ j * 0x04    printk(    "DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));    printk(    "DISPC_GFX_BA1: 0x%08x\n", omap_readl(0x48050484));    printk(    "DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xf-//debug 0x4805 0480+ j * 0x04
+    printk(    "DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));
+    printk(    "DISPC_GFX_BA1: 0x%08x\n", omap_readl(0x48050484));
+    printk(    "DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xff );
+    printk(    "DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
+
 
 	platform_add_devices(nowplus_devices,	ARRAY_SIZE(nowplus_devices));
 //	For	Regulator	Framework	:
