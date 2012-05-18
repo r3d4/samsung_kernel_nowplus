@@ -1400,6 +1400,7 @@ static void set_data_timeout(struct omap_hsmmc_host *host,
 			     unsigned int timeout_ns,
 			     unsigned int timeout_clks)
 {
+#if 0
 	unsigned int timeout, cycle_ns;
 	uint32_t reg, clkd, dto = 0;
 
@@ -1431,6 +1432,15 @@ static void set_data_timeout(struct omap_hsmmc_host *host,
 	reg &= ~DTO_MASK;
 	reg |= dto << DTO_SHIFT;
 	OMAP_HSMMC_WRITE(host->base, SYSCTL, reg);
+#else
+    uint32_t reg;
+
+    reg = OMAP_HSMMC_READ(host->base, SYSCTL);
+
+    reg &= ~DTO_MASK;
+    reg |= DTO << DTO_SHIFT;
+    OMAP_HSMMC_WRITE(host->base, SYSCTL, reg);
+#endif
 }
 
 /*
