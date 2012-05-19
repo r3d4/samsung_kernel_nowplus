@@ -239,4 +239,3 @@ struct s5ka3dfx_platform_data nowplus_s5ka3dfx_platform_data = {
 	.priv_data_set  = s5ka3dfx_sensor_set_prv_data,
 	.ifparm         = s5ka3dfx_ifparm,
 };
-EXPORT_SYMBOL(nowplus_s5ka3dfx_platform_data);

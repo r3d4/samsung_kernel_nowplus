@@ -36,31 +36,126 @@
 #include <linux/file.h>
 #include <plat/mux.h>
 
+#include "isp/isp.h"
+#include "isp/ispreg.h"
+#include "isp/ispccdc.h"
+
+
 #include "m4mo.h"
 #include "omap34xxcam.h"
 
-#include "dprintk.h"
-
-// ZEUS_CAM defined in m4mo.h
-#ifndef ZEUS_CAM 
-/* used for sensor firmware update */
-#include <mach/microusbic.h>
+#if (CAM_M4MO_DBG_MSG)
+#define	dprintk(x, y...)	\
+	do{\
+	printk("["#x"] "y);\
+	}while(0)
+#else
+#define dprintk(x, y...)
 #endif
 
 
+//#define ENABLE_FIRMWARE_UPDATE
+//#define ENABLE_FIRMWARE_DUMP
+
+//forward declaration
+static int m4mo_set_focus_mode(s32 value);
+static int m4mo_start_capture(void);
+static int m4mo_set_jpeg_quality(s32 value);
+static int m4mo_set_thumbnail_size(s32 value);
+
 /* Wait Queue For Fujitsu ISP Interrupt */
 static DECLARE_WAIT_QUEUE_HEAD(cam_wait);
-static int cam_interrupted = 0;
-static u32 jpeg_capture_size;
-static u32 thumbnail_capture_size;
-static int fw_update_status = 100;
-static int fw_dump_status = 100;
-static u8* cam_fw_name = NULL;
-static int cam_fw_major_version;
-static int cam_fw_minor_version;
-int camfw_update=0;
+
+static int cam_interrupted          = 0;
+static u32 jpeg_capture_size        = 0;
+static u32 thumbnail_capture_size   = 0;
+static int fw_update_status         = 100;
+static int fw_dump_status           = 100;
+static u8* cam_fw_name              = "RS_M4Mo_RD.bin";;
+static int cam_fw_major_version     = 0xFB;;
+static int cam_fw_minor_version     = 0xAA;
+int camfw_update                    = 0;
+static int af_used 					= 0;	//1 if AF was use at some time
+
+static u32 m4mo_curr_state          = M4MO_STATE_INVALID;
+static u32 m4mo_pre_state           = M4MO_STATE_INVALID;
+static bool m4mo_720p_enable        = false;
+
+extern int main_cap_started;    //isp.c
+
 
 extern u32 hw_revision;
+
+
+
+/**
+ * Array of image sizes supported by M4MO.  These must be ordered from
+ * smallest image size to largest.
+ */
+ /* Preview sizes */
+const static struct m4mo_capture_size m4mo_preview_sizes[] = {
+	{0,0},          //  
+	{160,120},      //  M4MO_QQVGA_SIZE		    0x1	
+	{176,144},      //  M4MO_QCIF_SIZE			0x2	
+	{320,240},      //  M4MO_QVGA_SIZE			0x3
+	{320,240},      //  M4MO_SL1_QVGA_SIZE	    0x4
+	{800,600},      //  M4MO_800_600_SIZE		0x5	
+	{2560,1920},    //  M4MO_5M_SIZE			0x6	
+	{640,482},      //  M4MO_640_482_SIZE		0x7	
+	{800,602},      //  M4MO_800_602_SIZE		0x8	
+	{320,240},      //  M4MO_SL2_QVGA_SIZE	    0x9	
+	{176,176},      //  M4MO_176_176_SIZE		0xA	
+	{352,288},      //  M4MO_CIF_SIZE			0xB	
+	{400,240},      //  M4MO_WQVGA_SIZE		    0xC	
+	{640,480 },	    //  M4MO_VGA_SIZE			0xD	
+	{240,320},	    //  M4MO_REV_QVGA_SIZE	    0xE	
+	{432,240},	    //  M4MO_REV_WQVGA_SIZE	    0xF	
+	{432,240},	    //  M4MO_432_240_SIZE		0x10
+	{800,480},	    //  M4MO_WVGA_SIZE		    0x11
+	{144,176},	    //  M4MO_REV_QCIF_SIZE		0x12
+	{240,432},	    //  M4MO_240_432_SIZE		0x13
+	{1024,768},	    //  M4MO_XGA_SIZE			0x14
+	{1280,720},	    //  M4MO_1280_720_SIZE		0x15
+	{720,480},	    //  M4MO_720_480_SIZE		0x16
+	{720,576},	    //  M4MO_720_576_SIZE		0x15
+};
+
+/* Image sizes */
+const static struct m4mo_capture_size m4mo_image_sizes[] = {
+	{0,0},          //  
+	{320,240},      //  M4MO_SHOT_QVGA_SIZE		    0x1
+	{640,480},      //  M4MO_SHOT_VGA_SIZE		    0x2
+	{1280,960},     //  M4MO_SHOT_1M_SIZE	        0x3
+	{1600,1200},    //  M4MO_SHOT_2M_SIZE		    0x4
+	{2048,1536},    //  M4MO_SHOT_3M_SIZE		    0x5
+	{2560,1920},    //  M4MO_SHOT_5M_SIZE		    0x6
+	{400,240},      //  M4MO_SHOT_WQVGA_SIZE	    0x7
+	{432,240},      //  M4MO_SHOT_432_240_SIZE	    0x8
+	{640,360},      //  M4MO_SHOT_640_360_SIZE	    0x9
+	{800,480},      //  M4MO_SHOT_WVGA_SIZE		    0xA
+	{1280,720},     //  M4MO_SHOT_720P_SIZE		    0xB
+	{1920,1080},    //  M4MO_SHOT_1920_1080_SIZE    0xC
+	{2560,1440},    //  M4MO_SHOT_2560_1440_SIZE	0xD
+	{160,120},      //  M4MO_SHOT_160_120_SIZE	    0xE
+	{176,144},      //  M4MO_SHOT_QCIF_SIZE		    0xF
+	{144,176},      //  M4MO_SHOT_144_176_SIZE	    0x10
+	{176,176},      //  M4MO_SHOT_176_176_SIZE	    0x11
+	{240,320},      //  M4MO_SHOT_240_320_SIZE	    0x12
+	{240,400},      //  M4MO_SHOT_240_400_SIZE	    0x13
+	{352,288},      //  M4MO_SHOT_CIF_SIZE			0x14
+	{800,600},      //  M4MO_SHOT_SVGA_SIZE		    0x15
+	{1024,768},     //  M4MO_SHOT_1024_768_SIZE	    0x16
+	{2304,1728}     //  M4MO_SHOT_4M_SIZE			0x17
+};      
+            
+
+//0xa..0xfa = 10..250= 1x..25x
+static int m4mo_zoom_step [M4MO_ZOOM_STAGES] = {
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32, 33, 34, 35, 36, 37, 38, 39
+};
+   
 
 static struct work_struct camera_firmup_work;
 static struct work_struct camera_firmdump_work;
@@ -68,52 +163,71 @@ static struct workqueue_struct *camera_wq;
 
 static struct m4mo_sensor m4mo = {
 	.timeperframe = {
-		.numerator = 0,
+		.numerator   = 0,
 		.denominator = 0,
 	},
-	.fps = M4MO_UNINIT_VALUE,
-	.state = SENSOR_NOT_DETECTED,
-	.effect = M4MO_UNINIT_VALUE,
-	.iso = M4MO_UNINIT_VALUE,
-	.photometry = M4MO_UNINIT_VALUE,
-	.ev = M4MO_UNINIT_VALUE,
-	.wdr = M4MO_UNINIT_VALUE,
-	.saturation = M4MO_UNINIT_VALUE,
-	.sharpness = M4MO_UNINIT_VALUE,
-	.contrast = M4MO_UNINIT_VALUE,
-	.wb = M4MO_UNINIT_VALUE,
-	.isc = M4MO_UNINIT_VALUE,
-	.scene = M4MO_UNINIT_VALUE,
-	.aewb = M4MO_UNINIT_VALUE,
-	.flash_capture = M4MO_UNINIT_VALUE,
+	.fps            = M4MO_UNINIT_VALUE,
+	.state          = M4MO_UNINIT_VALUE,
+    .mode           = M4MO_UNINIT_VALUE,
+    .detect         = SENSOR_NOT_DETECTED,
+	.effect         = M4MO_UNINIT_VALUE,
+	.iso            = M4MO_UNINIT_VALUE,
+	.photometry     = M4MO_UNINIT_VALUE,
+	.ev             = M4MO_UNINIT_VALUE,
+	.wdr            = M4MO_UNINIT_VALUE,
+	.saturation     = M4MO_UNINIT_VALUE,
+	.sharpness      = M4MO_UNINIT_VALUE,
+	.contrast       = M4MO_UNINIT_VALUE,
+	.wb             = M4MO_UNINIT_VALUE,
+	.isc            = M4MO_UNINIT_VALUE,
+	.scene          = M4MO_UNINIT_VALUE,
+	.aewb           = M4MO_UNINIT_VALUE,
+	.flash_capture  = M4MO_UNINIT_VALUE,
 	.face_detection = M4MO_UNINIT_VALUE,
-	.jpeg_quality = M4MO_UNINIT_VALUE, 
-	.zoom = M4MO_UNINIT_VALUE,
+	.jpeg_quality   = M4MO_UNINIT_VALUE, 
+	.zoom           = M4MO_UNINIT_VALUE,
 	.thumbnail_size = M4MO_UNINIT_VALUE,
-	.preview_size = M4MO_UNINIT_VALUE,
-	.capture_size = M4MO_UNINIT_VALUE,
-	.af_mode = M4MO_UNINIT_VALUE,
-	.capture_flag = 0,
-#ifdef MOBILE_COMM_INTERFACE
+	.preview_size   = M4MO_UNINIT_VALUE,
+	.capture_size   = M4MO_UNINIT_VALUE,
+	.af_mode        = M4MO_UNINIT_VALUE,
+    .jpeg_capture_w = JPEG_CAPTURE_WIDTH,
+	.jpeg_capture_h = JPEG_CAPTURE_HEIGHT,
 	.focus_mode = 0,
 	.focus_auto = 0,
 	.exposre_auto = 0,
 	.exposure = 4,
-	.zoom_mode = 0,
+//	.zoom_mode = 0,
 	.zoom_absolute = 0,
 	.auto_white_balance = 0,
-	.white_balance_preset = 0,
+//	.white_balance_preset = 0,
 	.strobe_conf_mode = V4L2_STROBE_OFF,
-#endif
 };
 
 struct v4l2_queryctrl m4mo_ctrl_list[] = {
+      {
+        .id            = V4L2_CID_SELECT_MODE,
+        .type          = V4L2_CTRL_TYPE_INTEGER,
+        .name          = "select mode",
+        .minimum       = M4MO_MODE_CAMERA,
+        .maximum       = M4MO_MODE_VT,
+        .step          = 1,
+        .default_value = M4MO_MODE_CAMERA,
+      },   
+      {
+        .id            = V4L2_CID_SELECT_STATE,
+        .type          = V4L2_CTRL_TYPE_INTEGER,
+        .name          = "select state",
+        .minimum       = M4MO_STATE_PREVIEW,
+        .maximum       = M4MO_STATE_CAPTURE,
+        .step          = 1,
+        .default_value = M4MO_STATE_PREVIEW,
+      },
 	{
 		.id = V4L2_CID_AF,
-		.type = V4L2_CTRL_TYPE_MENU,
-		.name = "Auto Focus",
-		.minimum = M4MO_AF_STOP,
-		.maximum = M4MO_AF_START,
+		.type = V4L2_CTRL_TYPE_INTEGER,
+		.name = "Focus Status",
+		.minimum = M4MO_AF_START ,
+		.maximum = M4MO_AF_STOP,
 		.step = 1,
 		.default_value = M4MO_AF_STOP,
 	},	
@@ -287,7 +401,6 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 		.step = 1,
 		.default_value = M4MO_SHARPNESS_DEFAULT,
 	},	
-#ifdef MOBILE_COMM_INTERFACE
 	{
 		.id = V4L2_CID_EXPOSURE_AUTO,
 		.type = V4L2_CTRL_TYPE_MENU,
@@ -308,12 +421,12 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 	},
 	{
 		.id = V4L2_CID_FOCUS_MODE,
-		.type = V4L2_CTRL_TYPE_MENU,
+		.type = V4L2_CTRL_TYPE_INTEGER,
 		.name = "Set Focus Mode",
-		.minimum = 0,
-		.maximum = 1,
+		.minimum = M4MO_AF_MODE_NORMAL,
+		.maximum = M4MO_AF_MODE_MACRO,
 		.step = 1,
-		.default_value = 0,
+		.default_value = M4MO_AF_MODE_NORMAL,
 	},
 	{
 		.id = V4L2_CID_FOCUS_AUTO,
@@ -324,6 +437,7 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 		.step = 1,
 		.default_value = 0,
 	},
+#if 0    
 	{
 		.id = V4L2_CID_ZOOM_MODE,
 		.type = V4L2_CTRL_TYPE_MENU,
@@ -333,6 +447,7 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 		.step = 1,
 		.default_value = 0,
 	},
+#endif
 	{
 		.id = V4L2_CID_ZOOM_ABSOLUTE,
 		.type = V4L2_CTRL_TYPE_MENU,
@@ -351,6 +466,7 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 		.step = 1,
 		.default_value = 0,
 	},
+#if 0
 	{
 		.id = V4L2_CID_WHITE_BALANCE_PRESET,
 		.type = V4L2_CTRL_TYPE_MENU,
@@ -360,7 +476,7 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 		.step = 1,
 		.default_value = 0,
 	},
-#endif	
+#endif
 	{
 		.id = V4L2_CID_THUMBNAIL_SIZE,
 		.name = "Thumbnail Image Size",
@@ -376,10 +492,10 @@ struct v4l2_queryctrl m4mo_ctrl_list[] = {
 
 struct v4l2_querymenu m4mo_menu_list[] = {
 	{.id = V4L2_CID_AF, .index = M4MO_AF_STOP, .name = "AF Stop"},
-	{.id = V4L2_CID_AF, .index = M4MO_AF_INIT_NORMAL,.name = "Set AF normal mode"},
-	{.id = V4L2_CID_AF, .index = M4MO_AF_INIT_MACRO, .name = "Set AF macro mode"},
 	{.id = V4L2_CID_AF, .index = M4MO_AF_START,.name = "AF Start"},
-
+	{.id = V4L2_CID_AF, .index = M4MO_AF_MODE_NORMAL,.name = "Set AF normal mode"},
+	{.id = V4L2_CID_AF, .index = M4MO_AF_MODE_MACRO, .name = "Set AF macro mode"},
+    
 	{.id = V4L2_CID_THUMBNAIL_SIZE, .index = M4MO_THUMB_QVGA_SIZE, .name = "QVGA Size"},
 	{.id = V4L2_CID_THUMBNAIL_SIZE, .index = M4MO_THUMB_400_225_SIZE, .name = "400 X 225 Size"},
 	{.id = V4L2_CID_THUMBNAIL_SIZE, .index = M4MO_THUMB_WQVGA_SIZE, .name = "WQVGA Size"},
@@ -455,11 +571,6 @@ struct v4l2_querymenu m4mo_menu_list[] = {
 	{.id = V4L2_CID_AEWB, .index = M4MO_AE_LOCK_AWB_UNLOCK, .name = "AE Lock/AWB Unlock"},
 	{.id = V4L2_CID_AEWB, .index = M4MO_AE_UNLOCK_AWB_LOCK, .name = "AE Unlock/AWB Lock"},
 	{.id = V4L2_CID_AEWB, .index = M4MO_AE_UNLOCK_AWB_UNLOCK, .name = "AE Unlock/AWB Unlock"},
-
-	{.id = V4L2_CID_AEWB, .index = M4MO_AE_LOCK_AWB_LOCK, .name = "AE Lock/AWB Lock"},
-	{.id = V4L2_CID_AEWB, .index = M4MO_AE_LOCK_AWB_UNLOCK, .name = "AE Lock/AWB Unlock"},
-	{.id = V4L2_CID_AEWB, .index = M4MO_AE_UNLOCK_AWB_LOCK, .name = "AE Unlock/AWB Lock"},
-	{.id = V4L2_CID_AEWB, .index = M4MO_AE_UNLOCK_AWB_UNLOCK, .name = "AE Unlock/AWB Unlock"},
 	
 	{.id = V4L2_CID_FLASH_CAPTURE, .index = M4MO_FLASH_CAPTURE_OFF, .name = "Flash Off"},
 	{.id = V4L2_CID_FLASH_CAPTURE, .index = M4MO_FLASH_CAPTURE_ON, .name = "Flash On"},
@@ -500,7 +611,6 @@ struct v4l2_querymenu m4mo_menu_list[] = {
 	{.id = V4L2_CID_SHARPNESS, .index = M4MO_SHARPNESS_PLUS_2, .name = "Sharpness +2"},
 	{.id = V4L2_CID_SHARPNESS, .index = M4MO_SHARPNESS_PLUS_3, .name = "Sharpness +3"},
 
-#ifdef MOBILE_COMM_INTERFACE
 	{.id = V4L2_CID_EXPOSURE_AUTO, .index = 0, .name = "Auto Exposure Unlock"},
 	{.id = V4L2_CID_EXPOSURE_AUTO, .index = 1, .name = "Auto Exposure Lock"},
 		
@@ -516,9 +626,9 @@ struct v4l2_querymenu m4mo_menu_list[] = {
 
 	{.id = V4L2_CID_FOCUS_MODE, .index = 0, .name = "Normal Auto Focus"},
 	{.id = V4L2_CID_FOCUS_MODE, .index = 1, .name = "Macro Auto Focus"},
-
+#if 0
 	{.id = V4L2_CID_ZOOM_MODE, .index = 0, .name = "Digital Zoom"},
-
+#endif
 	{.id = V4L2_CID_ZOOM_ABSOLUTE, .index = 0, .name = "1.0X"},
 	{.id = V4L2_CID_ZOOM_ABSOLUTE, .index = 1, .name = "1.3X"},
 	{.id = V4L2_CID_ZOOM_ABSOLUTE, .index = 2, .name = "1.7X"},
@@ -531,7 +641,7 @@ struct v4l2_querymenu m4mo_menu_list[] = {
 
 	{.id = V4L2_CID_AUTO_WHITE_BALANCE, .index = 0, .name = "Auto WB Unlock"},
 	{.id = V4L2_CID_AUTO_WHITE_BALANCE, .index = 1, .name = "Auto WB Lock"},
-
+#if 0
 	{.id = V4L2_CID_WHITE_BALANCE_PRESET, .index = 0, .name = "Auto WB"},
 	{.id = V4L2_CID_WHITE_BALANCE_PRESET, .index = 1, .name = "Incandescent"},
 	{.id = V4L2_CID_WHITE_BALANCE_PRESET, .index = 2, .name = "Fluorescent"},
@@ -573,6 +683,14 @@ void print_currenttime(void)
 	return;
 }
 
+irqreturn_t isp_irq_handler(int irq, void* dev_id)
+{
+	cam_interrupted = 1;
+	wake_up_interruptible(&cam_wait);
+	dprintk(CAM_DBG, M4MO_MOD_NAME "ISP IRQ HANDLER is called\n");
+
+	return IRQ_HANDLED;
+}
 
 static int m4mo_read_category_parm(struct i2c_client *client, 
 								u8 data_length, u8 category, u8 byte, u32* val)
@@ -817,6 +935,7 @@ again:
 
 static int m4mo_i2c_update_firmware(void)
 {
+#ifdef ENABLE_FIRMWARE_UPDATE
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 	
@@ -829,10 +948,6 @@ static int m4mo_i2c_update_firmware(void)
 	int i, j, retry, flash_addr, ret;
 	u32 val;
 	
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV02_N01)
-	return -ENODEV;
-#endif
-	
 	ret = request_firmware(&fw_entry, cam_fw_name, dev);
 	if(ret != 0) {
 		dprintk(CAM_ERR, M4MO_MOD_NAME "firmware request error!\n");
@@ -844,10 +959,10 @@ static int m4mo_i2c_update_firmware(void)
 	}
 		
 	gpio_direction_output(OMAP_GPIO_CAM_RST, 0);
-	mdelay(10);
+	msleep(10);
 	/* Release Reset */
 	gpio_direction_output(OMAP_GPIO_CAM_RST, 1);
-	mdelay(10);
+	msleep(10);
 
 	m4mo_write_mem(client, 0x000D, 0x50000100, pin1);
 	m4mo_write_mem(client, 0x000D, 0x50000200, pin2);
@@ -861,7 +976,7 @@ static int m4mo_i2c_update_firmware(void)
 		/*Set FLASH ROM programming address */	
 		m4mo_write_category_parm(client, 4, 0x0F, 0x00, flash_addr);	
 		flash_addr += 0x10000;
-		mdelay(10);
+		msleep(10);
 
 		/* Erase FLASH ROM entire memory */
 		m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x06, 0x01);				//3
@@ -874,21 +989,21 @@ static int m4mo_i2c_update_firmware(void)
 			if(val == 0)	//4
 				break;
 
-			mdelay(10);
+			msleep(10);
 			retry++;
 		}
 		
 		/* Set FLASH ROM programming size */
 		m4mo_write_category_parm(client, M4MO_16BIT, 0x0F, 0x04, 0x0000);	
-		mdelay(10);
+		msleep(10);
 
 		/* Clear m4mo internal RAM */
 		m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x08, 0x01);
-		mdelay(10);
+		msleep(10);
 
 		/* Send programmed firmware */
 		for(j=0; j<0x10000; j+=0x1000)
-			m4mo_write_mem(client, 0x1000, 0x68000000+j, (fw_entry->data + i + j));
+			m4mo_write_mem(client, 0x1000, 0x68000000+j, (u8*)(fw_entry->data + i + j));
 
 		/* Start Programming */
 		m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x07, 0x01);				
@@ -901,7 +1016,7 @@ static int m4mo_i2c_update_firmware(void)
 			if(val == 0)			//check programming process
 				break;
 
-			mdelay(10);
+			msleep(10);
 			retry++;
 		}
 		if(( i/0x10000) % 2)
@@ -913,12 +1028,17 @@ static int m4mo_i2c_update_firmware(void)
 	release_firmware(fw_entry);
 	
 	fw_update_status = 100;
-        
-        return 0;
+
+    return 0;
+#else
+    printk(KERN_INFO M4MO_MOD_NAME "Firmware update disabled!!\n");
+    return 0;
+#endif
 }
 
 static int m4mo_i2c_dump_firmware(void)
 {
+#ifdef ENABLE_FIRMWARE_DUMP
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 	
@@ -926,16 +1046,12 @@ static int m4mo_i2c_dump_firmware(void)
     	u8 pin2[] = { 0xF3, 0x00, 0x1F, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0xFF, 0x00, 0x04, 0x05, 0xBF};
     	u8 pin3[] = { 0x02, 0x00, 0x0C, 0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0x76, 0x00, 0x18, 0x00, 0x00};
 	int i, j, flash_addr, err = 0;
-	
 	u8* readdata;
 	int fd;
 	loff_t pos = 0;
 	struct file *file = NULL;
 	mm_segment_t old_fs = get_fs ();
 	
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV02_N01)
-	return -ENODEV;
-#endif
 
 	readdata = kmalloc(0x1000, GFP_KERNEL);
 
@@ -955,10 +1071,10 @@ static int m4mo_i2c_dump_firmware(void)
 	}
 		
 	gpio_direction_output(OMAP_GPIO_CAM_RST, 0);
-	mdelay(10);
+	msleep(10);
 	/* Release Reset */
 	gpio_direction_output(OMAP_GPIO_CAM_RST, 1);
-	mdelay(10);
+	msleep(10);
 
 	m4mo_write_mem(client, 0x000D, 0x50000100, pin1);
 	m4mo_write_mem(client, 0x000D, 0x50000200, pin2);
@@ -990,8 +1106,11 @@ DUMP_ERR:
 	kfree(readdata);  
 
 	fw_dump_status = 100;
-
-	return err;
+    return err;
+#else
+    printk(KERN_INFO M4MO_MOD_NAME "Firmware dump disabled!!\n");
+    return 0;
+#endif
 }
 
 static int m4mo_get_mode(void)
@@ -1013,7 +1132,8 @@ static int m4mo_get_mode(void)
 
 	return mode;
 }
-
+	
+ 
 static int m4mo_set_mode_common(u32 mode )
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -1037,7 +1157,6 @@ static int m4mo_set_mode_common(u32 mode )
 
 	return err;
 }
-
 static int m4mo_set_mode(u32 mode )
 {	
 	int org_value;
@@ -1124,108 +1243,192 @@ static int m4mo_set_mode(u32 mode )
 	return err;
 }
 
-static int
-m4mo_detect(void)
+static int  m4mo_set_preview(void)
+{
+    struct m4mo_sensor *sensor = &m4mo;
+    struct i2c_client *client = sensor->i2c_client;
+      
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);
+
+    m4mo_pre_state = m4mo_curr_state;
+    m4mo_curr_state = M4MO_STATE_PREVIEW;   
+    
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
+ 
+     
+    /*080917[paladin] Set the fps to the sensor. @LDK@*/
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
+    /*080917[paladin] Set the Monitor Size to the sensor. @LDK@*/
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x01, sensor->preview_size);
+    
+//    m4mo_set_mode(M4MO_MONITOR_MODE );
+
+return 0;
+}
+
+void m4mo_dump(void)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
-	
-	u32 fvh = 0, fvl = 0;
-	int err, usb_mode;
-	
+    u8 category, reg;
+    u32 val;
+    const u8 NUMREGS=0x30;
+    const u8 NUMCATS=0x0c;
 
-#ifndef ZEUS_CAM 
-	/* commented for zeus, no firmware update */
-	usb_mode = get_usbic_state();
-#endif /* end of zeus_cam */
+    printk("\nM4MO DUMP >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    printk("\nreg:           ");
+    for(reg=0; reg<NUMREGS; reg++)
+        printk("0x%02x, ", reg);
+    printk("\n---------------");  
+    for(reg=0; reg<NUMREGS; reg++)
+        printk("------"); 
+        
+    for(category=0; category<=NUMCATS; category++)
+    {
+        printk("\ncategory[0x%02x] ", category);
+        for(reg=0; reg<NUMREGS; reg++)
+        {
+            m4mo_read_category_parm(client, M4MO_8BIT, category, reg, &val); 
+            printk("0x%02x, ", val);
+        }
+    }
+    printk("\nM4MO DUMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+}
 
-	/* Start Camera Program */
-	err = m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x12, 0x01);
+static int  m4mo_set_capture(int pixelformat)
+{
+    struct m4mo_sensor *sensor = &m4mo;
+    struct i2c_client *client = sensor->i2c_client;
+    unsigned char format_byte = 0x00;   //YUV422
+   	u32 val; 
+    
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);
+
+    m4mo_pre_state = m4mo_curr_state;
+    m4mo_curr_state = M4MO_STATE_CAPTURE;   
+    
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
+
+    /*080917[paladin] Set the fps to the sensor. @LDK@*/
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
+    
+    if(pixelformat == V4L2_PIX_FMT_JPEG) 
+    {
+        format_byte = 0x04;
+        dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : JPEG + JPEG Thumnail\n");
+    } 
+    else if(pixelformat == V4L2_PIX_FMT_MJPEG) 
+    {
+        format_byte = 0x05;
+        dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : JPEG + YUV Thumnail\n");
+    } 
+    else 
+        dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : YUV422\n");
+
+    // set capture format
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x00, format_byte); 
+     
+    /* Set Capture Image Size */
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x04, sensor->capture_size); 
+    
+    
+    
+    m4mo_read_category_parm(client, M4MO_8BIT, 0x01, 0x02, &val); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "verify fps=0x%02x\n", val);
+    m4mo_read_category_parm(client, M4MO_8BIT, 0x02, 0x00, &val); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "verify format=0x%02x\n", val);
+    m4mo_read_category_parm(client, M4MO_8BIT, 0x02, 0x04, &val); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "verify capture size = 0x%02x\n", val);
+
+
+    //m4mo_set_jpeg_quality(M4MO_JPEG_SUPERFINE);
+    //m4mo_set_thumbnail_size(M4MO_THUMB_QVGA_SIZE);
+
+    //m4mo_dump();
+    m4mo_start_capture();
+
+//    m4mo_set_mode(M4MO_STILLCAP_MODE );
+    return 0;
+}
+
+static int m4mo_configure(void)
+{
+    struct m4mo_sensor *sensor = &m4mo;
+	struct i2c_client *client = sensor->i2c_client;
+    int err;
+	/* Request GPIO IRQ */
+	err = request_irq(OMAP_GPIO_IRQ(OMAP_GPIO_ISP_INT), 
+						isp_irq_handler, IRQ_TYPE_EDGE_RISING, M4MO_DRIVER_NAME, &m4mo);
+	if(err){
+		dprintk(CAM_ERR, M4MO_MOD_NAME "Failed to request IRQ, error: %d\n", err);
+		return err;
+	}
+
+	/* Parameter Setting Mode */
+	err = m4mo_set_mode(M4MO_PARMSET_MODE);
 	if(err)
 	{
-		dprintk(CAM_DBG, M4MO_MOD_NAME " There is no Camera Module!!!\n");
-		return -ENODEV;
+		dprintk(CAM_ERR, M4MO_MOD_NAME "Can not set operation mode\n");
+		return err;
 	}
-	msleep(100);
+#if 1
+// LIMO
+// --- ??????
+	m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x08, 0x8);
+	m4mo_write_category_parm(client, M4MO_8BIT, 0x03, 0x06, 0x02);
+    
+/* VSYNC x HSYNC => 1024 x 2048 */
+	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x18, 0x04); 
+	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x19, 0x00); 
+    
+#endif     
 
-	/* Read Firmware Version */
-	err = m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x01, &fvh);
-	if(err)
-	{
-#ifndef ZEUS_CAM 
-	/* commented for zeus, no firmware update */
-		if(usb_mode == MICROUSBIC_JIG_UART_OFF)
-			return -ENODEV;
-		else
-		{
-		dprintk(CAM_DBG, M4MO_MOD_NAME " Camera Firmware is erased!!!\n");
-		goto FW_UPDATE;
-	}
-#endif /* end of zeus_cam */		
-	}
-	m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x02, &fvl);
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV02_N01)
-	if(fvh == 0x0 && fvl == 0x0)
-		return -ENODEV;
-	else
-		return 0;
-#else
-	if(fvh == 0x0 && fvl == 0x0)
-		return -ENODEV;
-	
-#ifndef ZEUS_CAM 
-	/* commented for zeus, no firmware update */
-	if(camfw_update == 0 || camfw_update == 3)
-		return 0;
-	else if(camfw_update == 1)
-	{
-		if(fvh == cam_fw_major_version && fvl == cam_fw_minor_version)
-		return 0;
-	else
-		{
-			if(usb_mode == MICROUSBIC_JIG_UART_OFF)
-				return 0;
-			else
-		goto FW_UPDATE;
-	}
-	}
-	else if(camfw_update == 2)
-	{
-		if(usb_mode == MICROUSBIC_JIG_UART_OFF)
-			return 0;
-		else
-		goto FW_UPDATE;
-	}
-#endif /* end of zeus_cam */
-
-	else
-		{
-		dprintk(CAM_DBG, M4MO_MOD_NAME " Sensor is Detected!!!\n");
-		dprintk(CAM_DBG, M4MO_MOD_NAME " Fimrware Version[High Byte]: 0x%x\n", fvh);
-		dprintk(CAM_DBG, M4MO_MOD_NAME " Fimrware Version[Low Byte]: 0x%x\n", fvl);
-		return 0;
-		}
+#if 0  //(CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV03_N02)  
+    /* VSYNC x HSYNC => 1536 x 1200 */
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x18, 0x06); 
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x19, 0x00); 
 #endif
 
-FW_UPDATE: 
-		/* Firmware Update */
-		err = m4mo_i2c_update_firmware();
-		if(err)
-			return err;
-		
-		msleep(10);
-		/* Restart Camera Program */
-		m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x12, 0x01); 
-		msleep(30);	
-		/* Read Firmware Version */
-		m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x01, &fvh);
-		m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x02, &fvl);
+#if 0   //(CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV02_N01)    
+    /* Set vertical & hirizontal flip */
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x05, 0x00);
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x06, 0x00);
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x07, 0x00);
+    m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x08, 0x00);
+#endif
+   
+    return 0;   
+}
+  
+static int m4mo_detect(void)
+{
+    struct m4mo_sensor *sensor = &m4mo;
+    struct i2c_client *client = sensor->i2c_client;
+    
+    u32 fvh = 0, fvl = 0;
+    int err;
 
-	dprintk(CAM_DBG, M4MO_MOD_NAME " Sensor is Detected!!!\n");
-	dprintk(CAM_DBG, M4MO_MOD_NAME " Fimrware Version[High Byte]: 0x%x\n", fvh);
-	dprintk(CAM_DBG, M4MO_MOD_NAME " Fimrware Version[Low Byte]: 0x%x\n", fvl);
+    /* Start Camera Program */
+    err = m4mo_write_category_parm(client, M4MO_8BIT, 0x0F, 0x12, 0x01);
+    if(err)
+    {
+        dprintk(CAM_DBG, M4MO_MOD_NAME " There is no Camera Module!!!\n");
+        return -ENODEV;
+    }
+    msleep(100);
 
-	return 0;
+    /* Read Firmware Version */
+    err = m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x01, &fvh);
+    m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x02, &fvl);
+
+    if(fvh == 0x0 && fvl == 0x0)
+        return -ENODEV;
+    else
+    {
+        dprintk(CAM_DBG, M4MO_MOD_NAME " Sensor is Detected!!!\n");
+        dprintk(CAM_DBG, M4MO_MOD_NAME " Fimrware Version: 0x%02x 0x%02x\n", fvh, fvl);
+        return 0;
+    }
 }
 
 static int m4mo_read_interrupt(void)
@@ -1868,7 +2071,6 @@ static int m4mo_set_face_detection(s32 value)
 }
 
 
-
 static int m4mo_set_jpeg_quality(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -1876,7 +2078,8 @@ static int m4mo_set_jpeg_quality(s32 value)
 
 	if(sensor->jpeg_quality == value)
 		return 0;
-
+    dprintk(CAM_ERR, M4MO_MOD_NAME "[JPEG Quality] set value=%d!!!\n", value);
+    
 	switch(value)
 	{
 		case M4MO_JPEG_SUPERFINE:
@@ -1972,17 +2175,23 @@ static int m4mo_set_flash_capture(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
-
+    static int is_torch = 0;
+    
 	if(sensor->flash_capture== value)
 		return 0;
 	/* WDR & ISC are orthogonal!*/
 	switch(value)
 	{
 		case M4MO_FLASH_CAPTURE_OFF:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x00);
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x00);
-			if(sensor->scene == M4MO_SCENE_BACKLIGHT)
-				m4mo_set_photometry(M4MO_PHOTOMETRY_SPOT);
+            if(is_torch)
+            {
+                dprintk(CAM_ERR, M4MO_MOD_NAME "torch disabled \n");
+                is_torch = 0;
+            }
+            m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x00);
+            m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x00);
+            if(sensor->scene == M4MO_SCENE_BACKLIGHT)
+                m4mo_set_photometry(M4MO_PHOTOMETRY_SPOT);
 			break;
 		case M4MO_FLASH_CAPTURE_ON:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x01);
@@ -1994,6 +2203,13 @@ static int m4mo_set_flash_capture(s32 value)
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x02);
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x01, 0x02);
 			break;
+        case M4MO_FLASH_MOVIE_ON:
+        	m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x03);
+            is_torch = 1;
+            dprintk(CAM_ERR, M4MO_MOD_NAME "torch enabled \n");
+			break;
+            
+#if 0            
 		case M4MO_FLASH_MOVIE_ON:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x00, 0x03);
 			break;
@@ -2045,6 +2261,7 @@ static int m4mo_set_flash_capture(s32 value)
 		case M4MO_FLASH_LEVEL_OFF:
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0B, 0x06, 16);
 			break;
+#endif
 		default:
 			dprintk(CAM_ERR, M4MO_MOD_NAME "[FLASH CAPTURE]Invalid value is ordered!!!\n");
 			return -EINVAL;
@@ -2080,59 +2297,21 @@ static int m4mo_set_auto_focus(s32 value)
 	struct i2c_client *client = sensor->i2c_client;
 	
 	int ret;
-	static int mode = M4MO_AF_INIT_NORMAL;
 
-	dprintk(CAM_DBG, M4MO_MOD_NAME "AF set value = %d\n", value);
-	if(sensor->af_mode == value)
-		return 0;
-
+	dprintk(CAM_DBG, M4MO_MOD_NAME "%s: value = %d\n", __func__, value);
+    
+    if(m4mo_curr_state != M4MO_STATE_PREVIEW)
+	{
+		printk(M4MO_MOD_NAME "AF error: sensor is not preview state!!");
+		//return -EINVAL;	// allo AF_STOP
+	}
+    
 	switch(value) 
 	{
-		case M4MO_AF_INIT_NORMAL :
-			/* Release Auto Focus */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
-	
-			/*AF VCM Driver Standby Mode OFF */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
-			/* Set Normal AF Mode */		
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x01, 0x00); 
-			/* Set Base Position */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x01); 
-
-			ret = m4mo_i2c_verify(client, 0x0A, 0x10, 0x00);
-			if(ret)  
-			{
-				dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait a AF init!\n");
-				return ret;
-			}
-			/*AF VCM Driver Standby Mode ON */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x00); 
-		
-			sensor->af_mode = M4MO_AF_INIT_NORMAL;
-			mode = M4MO_AF_INIT_NORMAL;
-			break;
-		case M4MO_AF_INIT_MACRO  :
-			/* Release Auto Focus */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
-
-			/*AF VCM Driver Standby Mode OFF */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
-			/* Set Macro AF Mode */	
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x01, 0x01); 
-			/* Set Macro Base Position */
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x02); 
-			
-			ret =m4mo_i2c_verify(client, 0x0A, 0x10, 0x00);
-			if(ret) 
-			{
-				dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait a AF init!\n");
-				return ret;
-			}
-
-			sensor->af_mode = M4MO_AF_INIT_MACRO;
-			mode = M4MO_AF_INIT_MACRO;
-			break;
 		case M4MO_AF_START :
+			af_used = 1;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "AF start.\n");
+            
 			/*AF VCM Driver Standby Mode OFF */
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
 			/* AF operation start */
@@ -2141,8 +2320,12 @@ static int m4mo_set_auto_focus(s32 value)
 			sensor->af_mode = M4MO_AF_START;
 			break;
 		case M4MO_AF_STOP :
+			af_used = 0;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "AF stop.\n");
+            
 			/* Release Auto Focus */
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
+            
 			/* Wait till the staus is changed to monitor mode */
 			if(sensor->face_detection == M4MO_FACE_DETECTION_ON)
 			{
@@ -2163,7 +2346,7 @@ static int m4mo_set_auto_focus(s32 value)
 				}
 			}
 
-			if(mode == M4MO_AF_INIT_MACRO) 	// Macro off
+			if(sensor->focus_mode == M4MO_AF_MODE_MACRO) 	// Macro off
 				m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x02); // Set Macro Base Position
 			else
 				m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x01); // Set Base Position
@@ -2175,7 +2358,7 @@ static int m4mo_set_auto_focus(s32 value)
 				return ret;
 			}
 
-			if(mode == M4MO_AF_INIT_MACRO)
+			if(sensor->focus_mode == M4MO_AF_MODE_MACRO)
 				m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x01); // Set Base Position
 
 			/* AF VCM Driver Standby Mode ON */
@@ -2214,7 +2397,7 @@ static int m4mo_set_auto_focus(s32 value)
 			break;
 	}
 
-    	return 0;
+    return 0;
 }
 
 static int m4mo_set_scene(s32 value)
@@ -2231,7 +2414,7 @@ static int m4mo_set_scene(s32 value)
 	{
 		case M4MO_SCENE_NORMAL:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2255,7 +2438,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_PORTRAIT:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_ON);
 			/*Photometry */
@@ -2279,7 +2462,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_LANDSCAPE:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2303,7 +2486,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_SPORTS:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2327,7 +2510,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_PARTY_INDOOR:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2351,7 +2534,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_BEACH_SNOW:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2375,7 +2558,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_SUNSET:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2399,7 +2582,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_DUSK_DAWN:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2423,7 +2606,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_FALL_COLOR:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2447,7 +2630,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_NIGHT:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2471,7 +2654,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_FIREWORK:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2495,7 +2678,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_TEXT:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_MACRO);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_MACRO);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2519,7 +2702,7 @@ static int m4mo_set_scene(s32 value)
 			break;			
 		case M4MO_SCENE_CANDLELIGHT:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2543,7 +2726,7 @@ static int m4mo_set_scene(s32 value)
 			break;
 		case M4MO_SCENE_BACKLIGHT:
 			/* AF mode / Lens Position */
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+			err = m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
 			/* Face Detection */
 			err = m4mo_set_face_detection(M4MO_FACE_DETECTION_OFF);
 			/*Photometry */
@@ -2583,7 +2766,7 @@ static int m4mo_get_zoom(struct v4l2_control *vc)
 	u32 val;
 
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x02, 0x01, &val);
-	vc->value = val;
+	vc->value = (u8)(val*10); // M4MO 10=1x, ANDROID 100=1x
 	dprintk(CAM_DBG, M4MO_MOD_NAME "Zoom Value reading... 0x%x \n", val);
 
 	return 0;
@@ -2593,20 +2776,22 @@ static int m4mo_set_zoom(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
-
-	u32 intr_value;
-
-	if((value < 0xA) || (value > 0xFA))
+    int zoom_val;
+    
+   	if(value > M4MO_ZOOM_STAGES)
 	{
-		dprintk(CAM_ERR, M4MO_MOD_NAME "Error, Zoom Value is out of range!.\n");
+		dprintk(CAM_ERR, M4MO_MOD_NAME "Error, Zoom Value is out of range: %d!.\n", value );
 		return -EINVAL;
 	}
-	
-	if(sensor->zoom == value)
+    zoom_val = m4mo_zoom_step[value];
+
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called... value=%d, zoom_val=%d\n", __func__, value, zoom_val);
+      
+	if(sensor->zoom == zoom_val)
 		return 0;
 	
-	sensor->zoom=value;
-#if 0
+	sensor->zoom=zoom_val;
+#ifdef ZOOM_USE_IRQ
 	/* Interrupt Clear */
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x10, &intr_value);
 	/* Enable Digital Zoom Interrupt */
@@ -2615,9 +2800,9 @@ static int m4mo_set_zoom(s32 value)
 	m4mo_write_category_parm(client, M4MO_8BIT, 0x00, 0x12, 0x01);
 #endif
 	/* Start Digital Zoom */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, value); 
-	mdelay(30);
-#if 0
+	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, zoom_val); 
+	msleep(30);
+#ifdef ZOOM_USE_IRQ
 	/* Wait "Digital Zoom Finish" Interrupt */
 	dprintk(CAM_DBG, M4MO_MOD_NAME "Waiting for interrupt... \n");
 	wait_event_interruptible(cam_wait, cam_interrupted == 1);
@@ -2637,11 +2822,13 @@ static int m4mo_set_zoom(s32 value)
 
 static int m4mo_get_capture_size(struct v4l2_control *vc)
 {
-	struct m4mo_sensor *sensor = &m4mo;
-	struct i2c_client *client = sensor->i2c_client;
-	
-	u32 val1, val2, val3, val4;
-#if 0
+
+//	struct m4mo_sensor *sensor = &m4mo;
+//	struct i2c_client *client = sensor->i2c_client;
+//	u32 val1, val2, val3, val4;
+   	
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s is called...\n", __func__); 
+ #if 0
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x0C, 0x10, &val1); //Read JPEG Main Frame Length
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x0C, 0x11, &val2); //Read JPEG Main Frame Length
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x0C, 0x12, &val3); //Read JPEG Main Frame Length
@@ -2657,12 +2844,13 @@ static int m4mo_get_capture_size(struct v4l2_control *vc)
 
 static int m4mo_get_thumbnail_size(struct v4l2_control *vc)
 {
-	struct m4mo_sensor *sensor = &m4mo;
-	struct i2c_client *client = sensor->i2c_client;
-	
-	struct v4l2_pix_format pix = sensor->pix;
-	
-	u32 val1, val2, val3;
+//    struct m4mo_sensor *sensor = &m4mo;
+//	struct i2c_client *client = sensor->i2c_client;
+//	struct v4l2_pix_format pix = sensor->pix;
+
+//	u32 val1, val2, val3;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s is called...\n", __func__); 
 #if 0
 	if(pix.pixelformat == V4L2_PIX_FMT_JPEG) 
 	{
@@ -2679,11 +2867,11 @@ static int m4mo_get_thumbnail_size(struct v4l2_control *vc)
 		dprintk(CAM_DBG, M4MO_MOD_NAME "Thumbnail Size reading... 0x%x \n", vc->value);
 	}
 #endif
+// is set in m4mo_start_capture_transfer()
 	vc->value = thumbnail_capture_size;
 	
 	return 0;
 }
-
 static int m4mo_set_thumbnail_size(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -2762,28 +2950,68 @@ static void m4mo_wq_fw_update(struct work_struct *work)
 	return;
 }
 
-#ifdef MOBILE_COMM_INTERFACE
+#if 1
 static int m4mo_set_focus_mode(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 	int err = 0;
 	
-	switch(value)
+	dprintk(CAM_DBG, M4MO_MOD_NAME "AF set focus mode = %d\n", value);
+	if(sensor->focus_mode == value)
+		return 0;
+
+	switch(value) 
 	{
-		case 0:
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_NORMAL);
+		case M4MO_AF_MODE_NORMAL :
+			/* Release Auto Focus */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
+	
+			/*AF VCM Driver Standby Mode OFF */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
+			/* Set Normal AF Mode */		
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x01, 0x00); 
+			/* Set Base Position */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x01); 
+
+			err = m4mo_i2c_verify(client, 0x0A, 0x10, 0x00);
+			if(err)  
+			{
+				dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait a AF init!\n");
+				return err;
+			}
+			/*AF VCM Driver Standby Mode ON */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x00); 
+		
+			sensor->af_mode = M4MO_AF_MODE_NORMAL;
 			break;
-		case 1:
-			err = m4mo_set_auto_focus(M4MO_AF_INIT_MACRO);
+		case M4MO_AF_MODE_MACRO  :
+			/* Release Auto Focus */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
+
+			/*AF VCM Driver Standby Mode OFF */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
+			/* Set Macro AF Mode */	
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x01, 0x01); 
+			/* Set Macro Base Position */
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x02); 
+			
+			err =m4mo_i2c_verify(client, 0x0A, 0x10, 0x00);
+			if(err) 
+			{
+				dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait a AF init!\n");
+				return err;
+			}
 			break;
-		default:
-			dprintk(CAM_ERR, M4MO_MOD_NAME "[focus mode]Invalid value is ordered!!!\n");
-			return -EINVAL;
+            
+        default:
+            dprintk(CAM_DBG, M4MO_MOD_NAME "unsupported focus mode: %d!\n", value);
+            return 1;
 	}
 
-	if(!err)
-		sensor->focus_mode = value;
+
+    sensor->af_mode = value;
+	sensor->focus_mode = value;
 	
 	return err;
 }
@@ -2792,7 +3020,8 @@ static int m4mo_set_focus_auto(struct v4l2_control *vc)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
-	int err = 0, count = 0;
+	int err = 0;
+    //int    count = 0;
 	u32 data;
 	
 	switch(vc->value)
@@ -2893,7 +3122,7 @@ static int m4mo_set_exposure(s32 value)
 	
 	return 0;
 }
-
+#if 0
 static int m4mo_set_zoom_mode(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -2912,50 +3141,7 @@ static int m4mo_set_zoom_mode(s32 value)
 
 	return 0;
 }
-
-static int m4mo_set_zoom_absolute(s32 value)
-{
-	struct m4mo_sensor *sensor = &m4mo;
-	struct i2c_client *client = sensor->i2c_client;
-
-	switch(value)
-	{
-		case 0:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x0A);
-			break;
-		case 1:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x0D);
-			break;
-		case 2:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x11);
-			break;
-		case 3:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x15);
-			break;
-		case 4:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x19);
-			break;
-		case 5:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x1C);
-			break;
-		case 6:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x20);
-			break;	
-		case 7:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x24);
-			break;
-		case 8:
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x01, 0x28);
-			break;
-		default:
-			dprintk(CAM_ERR, M4MO_MOD_NAME "[ZOOM_ABSOLUTE]Invalid value is ordered!!!\n");
-			return -EINVAL;
-	}
-
-	sensor->zoom_absolute = value;
-
-	return 0;
-}
+#endif
 
 static int m4mo_set_auto_white_balance(s32 value)
 {
@@ -2979,7 +3165,7 @@ static int m4mo_set_auto_white_balance(s32 value)
 
 	return 0;
 }
-
+#if 0
 static int m4mo_set_white_balance_preset(s32 value)
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -3023,7 +3209,7 @@ static int m4mo_set_white_balance_preset(s32 value)
 
 	return 0;
 }
-
+#endif
 static int m4mo_set_strobe(enum v4l2_strobe_conf mode)
 {
 	struct m4mo_sensor *sensor = &m4mo;
@@ -3054,18 +3240,61 @@ static int m4mo_set_strobe(enum v4l2_strobe_conf mode)
 }
 #endif
 
+
+static void m4mo_set_skip(struct v4l2_pix_format *pix)
+{
+    struct m4mo_sensor *sensor = &m4mo;
+
+    int skip_frame = 0; 
+
+    dprintk(CAM_INF, M4MO_MOD_NAME "m4mo_set_skip is called for '%s'\n",
+        (sensor->state == M4MO_STATE_PREVIEW)?"preview":"capture");
+
+    //wait for overlay creation (250ms ~ 300ms)
+    if(sensor->state == M4MO_STATE_PREVIEW)
+    { 
+        if(m4mo_curr_state == M4MO_STATE_INVALID)
+        {
+            skip_frame = sensor->fps / 6 + 1; 
+        }
+        else
+        {
+            skip_frame = sensor->fps / 4 + 1; 
+        }
+    }
+    else
+    {
+        // if(pix->pixelformat == V4L2_PIX_FMT_JPEG)
+            // skip_frame = 0;
+        // else
+            skip_frame = 2;
+    }
+
+    dprintk(CAM_INF, M4MO_MOD_NAME "skip frame = %d frame\n", skip_frame);
+
+    isp_set_hs_vs(0, skip_frame);
+
+}
+
+
 static int m4mo_start_preview(void)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 
-	int mode, rval;
+//	int mode;
+    int rval;
 	u32 intr_value;
 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);
+
 	/* If mode is already Monitor, return now */
-	mode = m4mo_get_mode();
-	if(mode == M4MO_MONITOR_MODE)
+	if( m4mo_get_mode() == M4MO_MONITOR_MODE)
+	{
+		dprintk(CAM_DBG, M4MO_MOD_NAME "m4mo already in monitior mode!\n");
 		return 0;
+	}
+
 
 	/* Interrupt Clear */
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x10, &intr_value);
@@ -3082,14 +3311,7 @@ static int m4mo_start_preview(void)
 		m4mo_write_category_parm(client, M4MO_8BIT, 0x00, 0x11, 0x00);
 		return rval;
 	}
-#if 0
-	if(sensor->capture_flag)
-	{
-		/* Release Auto Focus */
-		m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
-		sensor->capture_flag = 0;
-	}
-#endif	
+
 	/* Wait YUV-Output Interrupt */
 	dprintk(CAM_DBG, M4MO_MOD_NAME "Waiting for interrupt... \n");
 
@@ -3114,10 +3336,16 @@ static int m4mo_start_capture_transfer(void)
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 	struct v4l2_pix_format pix = sensor->pix;
-
+//    u32 reg;
 	int i, size=0, count=0;
 	u32 val1, val2, val3, val4;
-	
+       
+	dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);  
+
+// DPRINTK_ISPCCDC("ccdc status: -----------------------------------------\n");
+// ispccdc_print_status();
+// DPRINTK_ISPCCDC("-------------------------------------------------------\n");
+
 	/* Select main frame image and wait until capture size is non zero*/
 	m4mo_write_category_parm(client, M4MO_8BIT, 0x0C, 0x04, 0x01);
 	while(size == 0)
@@ -3164,8 +3392,15 @@ static int m4mo_start_capture_transfer(void)
 		msleep(10);
 	}
 	
+
 	printk(KERN_INFO M4MO_MOD_NAME "Capture Image Transfer Complete!!\n");
-	
+    
+
+// //check if ccdc is busy
+// reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_PCR); 
+// dprintk(CAM_DBG, M4MO_MOD_NAME "ccdc module is state is %s\n", reg & ISPCCDC_PCR_BUSY?"busy":"idle"); 
+
+
 	return 0;
 }
 
@@ -3174,11 +3409,11 @@ static int m4mo_start_capture(void)
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 	
-	struct v4l2_pix_format pix = sensor->pix;
+//	struct v4l2_pix_format pix = sensor->pix;
 	
 	u32 intr_value;
-
-	sensor->capture_flag = 1;
+	
+    dprintk(CAM_DBG, M4MO_MOD_NAME "%s is called...\n", __func__);  
 
 	/* Interrupt Clear */
 	m4mo_read_category_parm(client, M4MO_8BIT, 0x00, 0x10, &intr_value);
@@ -3189,6 +3424,7 @@ static int m4mo_start_capture(void)
 	
 	/* Start Single Capture */
 	m4mo_set_mode(M4MO_STILLCAP_MODE);
+    
 	/* Wait Capture Interrupt */
 	dprintk(CAM_DBG, M4MO_MOD_NAME "Waiting for interrupt... \n");
 	wait_event_interruptible(cam_wait, cam_interrupted == 1);
@@ -3211,28 +3447,75 @@ static int m4mo_start_capture(void)
 
 static int ioctl_streamoff(struct v4l2_int_device *s)
 {
-	struct m4mo_sensor *sensor = s->priv;
-	struct i2c_client *client = sensor->i2c_client;
-	int err = 0;
-		
-	return err;
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
+    main_cap_started = 0; //sasken
+    
+    return 0;
 }
 
 static int ioctl_streamon(struct v4l2_int_device *s)
 {
 	struct m4mo_sensor *sensor = s->priv;
+#if 0    
+u32 reg;
+reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCDC, ISPCCDC_VDINT);   
+dprintk(CAM_DBG, M4MO_MOD_NAME "ISPCCDC_VDINT =0x%x\n", reg); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "VDINT0 =%d, VDINT1 =%d\n", (reg>>16)&0x7fff, reg&0x7fff); 
+ 
+reg = isp_reg_readl(OMAP3_ISP_IOMEM_MAIN, ISP_IRQ0ENABLE);
+dprintk(CAM_DBG, M4MO_MOD_NAME "ISP_IRQ0ENABLE =0x%x\n", reg); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    HS_VS_IRQ =%s\n", reg & IRQ0ENABLE_HS_VS_IRQ?"on":"off"); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    VD0_IRQ =%s\n",   reg & IRQ0ENABLE_CCDC_VD0_IRQ?"on":"off"); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    VD1_IRQ =%s\n",   reg & IRQ0ENABLE_CCDC_VD1_IRQ?"on":"off"); 
 
-	int rval;
+reg = isp_reg_readl(OMAP3_ISP_IOMEM_MAIN, ISP_CTRL);  
+dprintk(CAM_DBG, M4MO_MOD_NAME "ISP_CTRL =0x%x\n", reg); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    CCDC_FLUSH = %s\n", reg & ISPCTRL_CCDC_FLUSH?"on":"off"); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    JPEG_FLUSH = %s\n", reg & ISPCTRL_JPEG_FLUSH?"on":"off"); 
+dprintk(CAM_DBG, M4MO_MOD_NAME "    SYNC_DETECT = %d\n", reg>>14&0x3);  
 
-	printk("rs:m4mo-ioctl_streamon (%x)",sensor->capture_mode);
-	
-	if(sensor->capture_mode == V4L2_MODE_HIGHQUALITY)
-	{
-		if((rval = m4mo_start_capture_transfer()))
-			return rval;
-	}
+// reg = isp_reg_readl(OMAP3_ISP_IOMEM_CCP2, ISPCSI1_CTRL);
+// dprintk(CAM_DBG, M4MO_MOD_NAME "ISPCSI1_CTRL =0x%x\n", reg); 
 
-	return 0;
+// reg = isp_reg_readl(OMAP3_ISP_IOMEM_CSI2A, ISPCSI2_CTRL);
+// dprintk(CAM_DBG, M4MO_MOD_NAME "ISPCSI1_CTRL =0x%x\n", reg); 
+#endif
+//	int rval;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_streamon is called (%x)\n",sensor->capture_mode);
+    
+    if(sensor->state != M4MO_STATE_CAPTURE)
+    {
+        if(sensor->mode == M4MO_MODE_CAMCORDER)    
+        {
+            /* Lens focus setting */
+            if(m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL))
+            goto streamon_fail;       
+        }
+        
+        dprintk(CAM_DBG, M4MO_MOD_NAME "start preview....................\n");
+        main_cap_started = 0 ; //sasken
+        if(m4mo_start_preview())
+        goto streamon_fail;    
+        
+        /* Zoom setting */
+        //if(m4mo_set_zoom(sensor->zoom))
+        //goto streamon_fail;      
+    }
+    else
+    {
+        dprintk(CAM_DBG, M4MO_MOD_NAME "start capture transfer....................\n");
+        //m4mo_set_capture(V4L2_PIX_FMT_JPEG);
+        main_cap_started = 1; //sasken
+        if(m4mo_start_capture_transfer())
+            goto streamon_fail;
+    }
+
+    return 0;
+
+    streamon_fail:
+    printk(M4MO_MOD_NAME "ioctl_streamon is failed\n"); 
+    return -EINVAL;  
 }
 
 /**
@@ -3248,6 +3531,8 @@ static int ioctl_queryctrl(struct v4l2_int_device *s,
 				struct v4l2_queryctrl *qc)
 {
 	int i;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	for (i = 0; i < NUM_M4MO_CONTROL; i++) {
 		if (qc->id == m4mo_ctrl_list[i].id)
@@ -3266,38 +3551,39 @@ static int ioctl_queryctrl(struct v4l2_int_device *s,
 	return 0;
 }
 
-static int ioctl_querymenu(struct v4l2_int_device *s,
-				struct v4l2_querymenu *qm)
-{
-	int i;
+// static int ioctl_querymenu(struct v4l2_int_device *s,
+				// struct v4l2_querymenu *qm)
+// {
+	// int i;
+    
+    // dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
-	for (i = 0; i < NUM_M4MO_MENU; i++) {
-		if ((qm->id == m4mo_menu_list[i].id) && (qm->index == m4mo_menu_list[i].index))
-			break;
-	}
-	if (i == NUM_M4MO_MENU)
-	{
-		dprintk(CAM_DBG, M4MO_MOD_NAME "Control ID or Menu Index is not supported!!\n");
-		return -EINVAL;
-	}
+	// for (i = 0; i < NUM_M4MO_MENU; i++) {
+		// if ((qm->id == m4mo_menu_list[i].id) && (qm->index == m4mo_menu_list[i].index))
+			// break;
+	// }
+	// if (i == NUM_M4MO_MENU)
+	// {
+		// dprintk(CAM_DBG, M4MO_MOD_NAME "Control ID or Menu Index is not supported!!\n");
+		// return -EINVAL;
+	// }
 
-	*qm = m4mo_menu_list[i];
+	// *qm = m4mo_menu_list[i];
 
-	return 0;
-}
+	// return 0;
+// }
 
-static int ioctl_querycap(struct v4l2_int_device *s,
-				struct v4l2_capability* cap)
-{
-	cap->capabilities = V4L2_CAP_STREAMING | V4L2_CAP_VIDEO_CAPTURE;
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV03_N02)
-	strlcpy(cap->card, MOD_SEHF_NAME, sizeof(cap->card));
-#else
-	strlcpy(cap->card, MOD_STW_NAME, sizeof(cap->card));
-#endif
+// static int ioctl_querycap(struct v4l2_int_device *s,
+				// struct v4l2_capability* cap)
+// {
 
-	return 0;
-}
+    // dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
+
+	// cap->capabilities = V4L2_CAP_STREAMING | V4L2_CAP_VIDEO_CAPTURE;
+    // strlcpy(cap->card, MOD_STW_NAME, sizeof(cap->card));
+
+	// return 0;
+// }
 
 /**
  * ioctl_g_ctrl - V4L2 sensor interface handler for VIDIOC_G_CTRL ioctl
@@ -3312,10 +3598,17 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s,
 			     struct v4l2_control *vc)
 {	
 	struct m4mo_sensor *sensor = s->priv;
-	
 	int retval = 0;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	switch (vc->id) {
+      case V4L2_CID_SELECT_MODE:
+        vc->value = sensor->mode;
+      break;  
+     case V4L2_CID_SELECT_STATE:
+        vc->value = sensor->state;
+      break;  
 	case V4L2_CID_AF:
 		retval = m4mo_get_auto_focus(vc);
 		break;
@@ -3325,6 +3618,12 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s,
 	case V4L2_CID_JPEG_SIZE:
 		retval = m4mo_get_capture_size(vc);
 		break;
+    case V4L2_CID_JPEG_CAPTURE_WIDTH:
+        vc->value = sensor->jpeg_capture_w;
+        break; 
+    case V4L2_CID_JPEG_CAPTURE_HEIGHT:
+        vc->value = sensor->jpeg_capture_h;
+        break;
 	case V4L2_CID_THUMBNAIL_SIZE:
 		retval = m4mo_get_thumbnail_size(vc);
 		break;
@@ -3391,7 +3690,7 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s,
 	case V4L2_CID_AF_VERSION:
 		vc->value = 0x0;
 		break;
-#ifdef MOBILE_COMM_INTERFACE
+
 	/* Mobile Communication Lab. Request */
 	case V4L2_CID_FOCUS_MODE:
 		vc->value = sensor->focus_mode;
@@ -3405,25 +3704,46 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s,
 	case V4L2_CID_EXPOSURE:
 		vc->value = sensor->exposure;
 		break;
+#if 0        
 	case V4L2_CID_ZOOM_MODE:
 		vc->value = sensor->zoom_mode;
 		break;
+#endif
 	case V4L2_CID_ZOOM_ABSOLUTE:
 		vc->value = sensor->zoom_absolute;
 		break;
 	case V4L2_CID_AUTO_WHITE_BALANCE:
 		vc->value = sensor->auto_white_balance;
 		break;
+#if 0
 	case V4L2_CID_WHITE_BALANCE_PRESET:
 		vc->value = sensor->white_balance_preset;
 		break;
-#endif		
+#endif
+	
 
 	default:
+        dprintk(CAM_ERR, M4MO_MOD_NAME "unsupported ioctl_g: %d\n",vc->id); 
+
 		break;
 	}
 
 	return retval;
+}
+static int m4mo_set_mode_v4l(s32 value)
+{
+  struct m4mo_sensor *sensor = &m4mo;
+  sensor->mode = value;
+  dprintk(CAM_INF, M4MO_MOD_NAME "m4mo_set_mode is called... mode = %d\n", sensor->mode); 
+  return 0;
+}
+
+static int m4mo_set_state_v4l(s32 value)
+{
+  struct m4mo_sensor *sensor = &m4mo;
+  sensor->state = value;
+  dprintk(CAM_INF, M4MO_MOD_NAME "m4mo_set_state is called... state = %d\n", sensor->state); 
+  return 0;
 }
 
 /**
@@ -3443,8 +3763,16 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s,
 	
 	int retval = -EINVAL;
 	u32 fvh = 0, fvl = 0;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	switch (vc->id) {
+        case V4L2_CID_SELECT_MODE:
+        retval = m4mo_set_mode_v4l(vc->value);
+        break;  
+    case V4L2_CID_SELECT_STATE:
+        retval = m4mo_set_state_v4l(vc->value);
+        break; 
 	case V4L2_CID_AF:
 		retval = m4mo_set_auto_focus(vc->value);
 		break;
@@ -3513,10 +3841,10 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s,
 			fw_update_status = 0;
 			queue_work(camera_wq, &camera_firmup_work);
 			retval = 0;
-		break;
-		}
-		else
-			break;
+            break;
+		} 
+        else
+        break;
 	case V4L2_CID_WDR:
 		retval = m4mo_set_wdr(vc->value);
 		break;
@@ -3534,7 +3862,7 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s,
 		queue_work(camera_wq, &camera_firmdump_work);
 		retval = 0;
 		break;
-#ifdef MOBILE_COMM_INTERFACE
+
 	/* Mobile Communication Lab. Request */
 	case V4L2_CID_FOCUS_MODE:
 		retval = m4mo_set_focus_mode(vc->value);
@@ -3548,19 +3876,20 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s,
 	case V4L2_CID_EXPOSURE:
 		retval = m4mo_set_exposure(vc->value);
 		break;
+#if 0        
 	case V4L2_CID_ZOOM_MODE:
 		retval = m4mo_set_zoom_mode(vc->value);
 		break;
-	case V4L2_CID_ZOOM_ABSOLUTE:
-		retval = m4mo_set_zoom_absolute(vc->value);
-		break;
+#endif
 	case V4L2_CID_AUTO_WHITE_BALANCE:
 		retval = m4mo_set_auto_white_balance(vc->value);
 		break;
+#if 0
 	case V4L2_CID_WHITE_BALANCE_PRESET:
 		retval = m4mo_set_white_balance_preset(vc->value);
 		break;
-#endif
+#endif     
+
 
 	default:
 		break;
@@ -3580,28 +3909,48 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s,
 static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 				   struct v4l2_fmtdesc *fmt)
 {
-	int index = fmt->index;
-	enum v4l2_buf_type type = fmt->type;
-	
-	memset(fmt, 0, sizeof(*fmt));
-	fmt->index = index;
-	fmt->type = type;
+    int index = fmt->index;
+ //   enum v4l2_buf_type type = fmt->type;
 
-	switch (fmt->type) {
-	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
-		if (index >= NUM_CAPTURE_FORMATS)
-			return -EINVAL;
-	break;
-	default:
-		return -EINVAL;
-	}
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
-	fmt->flags = m4mo_formats[index].flags;
-	strlcpy(fmt->description, m4mo_formats[index].description,
-					sizeof(fmt->description));
-	fmt->pixelformat = m4mo_formats[index].pixelformat;
+    switch (fmt->type) 
+    {
+    case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+        switch(fmt->pixelformat)
+        {
+        case V4L2_PIX_FMT_UYVY:
+            index = 0;
+            break;
+
+        case V4L2_PIX_FMT_JPEG:
+            index = 1;
+            break;
+
+        case V4L2_PIX_FMT_MJPEG:
+            index = 2;
+            break;
+
+        default:
+            printk(M4MO_MOD_NAME "[format]Invalid value is ordered!!!\n");
+            goto enum_fmt_cap_fail;
+        }
+        break;
+        
+    default:
+        printk(M4MO_MOD_NAME "[type]Invalid value is ordered!!!\n");
+        goto enum_fmt_cap_fail;
+    }
+
+    fmt->flags = m4mo_formats[index].flags;
+    fmt->pixelformat = m4mo_formats[index].pixelformat;
+    strlcpy(fmt->description, m4mo_formats[index].description, sizeof(fmt->description));
 
 	return 0;
+    
+enum_fmt_cap_fail:
+    printk(M4MO_MOD_NAME "ioctl_enum_fmt_cap is failed\n"); 
+    return -EINVAL;  
 }
 
 /**
@@ -3616,186 +3965,100 @@ static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 static int ioctl_try_fmt_cap(struct v4l2_int_device *s,
 			     struct v4l2_format *f)
 {
-	int ifmt; 
-	struct v4l2_pix_format *pix = &f->fmt.pix;
-	struct m4mo_sensor *sensor = s->priv;
-	struct v4l2_pix_format *pix2 = &sensor->pix;
-	int fps;
-	
-	for (ifmt = 0; ifmt < NUM_CAPTURE_FORMATS; ifmt++) {
-		if (pix->pixelformat == m4mo_formats[ifmt].pixelformat)
-			break;
-	}
-	if (ifmt == NUM_CAPTURE_FORMATS)
-	{
-		dprintk(CAM_ERR, M4MO_MOD_NAME "Pixel Format is not supported!\n");
-		return -EINVAL;
-	}
+    struct v4l2_pix_format *pix = &f->fmt.pix;
+    struct m4mo_sensor *sensor = s->priv;
+    struct v4l2_pix_format *pix2 = &sensor->pix;
 
-	if(sensor->capture_mode == V4L2_MODE_HIGHQUALITY)
-	{	
-		if((pix->width == 320)&&(pix->height == 240))			sensor->capture_size = M4MO_SHOT_QVGA_SIZE;
-		else if((pix->width == 640)&&(pix->height == 480))
-			sensor->capture_size = M4MO_SHOT_VGA_SIZE;
-		else if((pix->width == 1280)&&(pix->height == 960))
-			sensor->capture_size = M4MO_SHOT_1M_SIZE;
-		else if((pix->width == 1600 )&&(pix->height == 1200))
-			sensor->capture_size = M4MO_SHOT_2M_SIZE;
-		else if((pix->width == 2048)&&(pix->height == 1536))
-			sensor->capture_size = M4MO_SHOT_3M_SIZE;
-		else if((pix->width == 2560)&&(pix->height == 1920))
-			sensor->capture_size = M4MO_SHOT_5M_SIZE;
-		else if((pix->width == 400)&&(pix->height == 240))
-			sensor->capture_size = M4MO_SHOT_WQVGA_SIZE;
-		else if((pix->width == 432)&&(pix->height == 240))
-			sensor->capture_size = M4MO_SHOT_432_240_SIZE;
-		else if((pix->width == 640)&&(pix->height == 360))
-			sensor->capture_size = M4MO_SHOT_640_360_SIZE;
-		else if((pix->width == 800)&&(pix->height == 480))
-			sensor->capture_size = M4MO_SHOT_WVGA_SIZE;
-		else if((pix->width == 1280)&&(pix->height == 720))
-			sensor->capture_size = M4MO_SHOT_720P_SIZE;
-		else if((pix->width == 1920)&&(pix->height == 1080))
-			sensor->capture_size = M4MO_SHOT_1920_1080_SIZE;
-		else if((pix->width == 2560)&&(pix->height == 1440))
-			sensor->capture_size = M4MO_SHOT_2560_1440_SIZE;
-		else if((pix->width == 160)&&(pix->height == 120))
-			sensor->capture_size = M4MO_SHOT_160_120_SIZE;
-		else if((pix->width == 176)&&(pix->height == 144))
-			sensor->capture_size = M4MO_SHOT_QCIF_SIZE;
-		else if((pix->width == 144)&&(pix->height == 176))
-			sensor->capture_size = M4MO_SHOT_144_176_SIZE;
-		else if((pix->width == 176)&&(pix->height == 176))
-			sensor->capture_size = M4MO_SHOT_176_176_SIZE;
-		else if((pix->width == 240)&&(pix->height == 320))
-			sensor->capture_size = M4MO_SHOT_240_320_SIZE;
-		else if((pix->width == 240)&&(pix->height == 400))
-			sensor->capture_size = M4MO_SHOT_240_400_SIZE;
-		else if((pix->width == 352)&&(pix->height == 288))
-			sensor->capture_size = M4MO_SHOT_CIF_SIZE;
-		else if((pix->width == 800)&&(pix->height == 600))
-			sensor->capture_size = M4MO_SHOT_SVGA_SIZE;
-		else if((pix->width == 1024)&&(pix->height == 768))
-			sensor->capture_size = M4MO_SHOT_1024_768_SIZE;
-		else if((pix->width == 2304)&&(pix->height == 1728))
-			sensor->capture_size = M4MO_SHOT_4M_SIZE;
-		else
-		{
-			dprintk(CAM_ERR, M4MO_MOD_NAME "Capture Image Size is not supported!\n");
-			return -EINVAL;
-		 }
-		
-		pix->field = V4L2_FIELD_NONE;
-		if(pix->pixelformat == V4L2_PIX_FMT_UYVY || pix->pixelformat == V4L2_PIX_FMT_YUYV)
-		{
-			pix->bytesperline = pix->width * 2;
-			pix->sizeimage = pix->bytesperline * pix->height;
-		}
-		else
-		{
-			/* paladin[08.10.14]: For JPEG Capture, use fixed buffer size @LDK@ */
-			pix->bytesperline = JPEG_CAPTURE_WIDTH	 * 2; 
-			pix->sizeimage = pix->bytesperline * JPEG_CAPTURE_HEIGHT;
-		}
-	}
-	else
-	{
-		if((pix->pixelformat != V4L2_PIX_FMT_UYVY) && (pix->pixelformat != V4L2_PIX_FMT_YUYV))
-		{
-			dprintk(CAM_ERR, M4MO_MOD_NAME "Pixel Format is not supported in Preview mode!\n");
-			return -EINVAL;
-		}
-		
-		if((pix->width == 160)&&(pix->height == 120))
-			sensor->preview_size = M4MO_QQVGA_SIZE;
-		else if((pix->width == 176)&&(pix->height == 144))
-			sensor->preview_size = M4MO_QCIF_SIZE;
-		else if((pix->width == 320)&&(pix->height == 240))
-		{
-			if(sensor->timeperframe.numerator == 0)
-				sensor->preview_size = M4MO_QVGA_SIZE;
-			else
-			{
-				fps = sensor->timeperframe.denominator/sensor->timeperframe.numerator;
-				if((fps >= 45) && (fps < 90))
-					sensor->preview_size = M4MO_SL1_QVGA_SIZE;
-				else if(fps >= 90)
-					sensor->preview_size = M4MO_SL2_QVGA_SIZE;
-				else
-					sensor->preview_size = M4MO_QVGA_SIZE;
-			}			
-		}
-		else if((pix->width == 800 )&&(pix->height == 600))
-			sensor->preview_size = M4MO_800_600_SIZE;
-		else if((pix->width == 2560)&&(pix->height == 1920))
-			sensor->preview_size = M4MO_5M_SIZE;
-		else if((pix->width == 640)&&(pix->height == 482))
-			sensor->preview_size = M4MO_640_482_SIZE;
-		else if((pix->width == 800)&&(pix->height == 602))
-			sensor->preview_size = M4MO_800_602_SIZE;
-		else if((pix->width == 176)&&(pix->height == 176))
-			sensor->preview_size = M4MO_176_176_SIZE;
-		else if((pix->width == 352)&&(pix->height == 288))
-			sensor->preview_size = M4MO_CIF_SIZE;
-		else if((pix->width == 400)&&(pix->height == 240))
-			sensor->preview_size = M4MO_WQVGA_SIZE;
-		else if((pix->width == 640)&&(pix->height == 480))
-			sensor->preview_size = M4MO_VGA_SIZE;
-		else if((pix->width == 240)&&(pix->height == 320))
-			sensor->preview_size = M4MO_REV_QVGA_SIZE;
-		else if((pix->width == 240)&&(pix->height == 400))
-			sensor->preview_size = M4MO_REV_WQVGA_SIZE;
-		else if((pix->width == 432)&&(pix->height == 240))
-			sensor->preview_size = M4MO_432_240_SIZE;
-		else if((pix->width == 800)&&(pix->height == 480))
-			sensor->preview_size = M4MO_WVGA_SIZE;
-		else if((pix->width == 144)&&(pix->height == 176))
-			sensor->preview_size = M4MO_REV_QCIF_SIZE;
-		else if((pix->width == 240)&&(pix->height == 432))
-			sensor->preview_size = M4MO_240_432_SIZE;
-		else if((pix->width == 1024)&&(pix->height == 768))
-			sensor->preview_size = M4MO_XGA_SIZE;
-		else if((pix->width == 1280)&&(pix->height == 720))
-			sensor->preview_size = M4MO_1280_720_SIZE;
-	//rs:+	
-		else if((pix->width == 720)&&(pix->height == 480))
-			sensor->preview_size = M4MO_720_480_SIZE;
-		else if((pix->width == 720)&&(pix->height == 576))
-			sensor->preview_size = M4MO_720_576_SIZE;
-	//rs:-	
-		else
-		{
-			dprintk(CAM_ERR, M4MO_MOD_NAME "Preview Image Size is not supported!\n");
-			return -EINVAL;
-		 }
+    int index = 0;
 
-		pix->field = V4L2_FIELD_NONE;
-		pix->bytesperline = pix->width * 2;
-		pix->sizeimage = pix->bytesperline * pix->height;
-	}
-	
-	switch (pix->pixelformat) {
-	case V4L2_PIX_FMT_YUYV:
-	case V4L2_PIX_FMT_UYVY:
-	case V4L2_PIX_FMT_JPEG:
-	case V4L2_PIX_FMT_MJPEG:
-		pix->colorspace = V4L2_COLORSPACE_JPEG;
-		break;
-	case V4L2_PIX_FMT_RGB565:
-	case V4L2_PIX_FMT_RGB565X:
-	case V4L2_PIX_FMT_RGB555:
-	case V4L2_PIX_FMT_SGRBG10:
-	case V4L2_PIX_FMT_RGB555X:
-	default:
-		pix->colorspace = V4L2_COLORSPACE_SRGB;
-		break;
-	}
+    dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_try_fmt_cap is called...\n");
+    dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_try_fmt_cap. mode : %d\n", sensor->mode);
+    dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_try_fmt_cap. state : %d\n", sensor->state);
 
-	*pix2 = *pix;
+    m4mo_set_skip(pix);  
 
-	return 0;
+    if(sensor->state == M4MO_STATE_CAPTURE)
+    { 
+        for(index = 0; index < ARRAY_SIZE(m4mo_image_sizes); index++)
+        {
+            if(m4mo_image_sizes[index].width == pix->width && m4mo_image_sizes[index].height == pix->height)
+            {
+                sensor->capture_size = index;
+                break;
+            }
+        }   
+
+        if(index == ARRAY_SIZE(m4mo_image_sizes))
+        {
+            printk(M4MO_MOD_NAME "Capture Image Size is not supported!\n");
+            goto try_fmt_fail;
+        }
+
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture size = %d\n", sensor->capture_size);  
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture width : %d\n", m4mo_image_sizes[index].width);
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture height : %d\n", m4mo_image_sizes[index].height);      
+
+        if(pix->pixelformat == V4L2_PIX_FMT_UYVY || pix->pixelformat == V4L2_PIX_FMT_YUYV)
+        {
+            pix->field = V4L2_FIELD_NONE;
+            pix->bytesperline = pix->width * 2;
+            pix->sizeimage = pix->bytesperline * pix->height;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "V4L2_PIX_FMT_UYVY\n");
+        }
+        else
+        {
+            pix->field = V4L2_FIELD_NONE;
+            pix->bytesperline = JPEG_CAPTURE_WIDTH * 2;
+            pix->sizeimage = pix->bytesperline * JPEG_CAPTURE_HEIGHT;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "V4L2_PIX_FMT_JPEG\n");
+        }
+
+        dprintk(CAM_DBG, M4MO_MOD_NAME "set capture....................\n");
+
+        if(m4mo_set_capture(pix->pixelformat))
+            goto try_fmt_fail;
+    }  
+
+    switch (pix->pixelformat) 
+    {
+    case V4L2_PIX_FMT_YUYV:
+    case V4L2_PIX_FMT_UYVY:
+    case V4L2_PIX_FMT_JPEG:
+    case V4L2_PIX_FMT_MJPEG:
+        pix->colorspace = V4L2_COLORSPACE_JPEG;
+        break;
+    case V4L2_PIX_FMT_RGB565:
+    case V4L2_PIX_FMT_RGB565X:
+    case V4L2_PIX_FMT_RGB555:
+    case V4L2_PIX_FMT_SGRBG10:
+    case V4L2_PIX_FMT_RGB555X:
+    default:
+        pix->colorspace = V4L2_COLORSPACE_SRGB;
+        break;
+    }
+
+    *pix2 = *pix;
+
+    return 0;
+
+    try_fmt_fail:
+    printk(M4MO_MOD_NAME "ioctl_try_fmt_cap is failed\n"); 
+    return -EINVAL;
+   
 }
 
+
+
+static char *getPxFmtName(int fmt)
+{
+    int i;
+    
+    for(i=0; i<NUM_CAPTURE_FORMATS; i++)
+        if(m4mo_formats[i].pixelformat == fmt)
+            return (char *)m4mo_formats[i].description;
+            
+    return "unknown";
+}
 /**
  * ioctl_s_fmt_cap - V4L2 sensor interface handler for VIDIOC_S_FMT ioctl
  * @s: pointer to standard V4L2 device structure
@@ -3805,71 +4068,140 @@ static int ioctl_try_fmt_cap(struct v4l2_int_device *s,
  * format, returns error code if format not supported or HW can't be
  * correctly configured.
  */
-static int ioctl_s_fmt_cap(struct v4l2_int_device *s,
-				struct v4l2_format *f)
+static int ioctl_s_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 {
-	struct m4mo_sensor *sensor = s->priv;
-	struct i2c_client *client = sensor->i2c_client;
-	struct v4l2_pix_format *pix = &f->fmt.pix;
-	int rval, old_size;
+    struct v4l2_pix_format *pix = &f->fmt.pix;
+    struct m4mo_sensor *sensor = s->priv;
+    struct v4l2_pix_format *pix2 = &sensor->pix;
 
-	printk("rs: m4mo-ioctl_s_fmt_cap (capture mode=%x) (pixel format=0x%x) \n",sensor->capture_mode,pix->pixelformat);
-	
-	if(sensor->capture_mode != V4L2_MODE_HIGHQUALITY)
-		old_size = sensor->preview_size;
-	else
-		old_size = sensor->capture_size;
+    int index = 0;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_s_fmt_cap is called...\n");
 
-	rval = ioctl_try_fmt_cap(s, f);
-	if (rval)
-	{
-		return rval;
-	}
+    printk(M4MO_MOD_NAME "camera mode  : %d (1:camera , 2:camcorder, 3:vt)\n", sensor->mode);
+    printk(M4MO_MOD_NAME "camera state : %d (0:preview, 1:snapshot)\n", sensor->state);
+    printk(M4MO_MOD_NAME "set width  : %d\n", pix->width);
+    printk(M4MO_MOD_NAME "set height : %d\n", pix->height); 
+    printk(M4MO_MOD_NAME "set format : %s\n", getPxFmtName(pix->pixelformat)); 
 
-	if(sensor->capture_mode != V4L2_MODE_HIGHQUALITY)
-	{
-		if(old_size != sensor->preview_size)
-		{
-		/*080917[paladin] If the sensor mode is not Parameter Setting, Change the mode. @LDK@*/
-		rval = m4mo_set_mode(M4MO_PARMSET_MODE);
-		if(rval)
-		{
-			dprintk(CAM_ERR, M4MO_MOD_NAME "Can not set operation mode\n");
-			return rval;
-		}
-		/*080917[paladin] Set the Monitor Size to the sensor. @LDK@*/
-		/*080917[paladin] Set the fps to the sensor. @LDK@*/
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x01, sensor->preview_size);
-		}
-	}
-	else
-	{
-		/* Set output method in still capture mode */
-		if(pix->pixelformat == V4L2_PIX_FMT_JPEG) 
-		{
-			dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : JPEG + JPEG Thumnail\n");
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x00, 0x04); // JPEG(without header)+ JPEG
-		} 
-		else if(pix->pixelformat == V4L2_PIX_FMT_MJPEG) 
-		{
-			dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : JPEG + YUV Thumnail\n");
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x00, 0x05); // JPEG(without header)+ YUV
-		} 
-		else 
-		{
-			dprintk(CAM_DBG, M4MO_MOD_NAME "STILL format : YUV422\n");
-			m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x00, 0x00); // YUV-out format
-		}
-		/* Set Capture Image Size */
-		m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x04, sensor->capture_size); 
-		dprintk(CAM_DBG, M4MO_MOD_NAME "capture size = %02x.\n", sensor->capture_size);
-		/* Start Capture */
-		//rval = m4mo_start_capture();
-	}
-	
 
-	return rval;
-}
+    m4mo_720p_enable = false;
+    
+    m4mo_set_skip(pix);  
+    
+    if(sensor->state == M4MO_STATE_CAPTURE)
+    { 
+        /* check for capture */
+        // if(m4mo_prepare_capture())
+        // goto s_fmt_fail;   
+        for(index = 0; index < ARRAY_SIZE(m4mo_image_sizes); index++)
+        {
+            if(m4mo_image_sizes[index].width == pix->width && m4mo_image_sizes[index].height == pix->height)
+            {
+                sensor->capture_size = index;
+                break;
+            }
+        }   
+
+        if(index == ARRAY_SIZE(m4mo_image_sizes))
+        {
+            printk(M4MO_MOD_NAME "Capture Image %d x %d Size is not supported!\n", pix->width, pix->height);
+            goto s_fmt_fail;
+        }
+
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture size = %d\n", sensor->capture_size);  
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture width : %d\n", m4mo_image_sizes[index].width);
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--capture height : %d\n", m4mo_image_sizes[index].height);      
+
+        if(pix->pixelformat == V4L2_PIX_FMT_UYVY || pix->pixelformat == V4L2_PIX_FMT_YUYV)
+        {
+            pix->field = V4L2_FIELD_NONE;
+            pix->bytesperline = pix->width * 2;
+            pix->sizeimage = pix->bytesperline * pix->height;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "V4L2_PIX_FMT_UYVY\n");
+        }
+        else
+        {
+            pix->field = V4L2_FIELD_NONE;
+            pix->bytesperline = JPEG_CAPTURE_WIDTH * 2;
+            pix->sizeimage = pix->bytesperline * JPEG_CAPTURE_HEIGHT;
+            dprintk(CAM_DBG, M4MO_MOD_NAME "V4L2_PIX_FMT_JPEG\n");
+        }
+
+        if(m4mo_set_capture(pix->pixelformat))
+            goto s_fmt_fail;
+        
+    }  
+    else
+    {  
+        /* check for preview */
+        // if(m4mo_prepare_preview())
+        // goto s_fmt_fail;
+
+        for(index = 0; index < ARRAY_SIZE(m4mo_preview_sizes); index++)
+        {
+            if(m4mo_preview_sizes[index].width == pix->width && m4mo_preview_sizes[index].height == pix->height)
+            {
+                sensor->preview_size = index;
+                break;
+            }
+        }   
+
+        if(index == ARRAY_SIZE(m4mo_preview_sizes))
+        {
+            printk(M4MO_MOD_NAME "Preview Image %d x %d Size is not supported!\n", pix->width, pix->height);
+            goto s_fmt_fail;
+        }
+
+        if(sensor->mode == M4MO_MODE_CAMCORDER)
+        {
+            if(pix->width == 1280 && pix->height == 720)
+            {
+                dprintk(CAM_DBG, M4MO_MOD_NAME "Preview Image Size is 720P!\n");
+                m4mo_720p_enable = true;
+            }
+        }
+
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--preview size = %d\n", sensor->preview_size); 
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--preview width : %d\n", m4mo_preview_sizes[index].width);
+        dprintk(CAM_DBG, M4MO_MOD_NAME "M4MO--preview height : %d\n", m4mo_preview_sizes[index].height);      
+
+        pix->field = V4L2_FIELD_NONE;
+        pix->bytesperline = pix->width * 2;
+        pix->sizeimage = pix->bytesperline * pix->height;  
+        dprintk(CAM_DBG, M4MO_MOD_NAME "V4L2_PIX_FMT_UYVY\n");
+
+        if(m4mo_set_preview())
+
+        goto s_fmt_fail;
+    }      
+
+    switch (pix->pixelformat) 
+    {
+    case V4L2_PIX_FMT_YUYV:
+    case V4L2_PIX_FMT_UYVY:
+    case V4L2_PIX_FMT_JPEG:
+    case V4L2_PIX_FMT_MJPEG:
+        pix->colorspace = V4L2_COLORSPACE_JPEG;
+        break;
+    case V4L2_PIX_FMT_RGB565:
+    case V4L2_PIX_FMT_RGB565X:
+    case V4L2_PIX_FMT_RGB555:
+    case V4L2_PIX_FMT_SGRBG10:
+    case V4L2_PIX_FMT_RGB555X:
+    default:
+        pix->colorspace = V4L2_COLORSPACE_SRGB;
+        break;
+    }
+
+    *pix2 = *pix;
+
+    return 0;
+
+    s_fmt_fail:
+    printk(M4MO_MOD_NAME "ioctl_s_fmt_cap is failed\n"); 
+    return -EINVAL;  
+    }
 
 /**
  * ioctl_g_fmt_cap - V4L2 sensor interface handler for ioctl_g_fmt_cap
@@ -3883,6 +4215,8 @@ static int ioctl_g_fmt_cap(struct v4l2_int_device *s,
 				struct v4l2_format *f)
 {
 	struct m4mo_sensor *sensor = s->priv;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	f->fmt.pix = sensor->pix;
 
@@ -3900,6 +4234,8 @@ static int ioctl_g_parm(struct v4l2_int_device *s,
 {
 	struct m4mo_sensor *sensor = s->priv;
 	struct v4l2_captureparm *cparm = &a->parm.capture;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	if (a->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
@@ -3926,76 +4262,30 @@ static int ioctl_s_parm(struct v4l2_int_device *s,
 			     struct v4l2_streamparm *a)
 {
 	struct m4mo_sensor *sensor = s->priv;
-	struct i2c_client *client = sensor->i2c_client;
-
 	struct v4l2_fract *timeperframe = &a->parm.capture.timeperframe;
-	int err = 0;
-	int fps, old_fps, org_mode;
+  
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
+  
+    /* Set mode (camera/camcorder/vt) & state (preview/capture) */
+    sensor->mode = a->parm.capture.capturemode;
+    sensor->state = a->parm.capture.currentstate;
+    
+    if(sensor->mode < 1 || sensor->mode > 3) sensor->mode = M4MO_MODE_CAMERA;
+    dprintk(CAM_DBG, M4MO_MOD_NAME "mode = %d, state = %d\n", sensor->mode, sensor->state);   
+ 
+    /* Set time per frame (FPS) */
+    if((timeperframe->numerator == 0)&&(timeperframe->denominator == 0))
+    {
+        sensor->fps = 30;
+    }
+    else
+    {
+        sensor->fps = timeperframe->denominator / timeperframe->numerator;
+    }
+    sensor->timeperframe = *timeperframe;
+    dprintk(CAM_DBG, M4MO_MOD_NAME "fps = %d\n", sensor->fps);  
 
-	printk("rs: b4 m4mo-ioctl_s_parm (capture mode=%x)\n",sensor->capture_mode);
-	//rs:+
-	if (a->parm.capture.capturemode<=1) //copying only valid values
-	sensor->capture_mode = a->parm.capture.capturemode;
-	
-	printk("rs: af m4mo-ioctl_s_parm (capture mode=%x)\n",sensor->capture_mode);
-	if(sensor->capture_mode != V4L2_MODE_HIGHQUALITY)
-	{
-		old_fps = sensor->fps;
-	
-	if(timeperframe->numerator == 0)
-		sensor->fps = M4MO_AUTO_FPS;
-	else
-	{
-		fps = timeperframe->denominator / timeperframe->numerator;
-		if(fps == 0)
-		sensor->fps = M4MO_AUTO_FPS;
-			else if((fps > 0) && (fps < 6))
-				sensor->fps = M4MO_5_FPS;
-			else if((fps >= 6) && (fps < 9))
-				sensor->fps = M4MO_7_FPS;
-		else if((fps >= 9) && (fps < 11))
-		sensor->fps = M4MO_10_FPS;
-		else if((fps >= 11) && (fps < 14))
-		sensor->fps = M4MO_12_FPS;
-		else if((fps >= 14) && (fps < 24))
-		sensor->fps = M4MO_15_FPS;
-		else if(fps >= 24)
-		sensor->fps = M4MO_30_FPS;
-	else
-	{
-		dprintk(CAM_ERR, M4MO_MOD_NAME "FPS is not supported!\n");
-		return -EINVAL;
-	}
-	}
-
-	sensor->timeperframe = *timeperframe;
-	
-		if(old_fps != sensor->fps)
-		{
-			org_mode = m4mo_get_mode();
-	/*080917[paladin] If the sensor mode is not Parameter Setting, Change the mode. @LDK@*/
-			err = m4mo_set_mode(M4MO_PARMSET_MODE);
-	if(err)
-	{
-		dprintk(CAM_ERR, M4MO_MOD_NAME "Can not set operation mode\n");
-		return err;
-	}
-	/*080917[paladin] Set the fps to the sensor. @LDK@*/
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
-
-			if(org_mode == M4MO_MONITOR_MODE)
-			{
-				err = m4mo_set_mode(M4MO_MONITOR_MODE);
-				if(err)
-				{
-					dprintk(CAM_ERR, M4MO_MOD_NAME "Can not set operation mode\n");
-					return err;
-				}
-			}
-		}
-	}
-
-	return err;
+	return 0;
 }
 
 /**
@@ -4012,13 +4302,17 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 {
 	struct m4mo_sensor *sensor = s->priv;
 	int rval;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 	
 	rval = sensor->pdata->ifparm(p);
 	if (rval)
-		{
-		return rval;
-		}
-
+    {
+        return rval;
+    }
+        
+    p->u.bt656.clock_curr = M4MO_XCLK;
+    
 	return 0;
 }
 
@@ -4032,7 +4326,15 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 static int ioctl_g_priv(struct v4l2_int_device *s, void *p)
 {
 	struct m4mo_sensor *sensor = s->priv;
-
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
+    
+    if(p == NULL)
+    {
+        printk(M4MO_MOD_NAME "ioctl_g_priv is failed because of null pointer\n"); 
+        return -EINVAL;
+    }
+    
 	return sensor->pdata->priv_data_set(p);
 
 }
@@ -4046,54 +4348,68 @@ static int ioctl_g_priv(struct v4l2_int_device *s, void *p)
  */
 static int ioctl_s_power(struct v4l2_int_device *s, enum v4l2_power on)
 {
-       struct m4mo_sensor *sensor = s->priv;
-	int rval;
+    struct m4mo_sensor *sensor = s->priv;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
-	rval = sensor->pdata->power_set(on);
-	
-	if (on == V4L2_POWER_ON)
-	{
-		rval = m4mo_detect();
-		
-		if (rval < 0) {
-			dprintk(CAM_ERR, M4MO_MOD_NAME "Unable to detect " M4MO_DRIVER_NAME " sensor\n");
-			sensor->state = SENSOR_NOT_DETECTED;
-			return rval;
-		}
-		
-		sensor->state = SENSOR_DETECTED;
-	}
+	if(sensor->pdata->power_set(on))
+    {
+            printk(M4MO_MOD_NAME "Can not power on/off " M4MO_DRIVER_NAME " sensor\n"); 
+        goto s_power_fail;
+    }
 
-	if (on == V4L2_POWER_RESUME) 
-	{
-		printk("rs:m4mo-ioctl_s_power: Start Capture (%x)\n",sensor->capture_mode);
-		
-		if(sensor->capture_mode != V4L2_MODE_HIGHQUALITY)
-		{
-			/* Monitor Mode */
-			if((rval = m4mo_start_preview()))
-				return rval;
-		      m4mo_set_auto_focus(1);
-		}
-		else
-		{
-			printk("rs:m4mo-ioctl_s_power: STart cAPTURE\n ");
-			
-			/* Capture Mode */
-			if((rval = m4mo_start_capture()))
-				return rval;
-		}
-	}
+    switch(on)
+    {
+    case V4L2_POWER_ON:
+        {
+            dprintk(CAM_DBG, M4MO_MOD_NAME "pwr on-----!\n");
+            if(m4mo_detect()) 
+            {
+                printk(M4MO_MOD_NAME "Unable to detect " M4MO_DRIVER_NAME " sensor\n");
+                sensor->pdata->power_set(V4L2_POWER_OFF);
+                goto s_power_fail;
+            }
 
-	return rval;
+            /* Make the default detect */
+            sensor->detect = SENSOR_DETECTED;     
+        }
+        break;
+
+    case V4L2_POWER_RESUME:
+        {
+            dprintk(CAM_DBG, M4MO_MOD_NAME "pwr resume-----!\n");
+        }  
+        break;
+
+    case V4L2_POWER_STANDBY:
+        {
+            dprintk(CAM_DBG, M4MO_MOD_NAME "pwr stanby-----!\n");
+        }
+        break;
+
+    case V4L2_POWER_OFF:
+        {
+            dprintk(CAM_DBG, M4MO_MOD_NAME "pwr off-----!\n");
+
+            /* Make the default detect */
+            sensor->detect = SENSOR_NOT_DETECTED;    
+        }
+        break;
+    }
+
+    return 0;
+
+s_power_fail:
+    printk(M4MO_MOD_NAME "ioctl_s_power is failed\n");
+    return -EINVAL;
 }
 
-#ifdef MOBILE_COMM_INTERFACE
 static int ioctl_s_strobe(struct v4l2_int_device *s, struct v4l2_strobe *strobe)
 {
-	struct m4mo_sensor *sensor = s->priv;
-
+//	struct m4mo_sensor *sensor = s->priv;
 	int err;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	err = m4mo_set_strobe(strobe->mode);
 
@@ -4103,6 +4419,8 @@ static int ioctl_s_strobe(struct v4l2_int_device *s, struct v4l2_strobe *strobe)
 static int ioctl_g_strobe(struct v4l2_int_device *s, struct v4l2_strobe *strobe)
 {
 	struct m4mo_sensor *sensor = s->priv;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	strobe->capabilities = V4L2_STROBE_CAP_OFF | V4L2_STROBE_CAP_ON 
 						| V4L2_STROBE_CAP_AUTO;
@@ -4110,7 +4428,6 @@ static int ioctl_g_strobe(struct v4l2_int_device *s, struct v4l2_strobe *strobe)
 
 	return 0;
 }
-#endif
 
 static int ioctl_g_exif(struct v4l2_int_device *s, struct v4l2_exif *exif)
 {
@@ -4119,6 +4436,8 @@ static int ioctl_g_exif(struct v4l2_int_device *s, struct v4l2_exif *exif)
 
 	int ret;
 	u32 val;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	ret = m4mo_read_category_parm(client, 4, 0x07, 0x00, &val);
 	exif->exposure_time_numerator = val;
@@ -4143,15 +4462,6 @@ static int ioctl_g_exif(struct v4l2_int_device *s, struct v4l2_exif *exif)
 	return 0;
 }
 
-irqreturn_t isp_irq_handler(int irq, void* dev_id)
-{
-	printk("m4mo-isp_irq_handler\n");
-	cam_interrupted = 1;
-	wake_up_interruptible(&cam_wait);
-	dprintk(CAM_DBG, M4MO_MOD_NAME "ISP IRQ HANDLER is called\n");
-
-	return IRQ_HANDLED;
-}
 
 /**
  * ioctl_deinit - V4L2 sensor interface handler for VIDIOC_INT_DEINIT
@@ -4160,7 +4470,18 @@ irqreturn_t isp_irq_handler(int irq, void* dev_id)
  * Deinitialize the sensor device
  */
 static int ioctl_deinit(struct v4l2_int_device *s)
-{	
+{		
+    struct m4mo_sensor *sensor = s->priv;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
+    
+    sensor->state = M4MO_STATE_INVALID; //init problem
+
+  /* Make the state init */
+    m4mo_curr_state = M4MO_STATE_INVALID;  
+    
+    main_cap_started = 0; //sasken
+
 	free_irq(OMAP_GPIO_IRQ(OMAP_GPIO_ISP_INT), &m4mo);
 
 	return 0;
@@ -4176,106 +4497,61 @@ static int ioctl_deinit(struct v4l2_int_device *s)
 static int ioctl_init(struct v4l2_int_device *s)
 {
 	struct m4mo_sensor *sensor = s->priv;
-	struct i2c_client *client = sensor->i2c_client;
 	int err;
+    
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called...\n", __func__); 
 
 	/* Initialize flag variable */
-	m4mo.timeperframe.numerator = 0;
-	m4mo.timeperframe.denominator = 0;
-	m4mo.fps =M4MO_AUTO_FPS,
-	m4mo.state = SENSOR_NOT_DETECTED,
-	m4mo.effect = M4MO_EFFECT_OFF,
-	m4mo.iso = M4MO_ISO_AUTO,
-	m4mo.photometry = M4MO_UNINIT_VALUE,
-	m4mo.ev = M4MO_EV_DEFAULT,
-	m4mo.wdr = M4MO_WDR_OFF,
-	m4mo.saturation = M4MO_SATURATION_DEFAULT,
-	m4mo.sharpness = M4MO_SHARPNESS_DEFAULT,
-	m4mo.contrast = M4MO_CONTRAST_DEFAULT,
-	m4mo.wb = M4MO_WB_AUTO,
-	m4mo.isc = M4MO_ISC_STILL_OFF,
-	m4mo.scene = M4MO_SCENE_NORMAL,
-	m4mo.aewb = M4MO_AE_UNLOCK_AWB_UNLOCK,
-	m4mo.flash_capture = M4MO_FLASH_CAPTURE_OFF,
-	m4mo.face_detection = M4MO_FACE_DETECTION_OFF,
-	m4mo.jpeg_quality = M4MO_UNINIT_VALUE, 
-	m4mo.zoom = M4MO_ZOOM_1X_VALUE,
-	m4mo.thumbnail_size = M4MO_THUMB_QVGA_SIZE,
-	m4mo.preview_size = M4MO_QVGA_SIZE,
-	m4mo.capture_size = M4MO_SHOT_5M_SIZE,
-	m4mo.af_mode = M4MO_UNINIT_VALUE,
-	m4mo.capture_flag = 0,
+	sensor->timeperframe.numerator          = 1;
+	sensor->timeperframe.denominator        = 30;
+	sensor->fps                             = 30;
+	sensor->state                           = M4MO_STATE_INVALID;
+    sensor->mode                            = M4MO_MODE_CAMERA;
+	sensor->effect                          = M4MO_EFFECT_OFF;
+	sensor->iso                             = M4MO_ISO_AUTO;
+	sensor->photometry                      = M4MO_UNINIT_VALUE;
+	sensor->ev                              = M4MO_EV_DEFAULT;
+	sensor->wdr                             = M4MO_WDR_OFF;
+	sensor->saturation                      = M4MO_SATURATION_DEFAULT;
+	sensor->sharpness                       = M4MO_SHARPNESS_DEFAULT;
+	sensor->contrast                        = M4MO_CONTRAST_DEFAULT;
+	sensor->wb                              = M4MO_WB_AUTO;
+	sensor->isc                             = M4MO_ISC_STILL_OFF;
+	sensor->scene                           = M4MO_SCENE_NORMAL;
+	sensor->aewb                            = M4MO_AE_UNLOCK_AWB_UNLOCK;
+	sensor->flash_capture                   = M4MO_FLASH_CAPTURE_OFF;
+	sensor->face_detection                  = M4MO_FACE_DETECTION_OFF;
+	sensor->jpeg_quality                    = M4MO_UNINIT_VALUE; 
+	sensor->zoom                            = M4MO_ZOOM_1X_VALUE;
+	sensor->thumbnail_size                  = M4MO_THUMB_QVGA_SIZE;
+	sensor->preview_size                    = M4MO_QVGA_SIZE;
+	sensor->capture_size                    = M4MO_SHOT_5M_SIZE;
+	sensor->af_mode                         = M4MO_UNINIT_VALUE;
+    sensor->jpeg_capture_w                  = JPEG_CAPTURE_WIDTH;
+	sensor->jpeg_capture_h                  = JPEG_CAPTURE_HEIGHT;  
+	sensor->focus_mode                      = 0,
+	sensor->focus_auto                      = 0,
+	sensor->exposre_auto                    = 0,
+	sensor->exposure                        = 4,
+//	sensor->zoom_mode                       = 0,
+	sensor->zoom_absolute                   = 0,
+	sensor->auto_white_balance              = 0,
+//	sensor->white_balance_preset            = 0,
+	sensor->strobe_conf_mode                = V4L2_STROBE_OFF,
+
 	cam_interrupted = 0;
-#ifdef MOBILE_COMM_INTERFACE
-	m4mo.focus_mode = 0,
-	m4mo.focus_auto = 0,
-	m4mo.exposre_auto = 0,
-	m4mo.exposure = 4,
-	m4mo.zoom_mode = 0,
-	m4mo.zoom_absolute = 0,
-	m4mo.auto_white_balance = 0,
-	m4mo.white_balance_preset = 0,
-	m4mo.strobe_conf_mode = V4L2_STROBE_OFF,
-#endif
 
-	/* Request GPIO IRQ */
-	err = request_irq(OMAP_GPIO_IRQ(OMAP_GPIO_ISP_INT), 
-						isp_irq_handler, IRQ_TYPE_EDGE_RISING, M4MO_DRIVER_NAME, &m4mo);
-	if(err){
-		dprintk(CAM_ERR, M4MO_MOD_NAME "Failed to request IRQ, error: %d\n", err);
-		return err;
-	}
+    memcpy(&m4mo, sensor, sizeof(struct m4mo_sensor));
 
-	/* Parameter Setting Mode */
-	err = m4mo_set_mode(M4MO_PARMSET_MODE);
-	if(err)
-	{
-		dprintk(CAM_ERR, M4MO_MOD_NAME "Can not set operation mode\n");
-		return err;
-	}
-	/* Set the Initialization Value */
-#if 0
-	/* Preview Size(5M) */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x01, 0x06);
-	/* Preview FPS(Auto) */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, 0x01);
-	/* Capture Output Format(JPEG+JPEG) */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x00, 0x04); 
-	/* Capture Size(5M) */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x04, 0x06);
-	/* Capture Mode(Normal) */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x0C, 0x00, 0x00);
-	/* Auto Flash Threshold */
-	m4mo_write_category_parm(client, M4MO_16BIT, 0x0B, 0x02, 0x0470);
-	/* transfer wait time */
-	//m4mo_write_category_parm(client, M4MO_8BIT, 0x0C, 0x0B, 0x64); 
-#endif
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV03_N02)  
-	/* VSYNC x HSYNC => 1536 x 1200 */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x18, 0x06); 
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x19, 0x00); 
-#else
-	/* VSYNC x HSYNC => 1024 x 2048 */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x18, 0x04); 
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x19, 0x00); 
-#endif
-#if (CONFIG_NOWPLUS_REV < CONFIG_NOWPLUS_REV02_N01)    
-	/* Set vertical & hirizontal flip */
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x05, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x06, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x07, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x08, 0x00);
-#endif
-// ZEUS+
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x05, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x06, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x07, 0x00);
-	m4mo_write_category_parm(client, M4MO_8BIT, 0x02, 0x08, 0x00);
-//zeus-	
-	return 0;         
+    err = m4mo_configure();
+
+    m4mo_curr_state = M4MO_STATE_INVALID;  
+    	
+    main_cap_started = 0; //sasken
+
+	return err;         
 }
 
-#ifdef ZEUS_CAM
 /* added following functins for v4l2 compatibility with omap34xxcam */
 
 /**
@@ -4288,95 +4564,78 @@ static int ioctl_init(struct v4l2_int_device *s)
 static int ioctl_enum_framesizes(struct v4l2_int_device *s,
 					struct v4l2_frmsizeenum *frms)
 {
-	int ifmt;
+//	int ifmt;
 	struct m4mo_sensor* sensor = s->priv; //rs:
 
-	for (ifmt = 0; ifmt < NUM_CAPTURE_FORMATS; ifmt++) {
-		if (frms->pixel_format == m4mo_formats[ifmt].pixelformat)
-			break;
-	}
-	/* Is requested pixelformat not found on sensor? */
-	if (ifmt == NUM_CAPTURE_FORMATS)
-		return -EINVAL;
+    dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_enum_framesizes called...\n");   
 
-//rs:+
-	if (sensor->capture_mode==V4L2_MODE_HIGHQUALITY)
-		{
-		//printk("RS: Size enumeration for image capture\n");
-		
-		if (frms->index >= ARRAY_SIZE(m4mo_image_sizes))
-			return -EINVAL;
-		
-		frms->type = V4L2_FRMSIZE_TYPE_DISCRETE;
-		frms->discrete.width = m4mo_image_sizes[frms->index].width;
-		frms->discrete.height = m4mo_image_sizes[frms->index].height;
-		return 0;
-		}
-//rs:-
+    if (sensor->state == M4MO_STATE_CAPTURE)
+    {    
+        dprintk(CAM_DBG, M4MO_MOD_NAME "Size enumeration for image capture size = %d\n", sensor->capture_size);
 
-	/* Check that the index we are being asked for is not
-	   out of bounds. */
-	if (frms->index >= ARRAY_SIZE(m4mo_sizes))
-		return -EINVAL;
+        if(sensor->capture_size == ARRAY_SIZE(m4mo_image_sizes))
+        goto enum_framesizes_fail;
 
-	frms->type = V4L2_FRMSIZE_TYPE_DISCRETE;
-	frms->discrete.width = m4mo_sizes[frms->index].width;
-	frms->discrete.height = m4mo_sizes[frms->index].height;
+        frms->index = sensor->capture_size;
+        frms->type = V4L2_FRMSIZE_TYPE_DISCRETE;
+        frms->discrete.width = m4mo_image_sizes[sensor->capture_size].width;
+        frms->discrete.height = m4mo_image_sizes[sensor->capture_size].height;        
+    }
+    else
+    {
+        dprintk(CAM_DBG, M4MO_MOD_NAME "Size enumeration for image preview size = %d\n", sensor->preview_size);
 
-	return 0;
+        if(sensor->preview_size == ARRAY_SIZE(m4mo_preview_sizes))
+        goto enum_framesizes_fail;
+        
+        frms->index = sensor->preview_size;
+        frms->type = V4L2_FRMSIZE_TYPE_DISCRETE;
+        frms->discrete.width = m4mo_preview_sizes[sensor->preview_size].width;
+        frms->discrete.height = m4mo_preview_sizes[sensor->preview_size].height;        
+    }
+
+    dprintk(CAM_DBG, M4MO_MOD_NAME "framesizes width : %d\n", frms->discrete.width); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "framesizes height : %d\n", frms->discrete.height); 
+
+    return 0;
+
+enum_framesizes_fail:
+    printk(M4MO_MOD_NAME "ioctl_enum_framesizes is failed\n"); 
+    return -EINVAL;   
 }
 
-// may need initialization for 7,12 fps as well?
-const struct v4l2_fract m4mo_frameintervals[] = {
-	{ .numerator = 6, .denominator = 30 }, // 5fps
-	{ .numerator = 5, .denominator = 30 },  //6 fps
-	{ .numerator = 2, .denominator = 30 }, //15 fps
-	{ .numerator = 1, .denominator = 30 }, //30fps
-};
 
 static int ioctl_enum_frameintervals(struct v4l2_int_device *s,
 					struct v4l2_frmivalenum *frmi)
 {
-	int ifmt;
+//	int ifmt;
 
-
-	/* Check that the requested format is one we support */
-	for (ifmt = 0; ifmt < NUM_CAPTURE_FORMATS; ifmt++) {
-		if (frmi->pixel_format == m4mo_formats[ifmt].pixelformat)
-			break;
-	}
-
-	if (ifmt == NUM_CAPTURE_FORMATS)
-		return -EINVAL;
-
-	/* Check that the index we are being asked for is not
-	   out of bounds. */
-	if (frmi->index >= ARRAY_SIZE(m4mo_frameintervals))
-		return -EINVAL;
-
-	/* Make sure that the 8MP size reports a max of 10fps */
-	if (frmi->width == 3280 && frmi->height == 2464) {
-		if (frmi->index != 0)
-			return -EINVAL;
-	}
-
-	frmi->type = V4L2_FRMIVAL_TYPE_DISCRETE;
-	frmi->discrete.numerator =
-				m4mo_frameintervals[frmi->index].numerator;
-	frmi->discrete.denominator =
-				m4mo_frameintervals[frmi->index].denominator;
+    dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_enum_frameintervals \n"); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_enum_frameintervals numerator : %d\n", frmi->discrete.numerator); 
+    dprintk(CAM_DBG, M4MO_MOD_NAME "ioctl_enum_frameintervals denominator : %d\n", frmi->discrete.denominator); 
 
 	return 0;
 }
-#endif  /* end of zeus_cam */
+
+static int ioctl_dev_init(struct v4l2_int_device *s)
+{
+	return 0;
+}
+
+static int ioctl_dev_exit(struct v4l2_int_device *s)
+{
+	return 0;
+}
 
 static struct v4l2_int_ioctl_desc m4mo_ioctl_desc[] = {
-#ifdef ZEUS_CAM
 	{ .num = vidioc_int_enum_framesizes_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_enum_framesizes},
   	{ .num = vidioc_int_enum_frameintervals_num,
-	  .func = (v4l2_int_ioctl_func *)ioctl_enum_frameintervals},
-#endif	  
+	  .func = (v4l2_int_ioctl_func *)ioctl_enum_frameintervals},  
+	{ .num = vidioc_int_dev_init_num,
+	  .func = (v4l2_int_ioctl_func *)ioctl_dev_init},
+	{ .num = vidioc_int_dev_exit_num,
+      .func = (v4l2_int_ioctl_func *)ioctl_dev_exit},
 	{ .num = vidioc_int_s_power_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_s_power },
 	{ .num = vidioc_int_g_priv_num,
@@ -4409,16 +4668,14 @@ static struct v4l2_int_ioctl_desc m4mo_ioctl_desc[] = {
 	  .func = (v4l2_int_ioctl_func *)ioctl_streamon },
 	{ .num = vidioc_int_streamoff_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_streamoff },
-	{ .num = vidioc_int_querymenu_num,
-	  .func = (v4l2_int_ioctl_func *)ioctl_querymenu },
-	{ .num = vidioc_int_querycap_num,
-	  .func = (v4l2_int_ioctl_func *)ioctl_querycap },  
-#ifdef MOBILE_COMM_INTERFACE
+	// { .num = vidioc_int_querymenu_num,
+	  // .func = (v4l2_int_ioctl_func *)ioctl_querymenu },
+	// { .num = vidioc_int_querycap_num,
+	  // .func = (v4l2_int_ioctl_func *)ioctl_querycap },  
 	{ .num = vidioc_int_s_strobe_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_s_strobe },  
 	{ .num = vidioc_int_g_strobe_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_g_strobe },
-#endif
 	{ .num = vidioc_int_g_exif_num,
 	  .func = (v4l2_int_ioctl_func *)ioctl_g_exif },
 };
@@ -4447,7 +4704,7 @@ static struct v4l2_int_device m4mo_int_device = {
  * device.
  */
 static int
-m4mo_probe(struct i2c_client *client)
+m4mo_probe(struct i2c_client *client, const struct i2c_device_id *device)
 {
 	struct m4mo_sensor *sensor = &m4mo;
 	int err;
@@ -4472,26 +4729,6 @@ m4mo_probe(struct i2c_client *client)
 	sensor->pix.height = 480;
 	sensor->pix.pixelformat = V4L2_PIX_FMT_UYVY;
 
-	if(hw_revision < CONFIG_NOWPLUS_REV03_N02)
-	{
-		cam_fw_name = "RS_M4Mo.bin";
-		cam_fw_major_version = 0xCB;
-		cam_fw_minor_version = 0xA0;
-	}
-	else if((hw_revision >= CONFIG_NOWPLUS_REV03_N02) && 
-				(hw_revision < CONFIG_NOWPLUS_REV08))
-	{
-		cam_fw_name = "RS_M4Mo_STW.bin";
-		cam_fw_major_version = 0xFB;
-		cam_fw_minor_version = 0xAB;
-	}
-	else
-	{
-		cam_fw_name = "RS_M4Mo_RD.bin";
-		cam_fw_major_version = 0xFB;
-		cam_fw_minor_version = 0xAA;
-	}
-	
 	err = v4l2_int_device_register(sensor->v4l2_int_device);
 	if (err)
 		i2c_set_clientdata(client, NULL);
@@ -4524,14 +4761,12 @@ m4mo_remove(struct i2c_client *client)
 	return 0;
 }
 
-#ifdef ZEUS_CAM
 static const struct i2c_device_id m4mo_id[] = {
 	{ M4MO_DRIVER_NAME, 0 },
 	{ },
 };
 
 MODULE_DEVICE_TABLE(i2c, m4mo_id);
-#endif /* end of zeus_cam */
 
 static struct i2c_driver m4mosensor_i2c_driver = {
 	.driver = {
@@ -4539,10 +4774,9 @@ static struct i2c_driver m4mosensor_i2c_driver = {
 		.owner = THIS_MODULE,
 	},
 	.probe = m4mo_probe,
-	.remove = __exit_p(m4mo_remove),
-#ifdef ZEUS_CAM	
+//	.remove = __exit_p(m4mo_remove),
+    .remove = m4mo_remove,
 	.id_table = m4mo_id,
-#endif /* end of zeus_cam */
 };
 
 /**

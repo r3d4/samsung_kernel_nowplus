@@ -57,7 +57,8 @@ static int isp_complete_reset = 1;
 int flag_720p = 0;
 int isCamera = 0;
 
-int ce147_cap_started = 0;
+int main_cap_started = 0;
+EXPORT_SYMBOL(main_cap_started);
 
 static void isp_save_ctx(struct device *dev);
 
@@ -986,10 +987,10 @@ static irqreturn_t isp_isr(int irq, void *_pdev)
 		bufs->wait_hs_vs--;
 
 #if 1 //sasken
-	if( (ce147_cap_started ) && (wait_hs_vs == 0)) {
+	if( (main_cap_started ) && (wait_hs_vs == 0)) {
 		isp_buf_process(dev, bufs);
 		spin_unlock_irqrestore(&isp->lock, flags);
-		//printk(" <------- isp_buf_process ce147_cap_started : %d\n", ce147_cap_started);
+		//printk(" <------- isp_buf_process main_cap_started : %d\n", main_cap_started);
 		//goto out_ignore_buff;
 		return IRQ_HANDLED;
 	}
