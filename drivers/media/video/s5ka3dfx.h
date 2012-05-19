@@ -34,16 +34,16 @@
 #define SENSOR_DETECTED                   1
 #define SENSOR_NOT_DETECTED               0
 
-#define OMAP3430_GPIO_CAMERA_EN           152
-#define OMAP3430_GPIO_CAMERA_RST          98
-#define OMAP3430_GPIO_CAMERA_STBY         153
+// #define OMAP3430_GPIO_CAMERA_EN           152
+// #define OMAP3430_GPIO_CAMERA_RST          98
+// #define OMAP3430_GPIO_CAMERA_STBY         153
 
-#define OMAP3430_GPIO_CAMERA_1P2V_EN      102
-#define OMAP3430_GPIO_CAMERA_1P8V_EN      62
+// #define OMAP3430_GPIO_CAMERA_1P2V_EN      102
+// #define OMAP3430_GPIO_CAMERA_1P8V_EN      62
 
-#define OMAP3430_GPIO_VGA_RST             180 
-#define OMAP3430_GPIO_VGA_STBY            181
-#define OMAP3430_GPIO_VGA_SEL             167
+// #define OMAP3430_GPIO_VGA_RST             180 
+// #define OMAP3430_GPIO_VGA_STBY            181
+// #define OMAP3430_GPIO_VGA_SEL             167
 
 #define CONFIG_NOWPLUS_HW_REV CONFIG_NOWPLUS_REV08 // think so!
 

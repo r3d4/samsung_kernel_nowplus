@@ -25,6 +25,7 @@
 #include <mach/gpio.h>
 #include <mach/hardware.h>
 #include <linux/mm.h>
+#include <plat/mux.h>
 #include <media/v4l2-int-device.h>
 #include "omap34xxcam.h"
 #include <../drivers/media/video/isp/ispreg.h>
@@ -73,169 +74,104 @@ struct isp_interface_config s5ka3dfx_if_config = {
 	.cam_mclk   = 240000000,
 };
 
-#if defined (CONFIG_MACH_SAMSUNG_ARCHER) || defined (CONFIG_MACH_HALO) // PROJECT DIVISTION START ///////////
-
-static int s5ka3dfx_stadby_gpio(void)
-{
-	dprintk(CAM_INF, S5KA3DFX_MOD_NAME "s5ka3dfx_stadby_gpio is called...\n");
-
-	/* Reset the GPIO pins */        
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_EN, 0);
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P8V_EN, 0);  
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P2V_EN, 0);  
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_STBY, 0);
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_RST, 0);    
-	gpio_direction_output(OMAP3430_GPIO_VGA_STBY, 0);        
-	gpio_direction_output(OMAP3430_GPIO_VGA_RST, 0); 
-
-	/* XCLK init */
-	isp_set_xclk(NULL, 0, 0);
-
-	/* VGA switch off */
-	gpio_direction_output(OMAP3430_GPIO_VGA_SEL, 1);
-
-	/* PMIC init (need to cam_en high) */
-	if(cam_pmic_write_reg(0x06, 0x09) != 0) {//BUCK 1.2V  
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage BUCK 1.2V");
-		return -EIO;       
-	}
-
-	if(cam_pmic_write_reg(0x05, 0xEC) != 0) {//LDO5 1.8V
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO5 1.8V");
-		return -EIO;       
-	}
-
-	if(cam_pmic_write_reg(0x04, 0xF1) != 0) {//LDO4 1.8V  
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO4 1.8V");
-		return -EIO;       
-	}
-
-	if(cam_pmic_write_reg(0x03, 0x79) != 0) {//LDO3 2.8V
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO3 2.8V");
-		return -EIO;       
-	}
-
-	if(cam_pmic_write_reg(0x02, 0x79) != 0) {//LDO2 2.8V
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO2 2.8V");
-		return -EIO;       
-	}
-
-	if(cam_pmic_write_reg(0x01, 0x79) != 0) {//LDO1 2.8V
-		printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO1 2.8V");
-		return -EIO;      
-	} 
-
-	//Enable PMIC
-	if(cam_pmic_write_reg(0x08, 0xBF) != 0) {
-		printk(S5KA3DFX_MOD_NAME "Could not request enable voltage");
-		return -EIO;       
-	} 
-
-	/* Enable sensor module power */  
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P2V_EN, 1);
-	msleep(1);
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_EN, 1);  
-	msleep(1);
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P8V_EN, 1);
-	msleep(1);   
-
-	/* Clock Enable */
-	isp_set_xclk(NULL, S5KA3DFX_XCLK, 0);
-	msleep(1); 
-
-	/* Activate STBY */
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_STBY, 1);
-	msleep(1);
-
-	/* Activate Reset */
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_RST, 1);
-	msleep(5);
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_RST, 0);
-	msleep(1);
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_STBY, 0);
-	msleep(1);     
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P2V_EN, 0);
-	msleep(1);  
-
-	/* VGA switch on */
-	gpio_direction_output(OMAP3430_GPIO_VGA_SEL, 0);
-
-	/* PMIC init (need to cam_en high)*/
-	if(cam_pmic_write_reg(0x08, 0xAA) != 0) {//Disable LDO1, LDO3, LDO5
-		printk(S5KA3DFX_MOD_NAME "Could not request enable voltage");
-		return -EIO;       
-	}  
-
-	return 0;
-}
-
-#endif
 
 static int s5ka3dfx_enable_gpio(void)
 {
-	dprintk(CAM_INF, S5KA3DFX_MOD_NAME "s5ka3dfx_enable_gpio is called...\n");
+  dprintk(CAM_INF, S5KA3DFX_MOD_NAME "s5ka3dfx_enable_gpio is called...\n");
 
-	/* Set standby mode */
-	s5ka3dfx_stadby_gpio();
 
-	/* Activate STBY */
-	gpio_direction_output(OMAP3430_GPIO_VGA_STBY, 1);     
-	msleep(1);     
+  /* Request and configure gpio pins */
+  if (gpio_request(OMAP_GPIO_CAM_EN,"CAM EN") != 0) 
+  {
+    printk(S5KA3DFX_MOD_NAME "Could not request GPIO %d\n", OMAP_GPIO_CAM_EN);
+    return -EIO;
+  }
+  
+  if (gpio_request(OMAP_GPIO_VGA_STBY,"VGA STDBY") != 0)
+  {
+    printk(S5KA3DFX_MOD_NAME "Could not request GPIO %d", OMAP_GPIO_VGA_STBY);
+    return -EIO;
+  }
 
-	/* Clock Enable */
-	isp_set_xclk(NULL, S5KA3DFX_XCLK, 0); //24MHz
-	msleep(1);   
+  if (gpio_request(OMAP_GPIO_VGA_RST,"CAM VGA RST") != 0) 
+  {
+    printk(S5KA3DFX_MOD_NAME "Could not request GPIO %d", OMAP_GPIO_VGA_RST);
+    return -EIO;
+  } 
+  
+  if (gpio_request(OMAP_GPIO_CAM_RST,"CAMERA_RST EN") != 0) 
+  {
+    printk(S5KA3DFX_MOD_NAME "Could not request GPIO %d\n", OMAP_GPIO_CAM_RST);
+    return -EIO;
+  }   
+    
 
-	/* Activate Reset */
-	gpio_direction_output(OMAP3430_GPIO_VGA_RST, 1);
-	msleep(5);
+  if (gpio_request(OMAP_GPIO_CAMERA_LEVEL_CTRL,"OMAP_GPIO_CAMERA_LEVEL_CTRL") != 0) 
+  {
+    printk(S5KA3DFX_MOD_NAME "Could not request GPIO %d\n", OMAP_GPIO_CAMERA_LEVEL_CTRL);
+    return -EIO;
+  }  
+  
+   cam_pmic_write_reg(0x03, 0xAC);  //LDO3
 
-	return 0; 
+    if(cam_pmic_write_reg(0x03, 0xAC) != 0) {//LDO3 
+        printk(S5KA3DFX_MOD_NAME "Could not request voltage LDO3");
+        return -EIO;       
+    }
+  /* Reset the GPIO pins */
+  gpio_direction_output(OMAP_GPIO_CAM_EN, 0);
+  gpio_direction_output(OMAP_GPIO_VGA_STBY, 0);        
+  gpio_direction_output(OMAP_GPIO_VGA_RST, 0);    
+
+  isp_set_xclk(NULL, 0,0);
+  
+  /* Enable sensor module power */     
+  gpio_direction_output(OMAP_GPIO_CAM_RST, 0);
+  gpio_direction_output(OMAP_GPIO_CAMERA_LEVEL_CTRL, 1);
+  msleep(10);
+
+  gpio_direction_output(OMAP_GPIO_CAM_EN, 1);
+  msleep(10);
+
+  gpio_direction_output(OMAP_GPIO_VGA_STBY, 1);
+  msleep(10);
+
+  /* Clock Enable */
+  isp_set_xclk(NULL, S5KA3DFX_XCLK, 0);
+  msleep(10); 
+
+  /* Activate Reset */
+  gpio_direction_output(OMAP_GPIO_VGA_RST, 1);
+  msleep(10);
+
+  return 0; 
 }
 
 static int s5ka3dfx_disable_gpio(void)
 {
-	dprintk(CAM_INF, S5KA3DFX_MOD_NAME "s5ka3dfx_disable_gpio is called...\n");
+  dprintk(CAM_INF, S5KA3DFX_MOD_NAME "s5ka3dfx_disable_gpio is called...\n");
 
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_RST, 0);
-	msleep(1);
+  gpio_direction_output(OMAP_GPIO_VGA_RST, 0);
+  msleep(2);
 
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_STBY, 0);
-	msleep(1); 
+  isp_set_xclk(NULL, 0, 0);
+  msleep(2);
+             
+  gpio_direction_output(OMAP_GPIO_VGA_STBY, 0);
+  msleep(2);         
 
-	gpio_direction_output(OMAP3430_GPIO_VGA_RST, 0);
-	msleep(1);
+  gpio_direction_output(OMAP_GPIO_CAM_EN, 0);
+  msleep(10);
 
-	isp_set_xclk(NULL, 0, 0);
-	msleep(1);
+  gpio_free(OMAP_GPIO_CAM_EN); 
+  gpio_free(OMAP_GPIO_VGA_STBY);
+  gpio_free(OMAP_GPIO_VGA_RST);
 
-	gpio_direction_output(OMAP3430_GPIO_VGA_STBY, 0);
-	msleep(1);         
+  gpio_free(OMAP_GPIO_CAM_RST); 
+  gpio_free(OMAP_GPIO_CAMERA_LEVEL_CTRL);
+  
 
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_EN, 0);
-	msleep(1);
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P2V_EN, 0);
-	msleep(1);  
-
-	gpio_direction_output(OMAP3430_GPIO_CAMERA_1P8V_EN, 0);
-	msleep(1);    
-
-	gpio_direction_output(OMAP3430_GPIO_VGA_SEL, 1);
-	msleep(1);    
-
-	//Disable PMIC
-	if(cam_pmic_write_reg(0x08, 0x80) != 0) {
-		printk(S5KA3DFX_MOD_NAME "Could not request enable voltage");
-		return -EIO;	   
-	} 
-
-	return 0;
+  return 0;
 }
 
 static int s5ka3dfx_sensor_power_set(enum v4l2_power power)
@@ -303,3 +239,4 @@ struct s5ka3dfx_platform_data nowplus_s5ka3dfx_platform_data = {
 	.priv_data_set  = s5ka3dfx_sensor_set_prv_data,
 	.ifparm         = s5ka3dfx_ifparm,
 };
+EXPORT_SYMBOL(nowplus_s5ka3dfx_platform_data);

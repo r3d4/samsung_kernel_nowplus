@@ -2302,10 +2302,12 @@ static	void	__init	nowplus_init(void)
 
 // debug: get video ram addres from SBL
 // 0x4805 0480+ j * 0x04    printk(    "DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));    printk(    "DISPC_GFX_BA1: 0x%08x\n", omap_readl(0x48050484));    printk(    "DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xf-//debug 0x4805 0480+ j * 0x04
-    printk(    "DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));
-    printk(    "DISPC_GFX_BA1: 0x%08x\n", omap_readl(0x48050484));
-    printk(    "DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xff );
-    printk(    "DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
+    printk(    " --- SBL dump -->\n"); 
+    printk(    "    DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));
+    printk(    "    GFXFORMAT: 0x%01x\n", omap_readl(0x480504A0)>>1&0xf);
+    printk(    "    DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xff );
+    printk(    "    DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
+    printk(    " <-- SBL dump ---\n"); 
 
 
 	platform_add_devices(nowplus_devices,	ARRAY_SIZE(nowplus_devices));

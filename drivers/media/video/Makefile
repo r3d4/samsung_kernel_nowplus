@@ -13,6 +13,9 @@ omap2cam-objs	:=	omap24xxcam.o omap24xxcam-dma.o
 videodev-objs	:=	v4l2-dev.o v4l2-ioctl.o v4l2-device.o v4l2-fh.o \
 			v4l2-event.o
 
+main_sensor-objs	:=	m4mo_platform.o m4mo.o
+vt_sensor-objs	:=	s5ka3dfx_platform.o s5ka3dfx.o
+
 # V4L2 core modules
 
 obj-$(CONFIG_VIDEO_DEV) += videodev.o v4l2-int-device.o
@@ -81,8 +84,8 @@ obj-$(CONFIG_VIDEO_OMAP3) += omap34xxcam.o
 
 obj-$(CONFIG_VIDEO_CAM_PMIC)     += cam_pmic.o
 obj-$(CONFIG_VIDEO_CAM_CE147)    += ce147_platform.o ce147.o
-obj-$(CONFIG_VIDEO_CAM_M4MO)     += m4mo_platform.o m4mo.o
-obj-$(CONFIG_VIDEO_CAM_S5KA3DFX) += s5ka3dfx_platform.o s5ka3dfx.o
+obj-$(CONFIG_VIDEO_CAM_M4MO)     += main_sensor.o
+obj-$(CONFIG_VIDEO_CAM_S5KA3DFX) += vt_sensor.o
 
 obj-$(CONFIG_SOC_CAMERA_MT9M001)	+= mt9m001.o
 obj-$(CONFIG_SOC_CAMERA_MT9M111)	+= mt9m111.o

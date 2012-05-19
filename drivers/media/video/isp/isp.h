@@ -67,9 +67,9 @@ struct isp_pipeline;
 #define ZEUS_CAM
 
 #ifdef ZEUS_CAM
-#define JPEG_CAPTURE_WIDTH  1536
+#define JPEG_CAPTURE_WIDTH  1024
 #define JPEG_CAPTURE_WIDTH_IN_OMAP JPEG_CAPTURE_WIDTH/ISP_BYTES_PER_PIXEL
-#define JPEG_CAPTURE_HEIGHT 2300
+#define JPEG_CAPTURE_HEIGHT 1800 // by trial & error ???
 
 #define is_isppreview_enabled()		0
 #define is_ispresizer_enabled()		0 // disabled for now, may need to enable
