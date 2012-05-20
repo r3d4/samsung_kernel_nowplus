@@ -1,632 +1,390 @@
 /*
 	Motorola Milestone overclock module
-	version 1.4.8 - 2011-03-20
-	by Tiago Sousa <mirage@kaotik.org>
+	version 1.1-mapphone - 2011-03-30
+	by Tiago Sousa <mirage@kaotik.org>, modified by nadlabak, Skrilax_CZ, tekahuna
 	License: GNU GPLv2
 	<http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 
-	Project site:
-	http://code.google.com/p/milestone-overclock/
-
 	Changelog:
-    2011-12-03 
-		- use EXPORTed functions, instead of address lookup
-	version 1.4.8 - 2011-03-20
-	- build process for motorola milestone 2.2
-	version 1.4.7 - 2011-01-16
-	- added sr_adjust_vsel field when reading the mpu_opps table if
-	  SMARTREFLEX is enabled (thanks tekahuna)
-	version 1.4.6.1 - 2010-12-17
-	- rolled back the address detection, needs more testing
-	version 1.4.6 - 2010-12-16
-        - automatic detection of omap2_clk_init_cpufreq_table_addr and
-	  cpufreq_stats_update_addr in most 2.6.32 kernels (by Skrilax_CZ and
-	  kabaldan)
-	- build process for motorola flipout, samsung galaxy a and archos
-	  tablets a70/a101
-	version 1.4.5 - 2010-12-09
-	- build process for motorola defy
-	version 1.4.4 - 2010-10-28
-	- build process for milestone leaked 2.6.32 and droid 2.2
-	version 1.4.3 - 2010-10-25
-	- build process for droid x 2.2
-	- fix vsel setting for droid x 2.x and others (thanks to kabaldan
-	  for hinting at this; the struct omap_opp changed to support "smart
-	  reflex class 1.5" technology)
-	- remove call to omap_pm_cpu_get_freq() because it's no longer
-	  exported in froyo (thanks tekahuna)
-	version 1.4.2 - 2010-08-31
-	- build process for samsung galaxy beam
-	version 1.4.1 - 2010-08-30
-	- change cpufreq stats when writing to /proc/overclock/freq_table
-	version 1.4 - 2010-08-16
-	- support kernel 2.6.32 (android froyo)
-	- improve the build process to compile against multiple kernels
-	- stop using default addresses for mpu_opps_addr and
-	  cpufreq_stats_table_addr to avoid confusion
-	- get the address of freq_table automatically with
-	  cpufreq_frequency_get_table()
-	- fix assignments when writing to
-	  /proc/overclock/omap2_clk_init_cpufreq_table_addr (thanks kabaldan)
-	- fix cpufreq stats (patch by kabaldan)
-	version 1.2 - 2010-05-25
-	- change the values of freq_table by writing "index frequency" to
-	  /proc/overclock/freq_table such as:
-	  echo "1 400000" > /proc/overclock/freq_table
-	- change the values of mpu_opps by writing "index rate vsel" to
-	  /proc/overclock/mpu_opps such as:
-	  echo "3 400000000 50" > /proc/overclock/mpu_opps
-	- autodetect freq_table and mpu_opps given
-	  omap2_clk_init_cpufreq_table's address at load time or:
-	  echo 0xc004e498 > /proc/overclock/omap2_clk_init_cpufreq_table_addr
-	  you can find the address with:
-	  grep omap2_clk_init_cpufreq_table /proc/kallsyms
-	version 1.1 - 2010-05-20
-	- mpu_opps now configurable in load time
-	- improved mpu_opps address lookup
-	- corrected vsel units
-	- applied mattih's patch to set policy->user_policy.max
-	version 1.0 - 2010-05-14
-	- initial release
+ 
+	version 1.5-mapphone - 2011-03-30
+	- port to Yokohama devices
 
+	version 1.1-mapphone - 2011-03-30
+	- simplified
+	- added missing item to frequency table
+
+	version 1.0-mapphone - 2010-11-19
+	- automatic symbol detection
+	- automatic values detection
+	
 	Description:
 
 	The MPU (Microprocessor Unit) clock has 5 discrete pairs of possible
 	rate frequencies and respective voltages, of which only 4 are passed
-	down to cpufreq as you can see with a tool such as SetCPU. The
+	down to cpufreq as you can see with a tool such as SetCPU.  The
 	default frequencies are 125, 250, 500 and 550 MHz (and a hidden
-	600). By using this module, you are changing the highest pair in the
-	tables of both cpufreq and MPU frequencies, so it becomes 125, 250,
-	500 and, say, 800. It's quite stable up to 1200; beyond that it
-	quickly becomes unusable, specially over 1300, with lockups or
-	spontaneous reboots.
-
-	This version was prepared for Motorola Milestone's official Android
-	2.1 for Central Europe, build number SHOLS_U2_02.31.0. Fortunately
-	Motorola appears to have used the same kernel in most of the 2.1
-	firmwares and even 2.0 works. All that's needed is to specify
-	autodetect addresses when loading the module. See KernelModule wiki
-	page at the project site for more information. To port the module to
-	different kernels or even other phones, see the Disassembly wiki
-	page. Testers welcome!
-
-	Usage:
-
-	insmod overclock.ko
-	busybox egrep "omap2_clk_init_cpufreq_table$" /proc/kallsyms
-	echo 0xc004e4b0 > /proc/overclock/omap2_clk_init_cpufreq_table_addr
-	busybox egrep "cpufreq_stats_update$" /proc/kallsyms
-	echo 0xc0295704 > /proc/overclock/cpufreq_stats_update_addr
-	echo 62 > /proc/overclock/max_vsel
-	echo 800000 > /proc/overclock/max_rate
-	
-	You should set max_vsel before max_rate if the new rate is going to
-	be higher than the current one, because higher frequencies often
-	require more voltage than supplied by default. Likewise, lower
-	max_rate first before max_vsel if you want to reduce both frequency
-	and voltage:
-
-	echo 550000 > /proc/overclock/max_rate
-	echo 56 > /proc/overclock/max_vsel
-
-	To set a specified frequency and voltage at load time (don't forget
-	to change the addr parameters according to your kernel):
-
-	insmod overclock.ko
-	echo 0xc004e4b0 > /proc/overclock/omap2_clk_init_cpufreq_table_addr
-	echo 0xc0295704 > /proc/overclock/cpufreq_stats_update_addr
-	echo 62 > /proc/overclock/max_vsel
-	echo 800000 > /proc/overclock/max_rate
-
-	It has been reported that the vsel is reset to default while rate
-	stays overclocked. This is caused by the default /system/bin/insmod
-	takes only one argument, which can consist of "nested" arguments,
-	ie, "arg1=1 arg2=2". Busybox's insmod, typically in
-	/system/xbin/insmod, takes normal arguments, ie, "arg1=1" "arg2=2".
-	This difference caused reports of the mpu_opps table not being
-	initialized, because its address was usually the second parameter
-	and it would be ignored when specified in the traditional insmod,
-	although it would work when written to /proc. Therefore it's
-	preferable to load the module without parameters and write the
-	addresses using /proc to maximize compatibility with different
-	insmod implementations.
-
-	Be careful when you try to load this in mot_boot_mode. It's
-	preferable to use the MilestoneOverclock app to do it, because it
-	only works if the sdcard is mounted, which is easy to override in
-	case of a bad overclock.
-
-	Remember that you are merely changing the maximum possible value
-	that cpufreq can choose to use. The current speed may well be lower
-	than the one specified if the phone is idle. I recommend the use of
-	the SetCPU app to effectively change the current frequency through
-	its policies (use Autodetect Speeds instead of Droid/Milestone
-	profile in the device settings).
+	600).  By using this module, you are changing the highest pair in
+	the tables of both cpufreq and MPU frequencies, so it becomes 125,
+	250, 500 and, say, 800.  It's quite stable up to 1200; beyond
+	that it quickly becomes unusable, specially over 1300, with lockups
+	or spontaneous reboots.
 */
 
+#define DRIVER_AUTHOR "Tiago Sousa <mirage@kaotik.org>, nadlabak, Skrilax_CZ, tekahuna"
+#define DRIVER_DESCRIPTION "Motorola Milestone CPU overclocking"
+#define DRIVER_VERSION "1.5-yokohama-beta-05"
+
 #include <linux/module.h>
+#include <linux/moduleparam.h>
+#include <linux/kernel.h>
+#include <linux/errno.h>
 #include <linux/init.h>
-#include <linux/version.h>
+
 #include <linux/proc_fs.h>
+#include <linux/string.h>
 #include <linux/vmalloc.h>
 #include <asm/uaccess.h>
+
+#include <linux/kallsyms.h>
+
+#include <linux/notifier.h>
+#include <linux/cpufreq.h>
+#include <linux/delay.h>
 #include <linux/interrupt.h>
+#include <linux/spinlock.h>
+#include <linux/device.h>
+#include <linux/slab.h>
+#include <linux/cpu.h>
+#include <linux/completion.h>
+#include <linux/mutex.h>
+
+#include <linux/err.h>
 #include <linux/clk.h>
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,32)
+#include <linux/io.h>
+
+#include <mach/hardware.h>
+#include <asm/system.h> 
+  
 #include <plat/omap-pm.h>
-#else
-#include <mach/omap-pm.h>
-#endif
 
-#define DRIVER_AUTHOR "Tiago Sousa <mirage@kaotik.org>"
-#define DRIVER_DESCRIPTION "Motorola Milestone/Droid/DroidX CPU overclocking"
-#define DRIVER_VERSION "1.4.8"
-
-#ifdef OMAP36XX
-#define DRIVER_DEFAULT_RATE 1000000
-#define DRIVER_DEFAULT_VSEL 66
-#else
-#define DRIVER_DEFAULT_RATE 600000
-#define DRIVER_DEFAULT_VSEL 56
-#endif
+#include "opp_info.h"
+#include "../symsearch/symsearch.h"
 
 MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESCRIPTION);
 MODULE_VERSION(DRIVER_VERSION);
 MODULE_LICENSE("GPL");
 
-static uint max_rate = DRIVER_DEFAULT_RATE;
-static uint max_vsel = DRIVER_DEFAULT_VSEL;
-static uint mpu_opps_addr = 0;
-static uint cpufreq_stats_table_addr = 0;
-static uint omap2_clk_init_cpufreq_table_addr = 0;
-static uint cpufreq_stats_update_addr = 0;
+//extern int cpufreq_stats_freq_update(unsigned int cpu, int index, unsigned int freq);
 
-module_param(max_rate, uint, 0444);
-module_param(max_vsel, uint, 0444);
-#ifdef OMAP36XX
-MODULE_PARM_DESC(max_rate, "The maximum MPU clock rate frequency in KHz (default 1000000)");
-MODULE_PARM_DESC(max_vsel, "The maximum MPU voltage selection (default 66)");
-#else
-MODULE_PARM_DESC(max_rate, "The maximum MPU clock rate frequency in KHz (default 600000)");
-MODULE_PARM_DESC(max_vsel, "The maximum MPU voltage selection (default 56)");
+// opp.c
+SYMSEARCH_DECLARE_FUNCTION_STATIC(int, 
+			opp_get_opp_count_fp, struct device *dev);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(struct omap_opp *, 
+			opp_find_freq_floor_fp, struct device *dev, unsigned long *freq);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(struct omap_opp * __deprecated,
+			opp_find_by_opp_id_fp, struct device *dev, u8 opp_id);
+// opp-max.c
+SYMSEARCH_DECLARE_FUNCTION_STATIC(unsigned long, vsel_to_uv_fp, unsigned char vsel);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(unsigned char, uv_to_vsel_fp, unsigned long uv);
+
+#ifdef OMAP4
+// opp44xxdata.c
+SYMSEARCH_DECLARE_FUNCTION_STATIC(struct device *, find_dev_ptr_fp, char *name);
 #endif
-module_param(mpu_opps_addr, uint, 0444);
-MODULE_PARM_DESC(mpu_opps_addr, "The mpu_opps address (default 0, no overclock)");
-module_param(cpufreq_stats_table_addr, uint, 0444);
-MODULE_PARM_DESC(cpufreq_stats_table_addr, "The cpufreq_stats_table address (default 0, no cpufreq stats correction)");
-module_param(omap2_clk_init_cpufreq_table_addr, uint, 0444);
-MODULE_PARM_DESC(omap2_clk_init_cpufreq_table_addr, "The omap2_clk_init_cpufreq_table function address to autodetect the other addresses (default 0, doesn't autodetect)");
-module_param(cpufreq_stats_update_addr, uint, 0444);
-MODULE_PARM_DESC(cpufreq_stats_update_addr, "The cpufreq_stats_update function address to autodetect the stats address (default 0, doesn't autodetect)");
+// cpufreq_stats.c
+/*SYMSEARCH_DECLARE_FUNCTION_STATIC(int, cpufreq_stats_free_table_fp, unsigned int cpu);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(int, cpufreq_stats_create_table_fp, 
+			struct cpufreq_policy *policy, struct cpufreq_frequency_table *table); */
 
-/* from drivers/cpufreq/cpufreq_stats.c */
-struct cpufreq_stats {
-	unsigned int cpu;
-	unsigned int total_trans;
-	unsigned long long  last_time;
-	unsigned int max_state;
-	unsigned int state_num;
-	unsigned int last_index;
-	cputime64_t *time_in_state;
-	unsigned int *freq_table;
-};
+// voltage.c
+SYMSEARCH_DECLARE_FUNCTION_STATIC(struct voltagedomain *, 
+			omap_voltage_domain_get_fp, char *name);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(void, 
+			omap_voltage_reset_fp, struct voltagedomain *voltdm);
 
-static struct cpufreq_frequency_table *freq_table;
-static struct omap_opp *my_mpu_opps;
-static struct cpufreq_stats *cpufreq_stats_table;
-static struct cpufreq_policy *policy;
-#define MPU_CLK         "arm_fck"
+// cpufreq.c
+SYMSEARCH_DECLARE_FUNCTION_STATIC(struct cpufreq_governor *,
+			__find_governor_fp, const char *str_governor);
+SYMSEARCH_DECLARE_FUNCTION_STATIC(int, __cpufreq_set_policy_fp, 
+			struct cpufreq_policy *data, struct cpufreq_policy *policy);
+
+#ifdef OMAP4
+#define MPU_CLK         "dpll_mpu_ck"
+#define GPU_CLK         "gpu_fck"
+#else
+#define MPU_CLK         "dpll1_clk"
+#endif
+
+static int opp_count, enabled_mpu_opp_count, main_index, base_index, cpufreq_index;
+
+static char orig_governor[16];
+static char good_governor[16] = "userspace";
+
+#ifdef OMAP4
+static struct device *mpu_dev, *gpu_dev;
+static struct omap_opp *mpu_opps, *gpu_opps;
+static struct clk *mpu_clk, *gpu_clk;
+#else
+static struct device *mpu_dev;
+static struct omap_opp *mpu_opps;
 static struct clk *mpu_clk;
+#endif
+static struct voltagedomain *voltdm;
+static struct omap_vdd_info *vdd;
+static struct cpufreq_frequency_table *freq_table;
+static struct cpufreq_policy *policy;
+
 
 #define BUF_SIZE PAGE_SIZE
 static char *buf;
 
-#ifdef LOOKUP
-extern unsigned long lookup_symbol_address(const char *name);
-#endif
-
-#ifdef EXPORT
-void omap2_clk_init_cpufreq_table(struct cpufreq_frequency_table **table);
-int cpufreq_stats_update(unsigned int cpu);
-#endif
-
-static void error_mpu_opps(void)
+static int set_governor(struct cpufreq_policy *policy, char str_governor[16])
 {
-	printk(KERN_INFO "overclock: mpu_opps address not configured, aborting action\n");
-}
-
-static void error_cpufreq_stats_table(void)
-{
-	printk(KERN_INFO "overclock: cpufreq_stats_table address not configured, aborting action\n");
-}
-
-static void set_max_speed(void)
-{
-	printk(KERN_INFO "overclock: setting max_rate %u and max_vsel %u\n",
-		max_rate, max_vsel);
-	if(!my_mpu_opps) {
-		error_mpu_opps();
-		return;
+	unsigned int ret = -EINVAL;
+	struct cpufreq_policy *new_policy;
+	struct cpufreq_governor *t;
+	
+	new_policy = policy;
+	
+	cpufreq_get_policy(new_policy, policy->cpu);;
+		
+	t = __find_governor_fp(str_governor);
+	
+	if (t != NULL) {
+		new_policy->governor = t;
+	} else {
+		return ret;
 	}
-	freq_table[0].frequency = policy->max = policy->cpuinfo.max_freq =
-		policy->user_policy.max = max_rate;
-	if(cpufreq_stats_table)	/* can overclock without it */
-		cpufreq_stats_table->freq_table[0] = max_rate;
-	else
-		error_cpufreq_stats_table();
-	my_mpu_opps[MAX_VDD1_OPP].vsel = max_vsel;
-#ifdef SMARTREFLEX
-	my_mpu_opps[MAX_VDD1_OPP].sr_adjust_vsel = max_vsel;
-#endif
-	my_mpu_opps[MAX_VDD1_OPP].rate = max_rate*1000;
-}
 
-static void omap2_find_addr(void)
-{
-	unsigned char *func = (void *)omap2_clk_init_cpufreq_table_addr;
-	uint *addr;
-	int i;
-	for(i = 0; i < 100; i+=4) {
-		if((func[i+3] == 0xe5) /* ldr */
-			&& func[i+2] == 0x9f) { /* [pc, */
-			addr = (void *)((uint)func)+i+8+func[i];
-			mpu_opps_addr = *addr;
-			printk (KERN_INFO "overclock: found mpu_opps_addr at 0x%x\n",
-				mpu_opps_addr);
-			break;
-		}
-	}
-}
-
-static void stats_find_addr(void)
-{
-	unsigned char *func = (void *)cpufreq_stats_update_addr;
-	uint *addr;
-	int i;
-	for(i = 0; i < 100; i+=4) {
-		if((func[i+3] == 0xe5) /* ldr */
-			&& func[i+2] == 0x9f) { /* [pc, */
-			addr = (void *)((uint)func)+i+8+func[i];
-			cpufreq_stats_table_addr = *addr;
-			printk (KERN_INFO "overclock: found cpufreq_stats_table_addr at 0x%x\n",
-				cpufreq_stats_table_addr);
-			break;
-		}
-	}
+	ret = __cpufreq_set_policy_fp(policy, new_policy);
+	
+	policy->user_policy.policy = policy->policy;
+	policy->user_policy.governor = policy->governor;
+	
+	return ret;
 }
 
 static int proc_info_read(char *buffer, char **buffer_location,
 		off_t offset, int count, int *eof, void *data)
 {
 	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "cpumin=%u cpumax=%u min=%u max=%u usermin=%u usermax=%u\nclk_get_rate=%lu\n",
-				policy->cpuinfo.min_freq, policy->cpuinfo.max_freq, policy->min, policy->max, policy->user_policy.min, policy->user_policy.max, clk_get_rate(mpu_clk) / 1000);
-
-	return ret;
-}
-
-static int proc_max_rate_read(char *buffer, char **buffer_location,
-		off_t offset, int count, int *eof, void *data)
-{
-	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "%u\n", max_rate);
-
-	return ret;
-}
-
-static int proc_max_rate_write(struct file *filp, const char __user *buffer,
-		unsigned long len, void *data)
-{
-	ulong newrate;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newrate)))
-		return result;
-	if(max_rate != newrate) {
-		max_rate = newrate;
-		set_max_speed();
-	}
-
-	return len;
-}
-
-static int proc_max_vsel_read(char *buffer, char **buffer_location,
-		off_t offset, int count, int *eof, void *data)
-{
-	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "%u\n", max_vsel);
-
-	return ret;
-}
-
-static int proc_max_vsel_write(struct file *filp, const char __user *buffer,
-		unsigned long len, void *data)
-{
-	ulong newvsel;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newvsel)))
-		return result;
-	if(max_vsel != newvsel) {
-		max_vsel = newvsel;
-		set_max_speed();
-	}
-
-	return len;
-}
-
-static int proc_mpu_opps_addr_read(char *buffer, char **buffer_location,
-		off_t offset, int count, int *eof, void *data)
-{
-	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "0x%x\n", (uint)mpu_opps_addr);
-
-	return ret;
-}
-
-static int proc_mpu_opps_addr_write(struct file *filp, const char __user *buffer,
-		unsigned long len, void *data)
-{
-	ulong newaddr;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newaddr)))
-		return result;
-	mpu_opps_addr = newaddr;
-	if(mpu_opps_addr)
-		my_mpu_opps = *(struct omap_opp **)mpu_opps_addr;
-	else
-		error_mpu_opps();
-
-	return len;
-}
-
-static int proc_omap2_clk_init_cpufreq_table_addr_read(char *buffer,
-		char **buffer_location, off_t offset, int count, int *eof,
-		void *data)
-{
-	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "0x%x\n",
-			(uint)omap2_clk_init_cpufreq_table_addr);
-
-	return ret;
-}
-
-static int proc_omap2_clk_init_cpufreq_table_addr_write(struct file *filp,
-		const char __user *buffer, unsigned long len, void *data)
-{
-	ulong newaddr;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newaddr)))
-		return result;
-	omap2_clk_init_cpufreq_table_addr = newaddr;
-	if(omap2_clk_init_cpufreq_table_addr)
-		omap2_find_addr();
-	if(mpu_opps_addr)
-		my_mpu_opps = *(struct omap_opp **)mpu_opps_addr;
-	else
-		error_mpu_opps();
-
-	return len;
-}
-
-static int proc_cpufreq_stats_table_addr_read(char *buffer, char **buffer_location,
-		off_t offset, int count, int *eof, void *data)
-{
-	int ret;
-	
-	if (offset > 0)
-		ret = 0;
-	else
-		ret = scnprintf(buffer, count, "0x%x\n", (uint)cpufreq_stats_table_addr);
-
-	return ret;
-}
-
-static int proc_cpufreq_stats_table_addr_write(struct file *filp,
-		const char __user *buffer,
-		unsigned long len, void *data)
-{
-	ulong newaddr;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newaddr)))
-		return result;
-	cpufreq_stats_table_addr = newaddr;
-	if(cpufreq_stats_table_addr)
-		cpufreq_stats_table = *(struct cpufreq_stats **)cpufreq_stats_table_addr;
-	else
-		error_cpufreq_stats_table();
-
-	return len;
-}
-
-static int proc_cpufreq_stats_update_addr_read(char *buffer,
-		char **buffer_location, off_t offset, int count, int *eof,
-		void *data)
-{
-	int ret;
 
 	if (offset > 0)
 		ret = 0;
 	else
-		ret = scnprintf(buffer, count, "0x%x\n",
-			(uint)cpufreq_stats_update_addr);
+#ifdef OMAP4
+		ret = scnprintf(buffer, count, "cpumin=%u cpumax=%u min=%u max=%u usermin=%u usermax=%u\nmpu_clk_get_rate=%lu gpu_clk_get_rate=%lu\n",
+				policy->cpuinfo.min_freq, policy->cpuinfo.max_freq, policy->min, policy->max, policy->user_policy.min, policy->user_policy.max, 
+				clk_get_rate(mpu_clk) / 1000, clk_get_rate(gpu_clk) / 1000);
+#else
+		ret = scnprintf(buffer, count, "cpumin=%u cpumax=%u min=%u max=%u usermin=%u usermax=%u\nmpu_clk_get_rate=%lu\n",
+					policy->cpuinfo.min_freq, policy->cpuinfo.max_freq, policy->min, policy->max, policy->user_policy.min, policy->user_policy.max, 
+					clk_get_rate(mpu_clk) / 1000);
+#endif
 
 	return ret;
 }
 
-static int proc_cpufreq_stats_update_addr_write(struct file *filp,
-		const char __user *buffer, unsigned long len, void *data)
-{
-	ulong newaddr;
-	int result;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if((result = strict_strtoul(buf, 0, &newaddr)))
-		return result;
-	cpufreq_stats_update_addr = newaddr;
-	if(cpufreq_stats_update_addr)
-		stats_find_addr();
-	if(cpufreq_stats_table_addr)
-		cpufreq_stats_table = *(struct cpufreq_stats **)cpufreq_stats_table_addr;
-	else
-		error_cpufreq_stats_table();
-
-	return len;
-}
 
 static int proc_freq_table_read(char *buffer, char **buffer_location,
 		off_t offset, int count, int *eof, void *data)
 {
 	int i, ret = 0;
-	
+
 	if (offset > 0)
 		ret = 0;
 	else
-		for(i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++) {
+		for(i = 0; freq_table[i].frequency != CPUFREQ_TABLE_END; i++) 
+		{
 			if(ret >= count)
 				break;
+
 			ret += scnprintf(buffer+ret, count-ret, "freq_table[%d] index=%u frequency=%u\n", i, freq_table[i].index, freq_table[i].frequency);
 		}
 
 	return ret;
 }
-
-static int proc_freq_table_write(struct file *filp, const char __user *buffer,
-		unsigned long len, void *data)
-{
-	uint index, frequency;
-
-	if(!len || len >= BUF_SIZE)
-		return -ENOSPC;
-	if(copy_from_user(buf, buffer, len))
-		return -EFAULT;
-	buf[len] = 0;
-	if(sscanf(buf, "%d %d", &index, &frequency) == 2) {
-		freq_table[index].frequency = frequency;
-		if(cpufreq_stats_table)
-			cpufreq_stats_table->freq_table[index] = frequency;
-		else
-			error_cpufreq_stats_table();
-
-	} else
-		printk(KERN_INFO "overclock: insufficient parameters for freq_table\n");
-
-	return len;
-}                        
+                       
                         
 static int proc_mpu_opps_read(char *buffer, char **buffer_location,
 		off_t offset, int count, int *eof, void *data)
 {
 	int i, ret = 0;
-	
-	if(!my_mpu_opps) {
-		error_mpu_opps();
-		return 0;
-	}
 
 	if (offset > 0)
 		ret = 0;
 	else
-		for(i = MAX_VDD1_OPP; my_mpu_opps[i].rate; i--) {
-			if(ret >= count)
-				break;
-#ifdef SMARTREFLEX
-			ret += scnprintf(buffer+ret, count-ret, "mpu_opps[%d] rate=%lu opp_id=%u vsel=%u sr_adjust_vsel=%u\n",
-				i, my_mpu_opps[i].rate,
-				my_mpu_opps[i].opp_id,
-				my_mpu_opps[i].vsel,
-				my_mpu_opps[i].sr_adjust_vsel);
-#else
-			ret += scnprintf(buffer+ret, count-ret, "mpu_opps[%d] rate=%lu opp_id=%u vsel=%u\n",
-				i, my_mpu_opps[i].rate,
-				my_mpu_opps[i].opp_id,
-				my_mpu_opps[i].vsel);
-#endif
+		// print out valid opp_id's
+		for(i = main_index;i >= base_index; i--) 
+		{
+			mpu_opps = opp_find_by_opp_id_fp(mpu_dev, i);
+			ret += scnprintf(buffer+ret, count-ret, "mpu_opps[%d] rate=%lu opp_id=%u vsel=%u u_volt=%lu\n", i, 
+			mpu_opps->rate, mpu_opps->opp_id, uv_to_vsel_fp(mpu_opps->u_volt), mpu_opps->u_volt); 		
 		}
 
 	return ret;
 }
 
+
 static int proc_mpu_opps_write(struct file *filp, const char __user *buffer,
 		unsigned long len, void *data)
 {
-	uint index, rate, vsel;
-
+	uint index, rate, vsel, volt, cpufreq_temp_min, cpufreq_temp_max;
+	bool bad_gov_check = false;
+	
+	cpufreq_temp_min = policy->cpuinfo.min_freq;
+	cpufreq_temp_max = policy->cpuinfo.max_freq;
+	
 	if(!len || len >= BUF_SIZE)
 		return -ENOSPC;
+
 	if(copy_from_user(buf, buffer, len))
 		return -EFAULT;
+
 	buf[len] = 0;
-	if(sscanf(buf, "%d %d %d", &index, &rate, &vsel) == 3) {
-		my_mpu_opps[index].rate = rate;
-		my_mpu_opps[index].vsel = vsel;
-#ifdef SMARTREFLEX
-		my_mpu_opps[index].sr_adjust_vsel = vsel;
-#endif
-	} else
+	
+	if(sscanf(buf, "%d %d %d", &index, &rate, &vsel) == 3) 
+	{
+		//check to make sure valid opp_id is entered
+		if (index < base_index || index > main_index) {
+			printk(KERN_INFO "overclock: invalid parameters for mpu_opps opp_id\n");
+			return len;
+		}
+		/* we need to lock frequency on to stop dvfs, and it can't be the
+		   same opp_id we are writing to, sloppy fix goes here */
+		if (index == main_index) {
+			policy->min = policy->cpuinfo.min_freq =
+			policy->user_policy.min =
+			policy->max = policy->cpuinfo.max_freq =
+			policy->user_policy.max = freq_table[cpufreq_index-1].frequency;
+		}
+		else {
+			policy->min = policy->cpuinfo.min_freq =
+			policy->user_policy.min = 
+			policy->max = policy->cpuinfo.max_freq =
+			policy->user_policy.max = cpufreq_temp_max;
+		}	
+		//we like making changes in userspace governor
+		if (policy->governor->name != good_governor) {
+			strcpy(orig_governor, policy->governor->name);
+			set_governor(policy, good_governor);
+			bad_gov_check = true;
+		}
+		//convert vsel to voltage in uV
+		if (vsel < 100) {
+			volt = vsel_to_uv_fp(vsel);
+		} else {
+		volt = vsel;
+		}
+		//lock up omap_vdd_info structure for mpu vdd & write  no
+		mutex_lock(&vdd->scaling_mutex);
+		//write nominal table
+		vdd->volt_data[index].volt_nominal = volt;
+		//write voltage dependancy table
+		vdd->dep_vdd_info[0].dep_table[index].main_vdd_volt = volt;
+		//unlock mpu vdd
+		mutex_unlock(&vdd->scaling_mutex);
+		//grab mpu_opps by opp_id
+		mpu_opps = opp_find_by_opp_id_fp(mpu_dev, index);
+		//write mpu_opps voltage
+		mpu_opps->u_volt = volt;
+		
+		//undo the cpu_freq lock that stops dvfs transitioning
+		if (index == main_index) {
+			policy->min = policy->cpuinfo.min_freq =
+			policy->user_policy.min = cpufreq_temp_min;
+			policy->max = policy->cpuinfo.max_freq =
+			policy->user_policy.max = rate / 1000;
+		}
+		else if (index == base_index) {
+			policy->min = policy->cpuinfo.min_freq =
+			policy->user_policy.min = rate / 1000;
+			policy->max = policy->cpuinfo.max_freq =
+			policy->user_policy.max = cpufreq_temp_max;
+		}
+		else {
+			policy->min = policy->cpuinfo.min_freq =
+			policy->user_policy.min = cpufreq_temp_min;
+			policy->max = policy->cpuinfo.max_freq =
+			policy->user_policy.max = cpufreq_temp_max;
+		}
+		//reset voltage to current values
+		omap_voltage_reset_fp(voltdm);
+		//update frequency table (index - lowest enabled opp_id)
+		freq_table[index-(base_index)].frequency = rate / 1000;
+		//write frequency for mpu_opps
+		mpu_opps->rate = rate;
+		//put us back in performance governor if we started there
+		if (bad_gov_check == true) {
+			set_governor(policy, orig_governor);
+		}
+//		cpufreq_stats_free_table_fp(0);
+//		cpufreq_stats_create_table_fp(policy, freq_table);
+//		cpufreq_stats_freq_update(0, cpufreq_index - index, rate / 1000);
+	} 
+	else
 		printk(KERN_INFO "overclock: insufficient parameters for mpu_opps\n");
 
 	return len;
-}                        
-                        
+}   
+
+#ifdef OMAP4
+static int proc_gpu_opps_read(char *buffer, char **buffer_location,
+							  off_t offset, int count, int *eof, void *data)
+{
+	int ret = 0;
+	unsigned long freq = ULONG_MAX;
+	
+	if (offset > 0)
+		ret = 0;
+	else {
+		gpu_opps = opp_find_freq_floor_fp(gpu_dev, &freq);
+		if (!gpu_opps || IS_ERR(gpu_opps)) {
+			printk(KERN_INFO "overclock: could not find gpu_opps\n");
+			return ret;
+		}
+		ret += scnprintf(buffer+ret, count-ret, "gpu_opps[%d] rate=%lu opp_id=%d u_volt=%lu\n", 
+						 gpu_opps->opp_id, gpu_opps->rate, gpu_opps->opp_id, gpu_opps->u_volt);
+	}
+	
+	return ret;
+}
+
+
+static int proc_gpu_opps_write(struct file *filp, const char __user *buffer,
+							   unsigned long len, void *data)
+{
+	uint rate;
+	unsigned long freq = ULONG_MAX;
+		
+	if(!len || len >= BUF_SIZE)
+		return -ENOSPC;
+	
+	if(copy_from_user(buf, buffer, len))
+		return -EFAULT;
+	
+	buf[len] = 0;
+	
+	if(sscanf(buf, "%d", &rate) == 1) 
+	{
+		gpu_opps = opp_find_freq_floor_fp(gpu_dev, &freq);
+		gpu_opps->rate = rate;
+	}
+	else
+		printk(KERN_INFO "overclock: insufficient parameters for gpu_opps\n");
+	
+	return len;
+}
+#endif
+
+                            
 static int proc_version_read(char *buffer, char **buffer_location,
 		off_t offset, int count, int *eof, void *data)
 {
 	int ret;
-	
+
 	if (offset > 0)
 		ret = 0;
 	else
@@ -635,97 +393,124 @@ static int proc_version_read(char *buffer, char **buffer_location,
 	return ret;
 }
 
+
 static int __init overclock_init(void)
 {
 	struct proc_dir_entry *proc_entry;
-
 	printk(KERN_INFO "overclock: %s version %s\n", DRIVER_DESCRIPTION, DRIVER_VERSION);
 	printk(KERN_INFO "overclock: by %s\n", DRIVER_AUTHOR);
 
-#ifdef LOOKUP
-	if(!omap2_clk_init_cpufreq_table_addr)
-		omap2_clk_init_cpufreq_table_addr = lookup_symbol_address("omap2_clk_init_cpufreq_table");
-	if(!cpufreq_stats_update_addr)
-		cpufreq_stats_update_addr = lookup_symbol_address("cpufreq_stats_update");
+	// opp.c
+	SYMSEARCH_BIND_FUNCTION_TO(overclock, 
+			opp_get_opp_count, opp_get_opp_count_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock, 
+			opp_find_freq_floor, opp_find_freq_floor_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			opp_find_by_opp_id, opp_find_by_opp_id_fp);
+	// opp-max.c
+#ifdef MAX8952
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			omap_max8952_vsel_to_uv,  vsel_to_uv_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			omap_max8952_uv_to_vsel,  uv_to_vsel_fp);
+#else
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			omap_twl_vsel_to_uv,  vsel_to_uv_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			omap_twl_uv_to_vsel,  uv_to_vsel_fp);
 #endif
-#ifdef EXPORT
-	if(!omap2_clk_init_cpufreq_table_addr)
-		omap2_clk_init_cpufreq_table_addr = (unsigned int)&omap2_clk_init_cpufreq_table;
-	if(!cpufreq_stats_update_addr)
-		cpufreq_stats_update_addr = (unsigned int)&cpufreq_stats_update;
+#ifdef OMAP4
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			find_dev_ptr, find_dev_ptr_fp);
 #endif
-
-
-	if(omap2_clk_init_cpufreq_table_addr)
-		omap2_find_addr();
-	if(cpufreq_stats_update_addr)
-		stats_find_addr();
+	// cpufreq_stats.c
+/*	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			cpufreq_stats_free_table, cpufreq_stats_free_table_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			cpufreq_stats_create_table, cpufreq_stats_create_table_fp); */
+	
+	// voltage.c
+	SYMSEARCH_BIND_FUNCTION_TO(overclock, 
+			omap_voltage_domain_get, omap_voltage_domain_get_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			omap_voltage_reset, omap_voltage_reset_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			__find_governor, __find_governor_fp);
+	SYMSEARCH_BIND_FUNCTION_TO(overclock,
+			__cpufreq_set_policy, __cpufreq_set_policy_fp);
 
 	freq_table = cpufreq_frequency_get_table(0);
+	
 	policy = cpufreq_cpu_get(0);
+	
 	mpu_clk = clk_get(NULL, MPU_CLK);
-	if(mpu_opps_addr)
-		my_mpu_opps = *(struct omap_opp **)mpu_opps_addr;
-	else
-		my_mpu_opps = 0;
-	if(cpufreq_stats_table_addr)
-		cpufreq_stats_table = *(struct cpufreq_stats **)cpufreq_stats_table_addr;
-	else
-		cpufreq_stats_table = 0;
-
-	if(max_rate != DRIVER_DEFAULT_RATE || max_vsel != DRIVER_DEFAULT_VSEL)
-		set_max_speed();
-
+	
+	voltdm = omap_voltage_domain_get_fp("mpu");
+	if (!voltdm || IS_ERR(voltdm)) {
+		return -ENODEV;
+	}
+	vdd = container_of(voltdm, struct omap_vdd_info, voltdm);
+	if (!vdd || IS_ERR(vdd)) {
+		return -ENODEV;
+	}
+	opp_count = vdd->volt_data_count;
+	
+	mpu_dev = omap2_get_mpuss_device();
+	if (!mpu_dev || IS_ERR(mpu_dev)) {
+		return -ENODEV;
+	}
+	
+#ifdef OMAP4
+	gpu_clk = clk_get(NULL, GPU_CLK);
+	
+	gpu_dev = find_dev_ptr_fp("gpu");
+	if (!gpu_dev || IS_ERR(gpu_dev)) {
+		return -ENODEV;
+	}
+#endif
+	enabled_mpu_opp_count = opp_get_opp_count_fp(mpu_dev);
+	
+	if (enabled_mpu_opp_count == opp_count) {
+		main_index = cpufreq_index = (enabled_mpu_opp_count-1);
+	} else {
+		main_index = enabled_mpu_opp_count;
+		cpufreq_index = (enabled_mpu_opp_count-1);
+	}
+	
+	base_index = main_index-cpufreq_index;
+		
 	buf = (char *)vmalloc(BUF_SIZE);
 
 	proc_mkdir("overclock", NULL);
 	proc_entry = create_proc_read_entry("overclock/info", 0444, NULL, proc_info_read, NULL);
-	proc_entry = create_proc_read_entry("overclock/max_rate", 0644, NULL, proc_max_rate_read, NULL);
-	proc_entry->write_proc = proc_max_rate_write;
-	proc_entry = create_proc_read_entry("overclock/max_vsel", 0644, NULL, proc_max_vsel_read, NULL);
-	proc_entry->write_proc = proc_max_vsel_write;
-	proc_entry = create_proc_read_entry("overclock/mpu_opps_addr", 0644, NULL, proc_mpu_opps_addr_read, NULL);
-	proc_entry->write_proc = proc_mpu_opps_addr_write;
-	proc_entry = create_proc_read_entry("overclock/omap2_clk_init_cpufreq_table_addr", 0644, NULL, proc_omap2_clk_init_cpufreq_table_addr_read, NULL);
-	proc_entry->write_proc = proc_omap2_clk_init_cpufreq_table_addr_write;
-	proc_entry = create_proc_read_entry("overclock/cpufreq_stats_table_addr", 0644, NULL, proc_cpufreq_stats_table_addr_read, NULL);
-	proc_entry->write_proc = proc_cpufreq_stats_table_addr_write;
-	proc_entry = create_proc_read_entry("overclock/cpufreq_stats_update_addr", 0644, NULL, proc_cpufreq_stats_update_addr_read, NULL);
-	proc_entry->write_proc = proc_cpufreq_stats_update_addr_write;
-	proc_entry = create_proc_read_entry("overclock/freq_table", 0644, NULL, proc_freq_table_read, NULL);
-	proc_entry->write_proc = proc_freq_table_write;
+	proc_entry = create_proc_read_entry("overclock/freq_table", 0444, NULL, proc_freq_table_read, NULL);
 	proc_entry = create_proc_read_entry("overclock/mpu_opps", 0644, NULL, proc_mpu_opps_read, NULL);
 	proc_entry->write_proc = proc_mpu_opps_write;
+#ifdef OMAP4
+	proc_entry = create_proc_read_entry("overclock/gpu_opps", 0644, NULL, proc_gpu_opps_read, NULL);
+	proc_entry->write_proc = proc_gpu_opps_write;
+#endif
 	proc_entry = create_proc_read_entry("overclock/version", 0444, NULL, proc_version_read, NULL);
 
 	return 0;
 }
 
+
 static void __exit overclock_exit(void)
 {
 	remove_proc_entry("overclock/version", NULL);
+#ifdef OMAP4
+	remove_proc_entry("overclock/gpu_opps", NULL);
+#endif
 	remove_proc_entry("overclock/mpu_opps", NULL);
 	remove_proc_entry("overclock/freq_table", NULL);
-	remove_proc_entry("overclock/cpufreq_stats_update_addr", NULL);
-	remove_proc_entry("overclock/cpufreq_stats_table_addr", NULL);
-	remove_proc_entry("overclock/omap2_clk_init_cpufreq_table_addr", NULL);
-	remove_proc_entry("overclock/mpu_opps_addr", NULL);
-	remove_proc_entry("overclock/max_vsel", NULL);
-	remove_proc_entry("overclock/max_rate", NULL);
 	remove_proc_entry("overclock/info", NULL);
 	remove_proc_entry("overclock", NULL);
-	 
+
 	vfree(buf);
-
-	if(max_rate != DRIVER_DEFAULT_RATE || max_vsel != DRIVER_DEFAULT_VSEL) {
-		max_rate = DRIVER_DEFAULT_RATE;
-		max_vsel = DRIVER_DEFAULT_VSEL;
-		set_max_speed();
-	}
-
 	printk(KERN_INFO "overclock: removed overclocking and unloaded\n");
 }
 
+
 module_init(overclock_init);
 module_exit(overclock_exit);
-

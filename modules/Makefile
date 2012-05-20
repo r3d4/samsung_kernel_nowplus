@@ -14,6 +14,7 @@ MODULES_VIBETONZ=y
 MODULES_KXSD9=y
 MODULES_PARAM=y
 MODULES_BATTERY=y
+MODULES_OVERCLOCK=y
 
 .PHONY: clean install
 
@@ -43,6 +44,9 @@ subdir-y += param
 endif
 ifeq ($(MODULES_BATTERY),y)
 subdir-y += battery
+endif
+ifeq ($(MODULES_OVERCLOCK),y)
+subdir-y += overclock symsearch
 endif
 
 SUBDIRS := $(subdir-y)

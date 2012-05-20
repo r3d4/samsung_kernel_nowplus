@@ -81,21 +81,13 @@
 #include	<../../../drivers/media/video/omap/omap_voutdef.h>
 #endif
 
-#if	0
-#include	"../../../drivers/media/video/cam_pmic.h"
-#include	"../../../drivers/media/video/m4mo.h"
-struct	m4mo_platform_data	nowplus_m4mo_platform_data;
-#include	"../../../drivers/media/video/s5ka3dfx.h"
-struct	s5ka3dfx_platform_data	nowplus1_s5ka3dfx_platform_data;
-#else
-//	camera	build	as	modules
-#define	M4MO_DRIVER_NAME				"m-4mo"
-#define	M4MO_I2C_ADDR					0x1F
-#define	S5KA3DFX_DRIVER_NAME			"s5ka3dfx"
-#define	S5KA3DFX_I2C_ADDR				0xC4>>1
-#define	CAM_PMIC_DRIVER_NAME			"cam_pmic"
-#define	CAM_PMIC_I2C_ADDR				0x7D
-#endif
+#define M4MO_DRIVER_NAME            "m-4mo"
+#define M4MO_I2C_ADDR               0x1F
+#define S5KA3DFX_DRIVER_NAME        "s5ka3dfx"
+#define S5KA3DFX_I2C_ADDR           0xC4>>1
+#define CAM_PMIC_DRIVER_NAME        "cam_pmic"
+#define CAM_PMIC_I2C_ADDR           0x7D
+
 
 /*	make	easy	to	register	param	to	sysfs	*/
 #define	REGISTER_PARAM(idx,name)		\
@@ -1558,30 +1550,87 @@ minor position size blocks id
  10: 0x1f280000-0x1f380000 0x00100000      8        9
  11: 0x1f380000-0x1f480000 0x00100000      8       10
 */
+//  max size = 0x1f280000-0x012c0000 = 0x1dfc0000
+
+/*
+start at limo initrd partition
+leave blocks bevore untouched so we use odin to flash
+kernel to BML partiton
+
+new layout:
+   ____________
+  | 0x00000000 |    BML AREA, flash with odin
+  |    ...     |
+  | ---------- | -----------------------------
+  | 0x012c0000 |    MTD AREA, flash from linux
+  |    ...     |
+  | ---------- | -----------------------------
+  | 0x1f280000 |    reserved area
+  |    ...     |
+  | 0x1f480000 |
+  |____________|
+
+*/
+
+#define MTD_START_OFFSET    0x012c0000   // bml initrd
+#define MTD_MAX_SIZE        0x1dfc0000   // bml initrd
+
+//for safety
+int check_mtd(struct mtd_partition *partitions , int cnt)
+{
+    int i;
+    int size=0;
+
+    //check start
+    if (partitions[0].offset != MTD_START_OFFSET)
+    {
+        printk("check_mtd failed: wrong offset of MTD start: 0x%08x!\n", partitions[0].offset);
+        return 0;
+    }
+
+    for (i=0; i<cnt; i++)
+        size+=partitions[i].size;
+    if(size > MTD_MAX_SIZE)
+    {
+        printk("check_mtd failed: wrong size of MTD area: 0x%08x!\n", size);
+        return 0;
+    }
+
+    return 1;
+}
+
 static struct mtd_partition onenand_partitions[] = {
+    {
+		.name           = "misc",
+        .offset         = MTD_START_OFFSET,
+		.size           = 0x00040000,
+	},
+    {
+		.name           = "recovery",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x00500000,
+	},
 	{
-		.name           = "initrd",
-		.offset         = 0x012c0000,
-		.size           = 0x01380000,
+		.name           = "boot",
+		.offset         = MTDPART_OFS_APPEND,
+		.size           = 0x00500000,
 		//.mask_flags     = MTD_WRITEABLE,	/* Force read-only */
 	},
 	{
 		.name           = "system",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x0b400000,
-	},
-	{
-		.name           = "data",
-		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x11340000,
-		//.size           = 0x0e640000,
+		.size           = 0x0a400000,
 	},
     {
 		.name           = "cache",
 		.offset         = MTDPART_OFS_APPEND,
 		.size           = 0x00500000,
-		//.size           = 0x03200000,
 	},
+    {
+		.name           = "userdata",
+		.offset         = MTDPART_OFS_APPEND,
+        .size           = 0x12c80000,
+    },
 
 };
 
@@ -1596,7 +1645,9 @@ static struct omap_onenand_platform_data board_onenand_data = {
 
 static void __init board_onenand_init(void)
 {
-	gpmc_onenand_init(&board_onenand_data);
+// only register if size and offset is correct
+    if(check_mtd(onenand_partitions, ARRAY_SIZE(onenand_partitions)))
+        gpmc_onenand_init(&board_onenand_data);
 }
 
 #else
