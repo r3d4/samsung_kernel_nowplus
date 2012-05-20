@@ -1603,33 +1603,32 @@ static struct mtd_partition onenand_partitions[] = {
     {
 		.name           = "misc",
         .offset         = MTD_START_OFFSET,
-		.size           = 0x00040000,
+		.size           = 0x00040000,   //262k 
 	},
     {
 		.name           = "recovery",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,
+		.size           = 0x00500000,   //5.2M
 	},
 	{
 		.name           = "boot",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,
-		//.mask_flags     = MTD_WRITEABLE,	/* Force read-only */
+		.size           = 0x00500000,   //5.2M
 	},
 	{
 		.name           = "system",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x0a400000,
+		.size           = 0x0a400000,   //172M
 	},
     {
 		.name           = "cache",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,
+		.size           = 0x00500000,   //5.2M
 	},
     {
 		.name           = "userdata",
 		.offset         = MTDPART_OFS_APPEND,
-        .size           = 0x12c80000,
+        .size           = 0x12c80000,   //315M
     },
 
 };
