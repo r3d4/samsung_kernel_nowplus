@@ -144,7 +144,7 @@ u32	hw_revision;
 EXPORT_SYMBOL(hw_revision);
 
 
-//#define	ENABLE_EMMC
+#define	ENABLE_EMMC
 
 
 #ifndef	CONFIG_TWL4030_CORE
@@ -1083,15 +1083,17 @@ static	struct	omap2_hsmmc_info	nowplus_mmc[]	=	{
 		.gpio_wp		=	-EINVAL,
 		.power_saving	=	true,
 	},
-	// {
-		// .name			=	"internal",
-		// .mmc			=	2,
-		// .caps			=	MMC_CAP_4_BIT_DATA	|	MMC_CAP_8_BIT_DATA,
-		// .gpio_cd		=	-EINVAL,
-		// .gpio_wp		=	-EINVAL,
-		// .nonremovable	=	true,
-		// .power_saving	=	true,
-	// },
+#ifdef	ENABLE_EMMC
+	{
+		.name			=	"internal",
+		.mmc			=	2,
+		.caps			=	MMC_CAP_4_BIT_DATA	|	MMC_CAP_8_BIT_DATA,
+		.gpio_cd		=	-EINVAL,
+		.gpio_wp		=	-EINVAL,
+		.nonremovable	=	true,
+		.power_saving	=	true,
+	},
+#endif
 	{
 		.mmc			=	3,
 		.caps			=	MMC_CAP_4_BIT_DATA,
@@ -1110,9 +1112,9 @@ static	int	__init	nowplus_twl_gpio_setup(struct	device	*dev,
 
 	/*	link	regulators	to	MMC	adapters	*/
 	nowplus_vmmc1_supply.dev	=	nowplus_mmc[0].dev;
-// #ifdef	ENABLE_EMMC
-	// nowplus_vmmc2_supply.dev	=	nowplus_mmc[1].dev;
-// #endif
+#ifdef	ENABLE_EMMC
+	nowplus_vmmc2_supply.dev	=	nowplus_mmc[1].dev;
+#endif
 	nowplus_vsim_supply.dev	=	nowplus_mmc[2].dev;
 
 	return	0;
@@ -1328,7 +1330,7 @@ static	struct	twl4030_platform_data	__initdata	nowplus_twl_data	__initdata	=	{
 
 	.vmmc1		=	&nowplus_vmmc1,
 #ifdef	ENABLE_EMMC
-	.vmmc2		=	&nowplus_vmmc2,	//temp	disable	movinand
+	.vmmc2		=	&nowplus_vmmc2,
 #endif
 	.vsim		=	&nowplus_vsim,
 	.vdac		=	&nowplus_vdac,
@@ -1987,26 +1989,26 @@ static	inline	void	__init	nowplus_init_fmradio(void)
 	gpio_direction_input(OMAP_GPIO_FM_INT);
 }
 
-static	inline	void	__init	nowplus_init_mmc1(void)
-{
-	if(gpio_request(OMAP_GPIO_TF_DETECT,	"OMAP_GPIO_TF_DETECT")	<	0	){
-		printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d\n",OMAP_GPIO_TF_DETECT);
-		return;
-		}
-		gpio_direction_input(OMAP_GPIO_TF_DETECT);
-		set_irq_type(OMAP_GPIO_IRQ(OMAP_GPIO_TF_DETECT),	IRQ_TYPE_EDGE_BOTH);
+// static	inline	void	__init	nowplus_init_mmc1(void)
+// {
+	// if(gpio_request(OMAP_GPIO_TF_DETECT,	"OMAP_GPIO_TF_DETECT")	<	0	){
+		// printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d\n",OMAP_GPIO_TF_DETECT);
+		// return;
+		// }
+		// gpio_direction_input(OMAP_GPIO_TF_DETECT);
+		// set_irq_type(OMAP_GPIO_IRQ(OMAP_GPIO_TF_DETECT),	IRQ_TYPE_EDGE_BOTH);
 
-	return;
-}
+	// return;
+// }
 
-static	inline	void	__init	nowplus_init_movi_nand(void)
-{
-	if(gpio_request(OMAP_GPIO_MOVI_EN,	"OMAP_GPIO_MOVI_EN")	<	0	){
-	printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_MOVI_EN);
-	return;
-	}
-	gpio_direction_output(OMAP_GPIO_MOVI_EN,0);
-}
+// static	inline	void	__init	nowplus_init_movi_nand(void)
+// {
+	// if(gpio_request(OMAP_GPIO_MOVI_EN,	"OMAP_GPIO_MOVI_EN")	<	0	){
+	// printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_MOVI_EN);
+	// return;
+	// }
+	// gpio_direction_output(OMAP_GPIO_MOVI_EN,0);
+// }
 
 static	inline	void	__init	nowplus_init_sound(void)
 {

@@ -37,6 +37,7 @@
 #include <plat/board.h>
 #include <plat/mmc.h>
 #include <plat/cpu.h>
+#include <plat/mux.h>
 
 static int debug_dma_ch =0;
 
@@ -107,6 +108,9 @@ static int debug_dma_ch =0;
 #define SOFTRESET		(1 << 1)
 #define RESETDONE		(1 << 0)
 
+
+#define OMAP_GPIO_MASSMEMORY    OMAP_GPIO_MOVI_EN
+
 /*
  * FIXME: Most likely all the data using these _DEVID defines should come
  * from the platform_data, or implemented in controller and slot specific
@@ -129,7 +133,7 @@ static int debug_dma_ch =0;
 
 //#define WA_FCLK_ENABLE
 
-#ifdef WA_FCLK_ENABLE 
+#ifdef WA_FCLK_ENABLE
 static int fclk_en_sus = 0 ;
 #endif
 
@@ -275,6 +279,63 @@ static int omap_hsmmc_1_set_power(struct device *dev, int slot, int power_on,
 	return ret;
 }
 
+static int twl_iNand_set_power(struct device *dev, int slot, int power_on, int vdd)
+{
+
+	int ret = 0;
+	struct omap_hsmmc_host * host = platform_get_drvdata(to_platform_device(dev));
+
+    printk("mmc::%s: power_on = %d\n", __func__, power_on);
+
+	if (mmc_slot(host).before_set_reg)
+		mmc_slot(host).before_set_reg(dev, slot, power_on, vdd);
+
+	if(power_on) {
+		gpio_set_value(OMAP_GPIO_MOVI_EN, 1);    // enable flash VDDF LDO, powers onchip nand
+		ret = regulator_enable(host->vcc);	// enable VDD movi controller (1.8v interface)
+
+        mdelay(50);  // spec is 1ms
+
+        // enable pullups at all MMC2 pins
+		omap_writew(0x1718, 0x48002158); //! CLK
+		omap_writew(0x1718, 0x4800215a); //! CMD
+		omap_writew(0x1718, 0x4800215c); //! DAT0
+		omap_writew(0x1718, 0x4800215e); //! DAT1
+		omap_writew(0x1718, 0x48002160); //! DAT2
+		omap_writew(0x1718, 0x48002162); //! DAT3
+		omap_writew(0x1718, 0x48002164); //! DAT4
+		omap_writew(0x1718, 0x48002166); //! DAT5
+		omap_writew(0x1718, 0x48002168); //! DAT6
+		omap_writew(0x1718, 0x4800216a); //! DAT7
+
+		mdelay(50);  //wait at least 1msec + power on ramp time
+	}
+	else {
+        // disable pullups at all MMC2 pins
+		omap_writew(0x1708, 0x48002158); //! CLK
+		omap_writew(0x1708, 0x4800215a); //! CMD
+		omap_writew(0x1708, 0x4800215c); //! DAT0
+		omap_writew(0x1708, 0x4800215e); //! DAT1
+		omap_writew(0x1708, 0x48002160); //! DAT2
+		omap_writew(0x1708, 0x48002162); //! DAT3
+		omap_writew(0x1708, 0x48002164); //! DAT4
+		omap_writew(0x1708, 0x48002166); //! DAT5
+		omap_writew(0x1708, 0x48002168); //! DAT6
+		omap_writew(0x1708, 0x4800216a); //! DAT7
+
+        ret = regulator_disable(host->vcc);	// disable 1.8V VDD
+        mdelay(5);
+		gpio_set_value(OMAP_GPIO_MASSMEMORY, 0);
+
+		/*add 150ms to stabilize VDDF power*/
+		mdelay(50);
+		mdelay(50);
+		mdelay(50);
+	}
+
+	return ret;
+}
+
 static int omap_hsmmc_23_set_power(struct device *dev, int slot, int power_on,
 				   int vdd)
 {
@@ -387,6 +448,16 @@ static int omap_hsmmc_reg_get(struct omap_hsmmc_host *host)
 		mmc_slot(host).set_sleep = omap_hsmmc_1_set_sleep;
 		break;
 	case OMAP_MMC2_DEVID:
+    	printk("%s with id%d is registered with twl_iNand_set_power \n",
+					mmc_hostname(host->mmc), host->id);
+		mmc_slot(host).set_power = twl_iNand_set_power;
+		if(gpio_request( OMAP_GPIO_MASSMEMORY, "iNand_Power_source") <0){
+			printk(KERN_ERR "Failed to get OMAP_GPIO_MASSMEMROY_EN pin \n");
+			return -1;
+		}
+		gpio_direction_output(OMAP_GPIO_MASSMEMORY, 1);
+		//mmc_slot(host).set_sleep = omap_hsmmc_23_set_sleep;
+		break;
 	case OMAP_MMC3_DEVID:
 		/* Off-chip level shifting, or none */
 		mmc_slot(host).set_power = omap_hsmmc_23_set_power;
@@ -1018,7 +1089,7 @@ static void omap_hsmmc_do_irq(struct omap_hsmmc_host *host, int status)
 	data = host->data;
 	dev_dbg(mmc_dev(host->mmc), "IRQ Status is %x\n", status);
 
-#ifdef  _SOFTWARE_TIMEOUT_    
+#ifdef  _SOFTWARE_TIMEOUT_
 	if ((status & ERR) || (status & TC) || (status & CC))
 	{
 		if (timer_pending(&host->sw_timer))
@@ -1400,11 +1471,12 @@ static void set_data_timeout(struct omap_hsmmc_host *host,
 			     unsigned int timeout_ns,
 			     unsigned int timeout_clks)
 {
-#if 0
+
 	unsigned int timeout, cycle_ns;
 	uint32_t reg, clkd, dto = 0;
 
 	reg = OMAP_HSMMC_READ(host->base, SYSCTL);
+#if 0
 	clkd = (reg & CLKD_MASK) >> CLKD_SHIFT;
 	if (clkd == 0)
 		clkd = 1;
@@ -1428,19 +1500,15 @@ static void set_data_timeout(struct omap_hsmmc_host *host,
 		if (dto > 14)
 			dto = 14;
 	}
-
+#else
+	/* Set dto to max value of 14 to avoid SD Card timeouts */
+    // see http://lists.linuxtogo.org/pipermail/openembedded-devel/2011-July/034084.html
+	dto = 14;
+#endif
 	reg &= ~DTO_MASK;
 	reg |= dto << DTO_SHIFT;
 	OMAP_HSMMC_WRITE(host->base, SYSCTL, reg);
-#else
-    uint32_t reg;
 
-    reg = OMAP_HSMMC_READ(host->base, SYSCTL);
-
-    reg &= ~DTO_MASK;
-    reg |= DTO << DTO_SHIFT;
-    OMAP_HSMMC_WRITE(host->base, SYSCTL, reg);
-#endif
 }
 
 /*
@@ -1918,15 +1986,15 @@ static int omap_hsmmc_disable_fclk(struct mmc_host *mmc, int lazy)
 	return 0;
 }
 
-#ifdef  _SOFTWARE_TIMEOUT_  
+#ifdef  _SOFTWARE_TIMEOUT_
 
-static void 
+static void
 mmc_omap_timeout_irq(unsigned long data)
 {
 	struct omap_hsmmc_host *host = (struct omap_hsmmc_host *) data;
 	int status = 0;
 	u32 regval = 0;
-	int i = debug_dma_ch ;  
+	int i = debug_dma_ch ;
 	struct mmc_data *data_t;
 	
 	data_t = host->data;
@@ -1942,10 +2010,10 @@ mmc_omap_timeout_irq(unsigned long data)
 		 omap_hsmmc_enable(host);
 		}
 
-	//SD card dump            
+	//SD card dump
 	regval = omap_readl(0x4809C010);     // _SYSCONFIG
 	printk("MMCHS_SYSCONFIG   %x  \n",regval);
-	regval = 0;    
+	regval = 0;
 
 	regval = omap_readl(0x4809C104);   //MMCHS_BLK
 	printk("MMCHS_BLK   %x \n",regval);
@@ -1953,9 +2021,9 @@ mmc_omap_timeout_irq(unsigned long data)
 
 	regval = omap_readl(0x4809C10C);    //MMCHS_CMD
 	printk("MMCHS_CMD   %x \n",regval);
-	regval = 0;      
+	regval = 0;
 
-	regval = omap_readl(0x4809C130);  //MMCHS_STAT 
+	regval = omap_readl(0x4809C130);  //MMCHS_STAT
 	printk("MMCHS_STAT   %x \n",regval);
 	regval = 0;
 
@@ -1966,39 +2034,39 @@ mmc_omap_timeout_irq(unsigned long data)
 	regval = omap_readl(0x4809C12C);  //MMCHS_SYSCTL
 	printk("MMCHS_SYSCONFIG   %x  \n",regval);
 	regval = 0;
-	     
-	//DMA     
+	
+	//DMA
 	regval = omap_readl(0x4805608C + (i*0x60));  //DMA4_CSRi
 	printk("DMA4_CSRi   %x \n",regval);
 	regval = 0;
 
 	regval = omap_readl(0x48056080+(i*0x60));  //DMA4_CCRi
 	printk("DMA4_CCRi   %x \n",regval);
-	regval = 0;    
+	regval = 0;
 
 	regval = omap_readl(0x48056094 + (i*0x60));  //DMA4_CENi
 	printk("DMA4_CENi   %x \n",regval);
-	regval = 0;     
+	regval = 0;
 
 	regval = omap_readl(0x48056098 + (i*0x60));  //DMA4_CFNi
 	printk("DMA4_CFNi   %x \n",regval);
-	regval = 0; 
+	regval = 0;
 
 	regval = omap_readl(0x4805609C + (i * 0x60));  //DMA4_CSSAi
 	printk("DMA4_CSSAi   %x \n",regval);
-	regval = 0; 
+	regval = 0;
 
 	regval = omap_readl(0x480560B4 + (i * 0x60));  //DMA4_CSACi
 	printk("DMA4_CSACi   %x \n",regval);
-	regval = 0; 
+	regval = 0;
 
 	regval = omap_readl(0x480560B8 + (i * 0x60));  //DMA4_CDACi
 	printk("DMA4_CDACi   %x \n",regval);
-	regval = 0; 
+	regval = 0;
 
 	regval = omap_readl(0x480560C0 + (i * 0x60));  //DMA4_CCFNi
 	printk("DMA4_CCFNi   %x  \n",regval);
-	regval = 0; 
+	regval = 0;
 
 	status = OMAP_HSMMC_READ(host->base, STAT);
 	printk("[MMC] Controller status = 0x%08x   dmachn = %d \n", status,i);
@@ -2211,7 +2279,7 @@ static int __init omap_hsmmc_probe(struct platform_device *pdev)
 
 	spin_lock_init(&host->irq_lock);
 
-#ifdef  _SOFTWARE_TIMEOUT_  
+#ifdef  _SOFTWARE_TIMEOUT_
 	init_timer(&host->sw_timer);
 	host->sw_timer.function = mmc_omap_timeout_irq;
 	host->sw_timer.data = (unsigned long) host;

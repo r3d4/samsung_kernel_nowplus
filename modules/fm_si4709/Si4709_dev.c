@@ -367,6 +367,7 @@ int Si4709_dev_powerup(void)
     debug("Si4709_dev_powerup called");
 
     mutex_lock(&(Si4709_dev.lock)); 
+    enable_irq(Si4709_IRQ);
 
     if(!(RADIO_ON==Si4709_dev.state.power_state))
     {
@@ -465,7 +466,7 @@ int Si4709_dev_powerdown(void)
     {
         debug("powerdown failed");
     }
-
+    disable_irq(Si4709_IRQ);
     mutex_unlock(&(Si4709_dev.lock)); 
 
     return ret;
