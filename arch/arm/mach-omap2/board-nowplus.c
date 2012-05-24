@@ -1571,7 +1571,7 @@ new layout:
   |____________|
 
 */
-#define MTD_SPLASH_SIZE     0x00060000  
+#define MTD_SPLASH_SIZE     3*(64*2048)
 #define MTD_START_OFFSET    (0x012c0000+MTD_SPLASH_SIZE)   
 #define MTD_MAX_SIZE        (0x1dfc0000-MTD_SPLASH_SIZE)  
 
@@ -1604,32 +1604,32 @@ static struct mtd_partition onenand_partitions[] = {
     {
 		.name           = "misc",
         .offset         = MTD_START_OFFSET,
-		.size           = 0x00040000,   //262k 
+		.size           = 2*(64*2048),
 	},
     {
 		.name           = "recovery",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,   //5.2M
+		.size           = 40*(64*2048),
 	},
 	{
 		.name           = "boot",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,   //5.2M
+		.size           = 40*(64*2048),
 	},
 	{
 		.name           = "system",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x0a400000,   //172M
+		.size           = 1312*(64*2048),
 	},
     {
 		.name           = "cache",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = 0x00500000,   //5.2M
+		.size           = 40*(64*2048),
 	},
     {
 		.name           = "userdata",
 		.offset         = MTDPART_OFS_APPEND,
-        .size           = 0x12c80000-MTD_SPLASH_SIZE,   //315M
+        .size           = 2401*(64*2048),
     },
 
 };
