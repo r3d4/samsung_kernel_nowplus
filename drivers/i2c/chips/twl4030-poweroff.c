@@ -73,7 +73,7 @@ static void twl4030_poweroff(void)
 }
 
 
-static void zeus_poweroff(void)
+static void nowplus_poweroff(void)
 {
 	/* int n_usbic_state; */
 
@@ -94,15 +94,6 @@ static void zeus_poweroff(void)
          msleep(2000);
 	}	
 #endif
-	/* get_real_usbic_state(); */
-	//gpio_direction_output(GPIO_MSM_RST,0);
-	//gpio_direction_output(GPIO_FONE_ACTIVE, 0);
-	// if (GPIO_TA_CONNECTED_N is LOW)
-// #if (CONFIG_ARCHER_REV < ARCHER_REV13)
-	// if ( get_real_usbic_state() )
-// #else
-	// if ( !gpio_get_value( OMAP_GPIO_TA_NCONNECTED ) || gpio_get_value( OMAP_GPIO_IF_CON_SENSE ) )
-// #endif
 	if( sec_switch_get_cable_status() != CABLE_TYPE_NONE)
 	{
 		printk("Warmreset by TA or USB or Jtag\n\n");
@@ -132,7 +123,7 @@ static void zeus_poweroff(void)
 		printk("Power Off !\n\n");
 		while(1)
 		{
-			gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 0);
+			gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
 
 			if (0 /*is_powerbutton_pressed*/)
 				printk("Power button is pressed\n\n");
@@ -148,7 +139,7 @@ static void zeus_poweroff(void)
 
 static int __init twl4030_poweroff_init(void)
 {
-	pm_power_off = zeus_poweroff;
+	pm_power_off = nowplus_poweroff;
 
 	return 0;
 }

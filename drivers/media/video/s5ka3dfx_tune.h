@@ -482,7 +482,7 @@ static const u32 reg_init_vga_table[] =
   0xef03,
   0x6e40,  //Dgain Min
   0x6f6a,  //Dgain Max
-  
+  0x7001, 
   0xef00,
   0x4800,
   0x4900,

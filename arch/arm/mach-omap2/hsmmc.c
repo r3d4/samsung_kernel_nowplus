@@ -118,6 +118,7 @@ static void omap_hsmmc1_after_set_reg(struct device *dev, int slot,
 		else
 			reg |= OMAP2_PBIASLITEVMODE0;
 		omap_ctrl_writel(reg, control_pbias_offset);
+        udelay(4);   /* 4 microsec delay for comparator to generate an error*/
 //TI patch OMAPS00239755
 	    reg = omap_ctrl_readl(control_pbias_offset);
 

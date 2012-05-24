@@ -1571,9 +1571,10 @@ new layout:
   |____________|
 
 */
+#define MTD_SPLASH_SIZE     0x00060000  
+#define MTD_START_OFFSET    (0x012c0000+MTD_SPLASH_SIZE)   
+#define MTD_MAX_SIZE        (0x1dfc0000-MTD_SPLASH_SIZE)  
 
-#define MTD_START_OFFSET    0x012c0000   // bml initrd
-#define MTD_MAX_SIZE        0x1dfc0000   // bml initrd
 
 //for safety
 int check_mtd(struct mtd_partition *partitions , int cnt)
@@ -1628,7 +1629,7 @@ static struct mtd_partition onenand_partitions[] = {
     {
 		.name           = "userdata",
 		.offset         = MTDPART_OFS_APPEND,
-        .size           = 0x12c80000,   //315M
+        .size           = 0x12c80000-MTD_SPLASH_SIZE,   //315M
     },
 
 };
@@ -2105,6 +2106,20 @@ static	inline	void	__init	nowplus_init_earphone(void)
 
 static	inline	void	__init	nowplus_init_platform(void)
 {
+	/*PS HOLD*/
+	if(gpio_request(OMAP_GPIO_PS_HOLD_PU,	"OMAP_GPIO_PS_HOLD_PU")	<	0	){
+			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_PS_HOLD_PU);
+			return;
+		}
+	gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 1);
+    
+	/*PDA ACTIVE*/
+	if(gpio_request(OMAP_GPIO_PDA_ACTIVE,	"OMAP_GPIO_PDA_ACTIVE")	<	0	){
+			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_PDA_ACTIVE);
+			return;
+		}
+	gpio_direction_output(OMAP_GPIO_PDA_ACTIVE, 1);
+    
 	/*NAND	INT_GPIO*/
 	if(gpio_request(OMAP_GPIO_AP_NAND_INT,	"OMAP_GPIO_AP_NAND_INT")	<	0	){
 			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_AP_NAND_INT);
@@ -2354,12 +2369,15 @@ static	void	__init	nowplus_init(void)
 
 // debug: get video ram addres from SBL
 // 0x4805 0480+ j * 0x04    printk(    "DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));    printk(    "DISPC_GFX_BA1: 0x%08x\n", omap_readl(0x48050484));    printk(    "DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xf-//debug 0x4805 0480+ j * 0x04
-    printk(    " --- SBL dump -->\n"); 
-    printk(    "    DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));
-    printk(    "    GFXFORMAT: 0x%01x\n", omap_readl(0x480504A0)>>1&0xf);
-    printk(    "    DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xff );
-    printk(    "    DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
-    printk(    " <-- SBL dump ---\n"); 
+    // printk(    " --- SBL dump -->\n"); 
+    // printk(    "    DISPC_GFX_BA0: 0x%08x\n", omap_readl(0x48050480));
+    // printk(    "    GFXFORMAT: 0x%01x\n", omap_readl(0x480504A0)>>1&0xf);
+    // printk(    "    DISPC_GFX_POSITION: %dx%d\n", omap_readl(0x48050488)&0xff, (omap_readl(0x48050488)>>16)&0xff );
+    // printk(    "    DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
+    // printk(    "    ---\n");   
+    // printk(    "    CM_CLKSEL1_PLL: %dx%d\n", omap_readl(0x48004D40));
+
+    // printk(    " <-- SBL dump ---\n"); 
 
 
 	platform_add_devices(nowplus_devices,	ARRAY_SIZE(nowplus_devices));

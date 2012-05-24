@@ -599,7 +599,8 @@ static int __init parse_tag_cmdline(const struct tag *tag)
 #ifndef CONFIG_CMDLINE_FORCE
 	strlcpy(default_command_line, tag->u.cmdline.cmdline, COMMAND_LINE_SIZE);
 #else
-	printk(KERN_WARNING "Ignoring tag cmdline(using the default kernel command line)\n");
+	printk(KERN_WARNING "Ignoring tag cmdline: %s\n", tag->u.cmdline.cmdline);
+	printk(KERN_WARNING "   using the default kernel command line\n");
 #endif /* CONFIG_CMDLINE_FORCE */
 	return 0;
 

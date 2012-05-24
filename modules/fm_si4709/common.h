@@ -13,6 +13,8 @@
 #define GPIO_LEVEL_HIGH             1
 #define GPIO_LEVEL_LOW              0
 
+/*Si4709 IRQ Number*/
+#define Si4709_IRQ OMAP_GPIO_IRQ(OMAP_GPIO_FM_INT)
 
 #define error(fmt,arg...) printk(KERN_CRIT fmt "\n",## arg)
 #ifdef Si4709_DEBUG

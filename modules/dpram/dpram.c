@@ -1547,13 +1547,13 @@ static void check_miss_interrupt(void)
 
 static int dpram_suspend(struct platform_device *dev, pm_message_t state)
 {
-	gpio_direction_output(OMAP_GPIO_PDA_ACTIVE, 0);
+	gpio_set_value(OMAP_GPIO_PDA_ACTIVE, 0);
 	return 0;
 }
 
 static int dpram_resume(struct platform_device *dev)
 {
-	gpio_direction_output(OMAP_GPIO_PDA_ACTIVE, 1);
+	gpio_set_value(OMAP_GPIO_PDA_ACTIVE, 1);
 	check_miss_interrupt();
 	return 0;
 }
@@ -1561,12 +1561,6 @@ static int dpram_resume(struct platform_device *dev)
 void enable_dpram_pins(void)
 {
 	int ret;
-
-	/*PDA ACTIVE*/
-	if(gpio_request(OMAP_GPIO_PDA_ACTIVE, "OMAP_GPIO_PDA_ACTIVE") < 0 ){
-    		printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d \n",OMAP_GPIO_PDA_ACTIVE);
-    		return;
-  	}
 
 	ret = gpio_request( OMAP_GPIO_PHONE_ACTIVE, "OMAP_GPIO_PHONE_ACTIVE");
 	if (ret < 0)
@@ -1603,7 +1597,7 @@ void enable_dpram_pins(void)
 		//return;
 	}
 
-	gpio_direction_output(OMAP_GPIO_PDA_ACTIVE, 1);
+	gpio_set_value(OMAP_GPIO_PDA_ACTIVE, 1);
 	gpio_direction_input( OMAP_GPIO_PHONE_ACTIVE );
 	gpio_direction_input( OMAP_GPIO_INT_ONEDRAM_AP );
 	gpio_direction_output( OMAP_GPIO_FONE_ON, 0 );
@@ -1614,7 +1608,6 @@ void enable_dpram_pins(void)
 }
 void disable_dpram_pins(void)
 {
-	gpio_free( OMAP_GPIO_PDA_ACTIVE );
 	gpio_free( OMAP_GPIO_PHONE_ACTIVE );
 	gpio_free( OMAP_GPIO_INT_ONEDRAM_AP );
 	gpio_free( OMAP_GPIO_FONE_ON );

@@ -23,10 +23,6 @@
 
 /*******************************************************/
 
-/*Si4709 IRQ Number*/
-#define Si4709_IRQ OMAP_GPIO_IRQ(OMAP_GPIO_FM_INT)
-//#define Si4709_IRQ 1
-
 /*static functions*/
 
 /*file operatons*/
