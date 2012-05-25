@@ -41,18 +41,17 @@
 #include <linux/interrupt.h>
 #include "mux.h"
 
-/* Impossible HW revisions to avoid warnings */
-#ifndef CONFIG_SAMSUNG_EMU_HW_REV
-#define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
-#endif
-#ifndef CONFIG_SAMSUNG_REL_HW_REV
-#define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
-#endif
+// /* Impossible HW revisions to avoid warnings */
+// #ifndef CONFIG_SAMSUNG_EMU_HW_REV
+// #define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
+// #endif
+// #ifndef CONFIG_SAMSUNG_REL_HW_REV
+// #define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
+// #endif
 
-#if ( defined( CONFIG_MACH_SAMSUNG_NOWPLUS ) )
-#include <plat/mux_nowplus.h>
-#include "mux_nowplus.c"
-#endif
+// #if ( defined( CONFIG_MACH_SAMSUNG_NOWPLUS ) )
+// #include <plat/mux_nowplus.h>
+// #endif
 
 #define OMAP_MUX_BASE_OFFSET		0x30	/* Offset from CTRL_BASE */
 #define OMAP_MUX_BASE_SZ		0x5ca
@@ -195,11 +194,10 @@ static int __init _omap_mux_init_signal(struct omap_mux_partition *partition,
 				old_mode = omap_mux_read(partition,
 							 m->reg_offset);
 				mux_mode = val | i;
-				printk/*pr_debug*/("%s: Setting signal "
+				pr_debug("%s: Setting signal "
 					 "%s.%s 0x%04x -> 0x%04x\n",
 					 __func__, m0_entry, muxname,
 					old_mode, mux_mode);
-				
 				omap_mux_write(partition, mux_mode,
 					       m->reg_offset);
 				found++;
@@ -317,13 +315,15 @@ static inline void omap_mux_decode(struct seq_file *s, u16 val)
 
 	OMAP_MUX_TEST_FLAG(val, OMAP_PIN_OFF_WAKEUPENABLE);
 	if (val & OMAP_OFF_EN) {
-		if (!(val & OMAP_OFFOUT_EN)) {
-			if (!(val & OMAP_OFF_PULL_UP)) {
-				OMAP_MUX_TEST_FLAG(val,
-					OMAP_PIN_OFF_INPUT_PULLDOWN);
-			} else {
-				OMAP_MUX_TEST_FLAG(val,
-					OMAP_PIN_OFF_INPUT_PULLUP);
+		if (val & OMAP_OFFOUT_EN) {
+			if (val & OMAP_OFF_PULL_EN) {
+				if (!(val & OMAP_OFF_PULL_UP)) {
+					OMAP_MUX_TEST_FLAG(val,
+						OMAP_PIN_OFF_INPUT_PULLDOWN);
+				} else {
+					OMAP_MUX_TEST_FLAG(val,
+						OMAP_PIN_OFF_INPUT_PULLUP);
+				}
 			}
 		} else {
 			if (!(val & OMAP_OFFOUT_VAL)) {
@@ -862,7 +862,6 @@ static void omap_mux_init_signals(struct omap_mux_partition *partition,
 				  struct omap_board_mux *board_mux)
 {
 	omap_mux_set_cmdline_signals();
-	//omap_mux_write_array(partition->base, board_mux); //Bug 
     omap_mux_write_array(partition, board_mux);
 }
 
@@ -921,38 +920,4 @@ int __init omap_mux_init(const char * name, u32 flags,
 	omap_mux_init_signals(partition, board_mux);
 
 	return 0;
-}
-
-int omap_gpio_out_init( void )
-{
-	int i;
-	int gpio=output_gpio[i][0];
-	int state=output_gpio[i][1];
-
-	for( i = 0 ; i < ARRAY_SIZE( output_gpio ) ; i++ ) 
-	{
-		if (gpio_request(gpio, "") < 0) {
-			printk(KERN_ERR "can't get %d GPIO\n" , gpio);
-			return 0; 
-		}
-		gpio_direction_output(gpio, state);
-		gpio_free(gpio);
-	}
-
-	return 1;
-}
-
-
-EXPORT_SYMBOL(omap_gpio_out_init);
-int set_wakeup_gpio( void )
-{
-	int ret = 0;
-	int i;
-
-	for( i = 0 ; i < ARRAY_SIZE( wakeup_gpio ) ; i++ ) 
-       {
-		enable_irq_wake( OMAP_GPIO_IRQ( wakeup_gpio[i] ) );
-	}
-
-	return ret;
 }

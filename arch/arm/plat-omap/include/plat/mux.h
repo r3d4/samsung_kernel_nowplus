@@ -33,13 +33,13 @@
 #ifndef __ASM_ARCH_MUX_H
 #define __ASM_ARCH_MUX_H
 
-/* Impossible HW revisions to avoid warnings */
-#ifndef CONFIG_SAMSUNG_EMU_HW_REV
-#define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
-#endif
-#ifndef CONFIG_SAMSUNG_REL_HW_REV
-#define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
-#endif
+// /* Impossible HW revisions to avoid warnings */
+// #ifndef CONFIG_SAMSUNG_EMU_HW_REV
+// #define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
+// #endif
+// #ifndef CONFIG_SAMSUNG_REL_HW_REV
+// #define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
+// #endif
 
 #if ( defined( CONFIG_MACH_SAMSUNG_NOWPLUS ) )
 #include "mux_nowplus.h"
@@ -679,6 +679,4 @@ static inline int omap_cfg_reg(unsigned long reg_cfg) { return 0; }
 
 extern int omap2_mux_init(void);
 
-extern int omap_gpio_out_init( void );
-extern int set_wakeup_gpio( void );
 #endif

@@ -57,71 +57,51 @@
         .mux_val        = mux_value                             \
 },
 
-#define OMAP_GPIO_FM_INT	    3	//r
-#define OMAP_GPIO_USBSW_NINT        10	//r
-#define OMAP_GPIO_AP_NAND_INT       13	//r
-#define OMAP_GPIO_AP_ALARM          14	//r
-#define OMAP_GPIO_INT_ONEDRAM_AP    15	//r
-#define OMAP_GPIO_CHG_ING_N         16	//r
-#define OMAP_GPIO_WLAN_IRQ          21	//r
+#define OMAP_GPIO_FM_INT            3    //r
+#define OMAP_GPIO_USBSW_NINT        10    //r
+#define OMAP_GPIO_AP_NAND_INT       13    //r
+#define OMAP_GPIO_AP_ALARM          14    //r
+#define OMAP_GPIO_INT_ONEDRAM_AP    15    //r
+#define OMAP_GPIO_CHG_ING_N         16    //r
+#define OMAP_GPIO_WLAN_IRQ          21    //r
 #define OMAP_GPIO_SYS_DRM_MSECURE   22  //r  //output
-#define OMAP_GPIO_TF_DETECT         23	//r
-#define OMAP_GPIO_KEY_PWRON         24	//r
+#define OMAP_GPIO_TF_DETECT         23    //r
+#define OMAP_GPIO_KEY_PWRON         24    //r
 #define OMAP_GPIO_PS_HOLD_PU        25  //r  //output H
-#define OMAP_GPIO_EAR_KEY           26	//r
-#define OMAP_GPIO_DET_3_5           27	//r
-//#define OMAP_GPIO_PS_VOUT           28	//u
-//#define OMAP_GPIO_COMPASS_RST	    35  //u // output
-#define OMAP_GPIO_PCM_SEL	    52	//r
-#define OMAP_GPIO_PS_OUT            53	//r
-#define OMAP_GPIO_IF_CON_SENSE      54	//r
-
-//#define OMAP_GPIO_MAIN_MIC_LDO_EN   55	//u
-#define OMAP_GPIO_VF	 	    56	//r
-//#define OMAP_GPIO_TV_SEL	    60	//u
-//#define OMAP_GPIO_TA_NCONNECTED     61	//u
-//#define OMAP_GPIO_CAM_1P8V_EN       62  //u  //output
+#define OMAP_GPIO_EAR_KEY           26    //r
+#define OMAP_GPIO_DET_3_5           27    //r
+#define OMAP_GPIO_PCM_SEL           52    //r
+#define OMAP_GPIO_PS_OUT            53    //r
+#define OMAP_GPIO_IF_CON_SENSE      54    //r
+#define OMAP_GPIO_VF                56    //r
 #define OMAP_GPIO_BT_NSHUTDOWN      63  //r  //output
-#define OMAP_GPIO_VGA_RST        64  //r     
-#define OMAP_GPIO_FM_nRST	    65	//r
-//#define OMAP_GPIO_CP_BOOT_SEL       65    //output
+#define OMAP_GPIO_VGA_RST           64  //r     
+#define OMAP_GPIO_FM_nRST           65    //r
 #define OMAP_GPIO_CAM_RST           98  //r  //output
-#define OMAP_GPIO_LCD_REG_RST       99	//r
+#define OMAP_GPIO_LCD_REG_RST       99    //r
 #define OMAP_GPIO_ISP_INT           100 //r
-#define OMAP_GPIO_VGA_STBY          101	//r  
-//#define OMAP_GPIO_USIM_BOOT         101   //output
-//#define OMAP_GPIO_CAM_1P2V_EN       102   //output
-#define OMAP_GPIO_PDA_ACTIVE        111   //r	//output
-//#define OMAP_GPIO_MIC_SEL           114
-#define OMAP_GPIO_ACC_INT           115	  //r
-#define OMAP_GPIO_UART_SEL          126   //r	//output
-//#define OMAP_GPIO_VGA_RST	    127   
-//#define OMAP_GPIO_EAR_SEL           136
-#define OMAP_GPIO_FONE_ON	    140	  //r	//output
-#define OMAP_GPIO_MOTOR_EN          141   //r	//output
+#define OMAP_GPIO_VGA_STBY          101    //r  
+#define OMAP_GPIO_PDA_ACTIVE        111   //r    //output
+#define OMAP_GPIO_ACC_INT           115      //r
+#define OMAP_GPIO_UART_SEL          126   //r    //output
+#define OMAP_GPIO_FONE_ON           140      //r    //output
+#define OMAP_GPIO_MOTOR_EN          141   //r    //output
 #define OMAP_GPIO_TOUCH_IRQ         142   //r
-//#define OMAP_GPIO_TSP_EN            149
 #define OMAP_GPIO_USB_SEL           150    //r //output
-#define OMAP_GPIO_RGB_RST	    151	  //r //output
+#define OMAP_GPIO_RGB_RST           151      //r //output
 #define OMAP_GPIO_CAM_EN            152   //r //output
-//#define OMAP_GPIO_CAM_STBY          153   //output
-#define OMAP_GPIO_PHONE_ACTIVE      154	  //r
-#define OMAP_GPIO_MOVI_EN	    155         //r
-#define OMAP_GPIO_HW_REV0           156	  //r
-#define OMAP_GPIO_CHG_EN            157   //r	//output 
-#define OMAP_GPIO_HW_REV1           158	  //r
-#define OMAP_GPIO_HW_REV2           159	  //r
-#define OMAP_GPIO_WLAN_EN           160   //r	//output
-#define OMAP_GPIO_LCD_ID            161	  //r
-#define OMAP_GPIO_EAR_MIC_LDO_EN    162   //r	//output
-//#define OMAP_GPIO_CMC_EN	    163  //output
-//#define OMAP_GPIO_CMC_EN1	    165  //output
-//#define OMAP_GPIO_CMC_EN2	    166  //output
-//#define OMAP_GPIO_KEY_VOLDN         164
-#define OMAP_GPIO_CAMERA_LEVEL_CTRL           167   //output H //OMAP3430_GPIO_CAMERA_LEVEL_CTRL
-#define OMAP_GPIO_MLCD_RST          170   //r	//output H
-#define OMAP_GPIO_TVOUT_SEL	    177
-//#define OMAP_GPIO_EAR_ADC_SEL       177   //output
+#define OMAP_GPIO_PHONE_ACTIVE      154      //r
+#define OMAP_GPIO_MOVI_EN           155         //r
+#define OMAP_GPIO_HW_REV0           156      //r
+#define OMAP_GPIO_CHG_EN            157   //r    //output 
+#define OMAP_GPIO_HW_REV1           158      //r
+#define OMAP_GPIO_HW_REV2           159      //r
+#define OMAP_GPIO_WLAN_EN           160   //r    //output
+#define OMAP_GPIO_LCD_ID            161      //r
+#define OMAP_GPIO_EAR_MIC_LDO_EN    162   //r    //output
+#define OMAP_GPIO_CAMERA_LEVEL_CTRL 167   //output H //OMAP3430_GPIO_CAMERA_LEVEL_CTRL
+#define OMAP_GPIO_MLCD_RST          170   //r    //output H
+#define OMAP_GPIO_TVOUT_SEL         177
 #define OMAP_GPIO_MSM_RST18_N       178   //r //output H
 
 
