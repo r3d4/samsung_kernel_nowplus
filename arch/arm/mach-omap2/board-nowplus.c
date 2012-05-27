@@ -89,6 +89,15 @@
 #define CAM_PMIC_I2C_ADDR           0x7D
 
 
+#define TWL4030_RESCONFIG(res,grp,typ1,typ2,state) \
+{ \
+    .resource = res, \
+    .devgroup = grp, \
+    .type = typ1, \
+    .type2 = typ2, \
+    .remap_sleep = state \
+}
+    
 /*	make	easy	to	register	param	to	sysfs	*/
 #define	REGISTER_PARAM(idx,name)		\
 static	ssize_t	name##_show(struct	device	*dev,	struct	device_attribute	*attr,	char	*buf)\
@@ -1128,82 +1137,47 @@ static	struct	twl4030_madc_platform_data	nowplus_madc_data	=	{
 	.irq_line	=	1,
 };
 
+/*
+ TWL5030 power management sequences
+    DEV_GRP_P1= sleep when OMAP SYS_OFF_MODE=L  (only used in real OFF_MODE, not in RETENTION!)
+    DEV_GRP_P3= sleep when OMAP SYS_CLKREQ=L
+    
+#define MSG_BROADCAST(devgrp, grp, type, type2, state) \
+        ( (devgrp) << 13 | 1 << 12 | (grp) << 9 | (type2) << 7 \
+        | (type) << 4 | (state))
+
+#define MSG_SINGULAR(devgrp, id, state) \
+        ((devgrp) << 13 | 0 << 12 | (id) << 4 | (state))
+*/
 /* 'Active to Sleep' sequence */
 static	struct	twl4030_ins	__initdata	sleep_on_seq[]	=	{
-	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_RC,	RES_TYPE_ALL,0x0,RES_STATE_SLEEP),	4},
-	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_ALL,	RES_TYPE_ALL,0x0,RES_STATE_SLEEP),	2},
-};
-
-static	struct	twl4030_script	sleep_on_script	__initdata	=	{
-	.script	=	sleep_on_seq,
-	.size	=	ARRAY_SIZE(sleep_on_seq),
-	.flags	=	TWL4030_SLEEP_SCRIPT,
+	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_RC,	    RES_TYPE_ALL,0x0,RES_STATE_SLEEP),	4}, //set RC group to sleep
+	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_ALL,	RES_TYPE_ALL,0x0,RES_STATE_SLEEP),	2}, // set all resource to sleep
 };
 
 /* 'Sleep to Active (P12)' sequence */
 static	struct	twl4030_ins	wakeup_p12_seq[]	__initdata	=	{
 	//{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_RES,	RES_TYPE_ALL,0x2,RES_STATE_ACTIVE),	2},
-	{MSG_SINGULAR(DEV_GRP_P1,	RES_CLKEN,	RES_STATE_ACTIVE),	2},
-	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_ALL,	RES_TYPE_ALL,0x0,RES_STATE_ACTIVE),	2},
+	{MSG_SINGULAR(DEV_GRP_P1,	RES_CLKEN,	RES_STATE_ACTIVE),	2},                        //set CLKEN to active
+	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_ALL,	RES_TYPE_ALL,0x0,RES_STATE_ACTIVE),	2},   //set all resourcec to active  
 
-};
-
-static	struct	twl4030_script	wakeup_p12_script	__initdata	=	{
-	.script	=	wakeup_p12_seq,
-	.size	=	ARRAY_SIZE(wakeup_p12_seq),
-	.flags	=	TWL4030_WAKEUP12_SCRIPT,
 };
 
 /* 'Sleep to Active' (P3) sequence */
 static	struct	twl4030_ins	wakeup_p3_seq[]	__initdata	=	{
-	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_RC,	RES_TYPE_ALL,0x0,RES_STATE_ACTIVE),	0x37},
-};
-
-static	struct	twl4030_script	wakeup_p3_script	__initdata	=	{
-	.script	=	wakeup_p3_seq,
-	.size	=	ARRAY_SIZE(wakeup_p3_seq),
-	.flags	=	TWL4030_WAKEUP3_SCRIPT,
+	{MSG_BROADCAST(DEV_GRP_NULL,	RES_GRP_RC,	RES_TYPE_ALL,0x0,RES_STATE_ACTIVE),	0x37},  // set RC group to active (nRESPWRON, CLKEN, SYSEN, HFCLKOUT, 32KCLKOUT, TRITON_RESET)
 };
 
 /* warm reset sequence  */
 static	struct	twl4030_ins	wrst_seq[]	__initdata	=	{
-/*
-	*	Reset	twl4030.
-	*	Reset	VDD1	regulator.
-	*	Reset	VDD2	regulator.
-	*	Reset	VPLL1	regulator.
-	*	Enable	sysclk	output.
-	*	Reenable	twl4030.
-	*/
-	{MSG_SINGULAR(DEV_GRP_NULL,	RES_RESET,	RES_STATE_OFF),	2},
-	{MSG_SINGULAR(DEV_GRP_P1,	RES_VDD1,	RES_STATE_WRST),	0xE},			//	VDD1
-	{MSG_SINGULAR(DEV_GRP_P1,	RES_VDD2,	RES_STATE_WRST),	0xE},			//	VDD2
-	{MSG_SINGULAR(DEV_GRP_P1,	RES_VPLL1,	RES_STATE_WRST),	0x60},			//	VPLL1
-	{MSG_SINGULAR(DEV_GRP_P1,	RES_HFCLKOUT,	RES_STATE_ACTIVE),	2},
-	{MSG_SINGULAR(DEV_GRP_NULL,	RES_RESET,	RES_STATE_ACTIVE),	2},
-};
-static	struct	twl4030_script	wrst_script	__initdata	=	{
-	.script	=	wrst_seq,
-	.size	=	ARRAY_SIZE(wrst_seq),
-	.flags	=	TWL4030_WRST_SCRIPT,
+	{MSG_SINGULAR(DEV_GRP_NULL,	RES_RESET,	    RES_STATE_OFF),	    2},         //	Reset	twl4030.
+	{MSG_SINGULAR(DEV_GRP_P1,	RES_VDD1,	    RES_STATE_WRST),	0xE},		//	Reset	VDD1	regulator.
+	{MSG_SINGULAR(DEV_GRP_P1,	RES_VDD2,	    RES_STATE_WRST),	0xE},		//	Reset	VDD2	regulator.
+	{MSG_SINGULAR(DEV_GRP_P1,	RES_VPLL1,	    RES_STATE_WRST),	0x60},		//	Reset	VPLL1	regulator.
+	{MSG_SINGULAR(DEV_GRP_P1,	RES_HFCLKOUT,	RES_STATE_ACTIVE),	2},         //	Enable	sysclk	output.
+	{MSG_SINGULAR(DEV_GRP_NULL,	RES_RESET,	    RES_STATE_ACTIVE),	2},         //	Reenable	twl4030.
 };
 
-static	struct	twl4030_script	*twl4030_scripts[]	__initdata	=	{
-	&sleep_on_script,
-	&wakeup_p12_script,
-	&wakeup_p3_script,
-	&wrst_script,
-};
-
-#define TWL4030_RESCONFIG(res,grp,typ1,typ2,state) \
-{ \
-    .resource = res, \
-    .devgroup = grp, \
-    .type = typ1, \
-    .type2 = typ2, \
-    .remap_sleep = state \
-}
-    
 static struct twl4030_resconfig twl4030_rconfig[] = {
 //                    .resource     .devgroup  .type .type2 .remap_sleep
     TWL4030_RESCONFIG(RES_HFCLKOUT, DEV_GRP_P3,     -1, -1, RES_STATE_OFF   ),
@@ -1235,6 +1209,33 @@ static struct twl4030_resconfig twl4030_rconfig[] = {
     TWL4030_RESCONFIG(RES_VUSB_3V1, -1,             -1, -1, RES_STATE_OFF   ),
     
     TWL4030_RESCONFIG(0, 0, 0, 0, 0),
+};
+
+static	struct	twl4030_script	sleep_on_script	__initdata	=	{
+	.script	=	sleep_on_seq,
+	.size	=	ARRAY_SIZE(sleep_on_seq),
+	.flags	=	TWL4030_SLEEP_SCRIPT,
+};
+static	struct	twl4030_script	wakeup_p12_script	__initdata	=	{
+	.script	=	wakeup_p12_seq,
+	.size	=	ARRAY_SIZE(wakeup_p12_seq),
+	.flags	=	TWL4030_WAKEUP12_SCRIPT,
+};
+static	struct	twl4030_script	wakeup_p3_script	__initdata	=	{
+	.script	=	wakeup_p3_seq,
+	.size	=	ARRAY_SIZE(wakeup_p3_seq),
+	.flags	=	TWL4030_WAKEUP3_SCRIPT,
+};
+static	struct	twl4030_script	wrst_script	__initdata	=	{
+	.script	=	wrst_seq,
+	.size	=	ARRAY_SIZE(wrst_seq),
+	.flags	=	TWL4030_WRST_SCRIPT,
+};
+static	struct	twl4030_script	*twl4030_scripts[]	__initdata	=	{
+	&sleep_on_script,
+	&wakeup_p12_script,
+	&wakeup_p3_script,
+	&wrst_script,
 };
 static	struct	twl4030_power_data	nowplus_t2scripts_data	__initdata	=	{
 	.scripts	=	twl4030_scripts,
@@ -1755,97 +1756,6 @@ int	config_twl4030_resource_remap(	void	)
 {
 	int	ret	=	0;
 	printk("Start	config_twl4030_resource_remap\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_CLKEN_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_CLKEN_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VDD1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VDD1_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VDD2_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VDD2_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VPLL1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VPLL1_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VPLL2_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VPLL2_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_HFCLKOUT_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_HFCLKOUT_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VINTANA2_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VINTANA2_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_SLEEP,	TWL4030_VINTDIG_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VINTDIG_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_SLEEP,	TWL4030_VIO_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VIO_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VSIM_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VSIM_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VAUX1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VAUX1_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_ACTIVE,	TWL4030_VAUX2_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VAUX2_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VAUX3_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VAUX3_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VAUX4_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VAUX4_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VMMC1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VMMC1_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VMMC2_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VMMC2_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VDAC_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VDAC_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VUSB1V5_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VUSB1V5_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VUSB1V8_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VUSB1V8_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_VUSB3V1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VUSB3V1_REMAP\n");
-
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_OFF,	TWL4030_REGEN_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_REGEN_REMAP\n");
-
-	//	[	-	In	order	to	prevent	damage	to	the	PMIC(TWL4030	or	5030),
-	//		VINTANA1	should	maintain	active	state	even	though	the	system	is	in	offmode.
-	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	REMAP_ACTIVE,	TWL4030_VINTANA1_REMAP	);
-	if	(ret)
-		printk("	board-file:	fail	to	set	reousrce	remap	TWL4030_VINTANA1_REMAP\n");
-	//	]
 
 #if	1//TI	HS.Yoon	20101018	for	increasing	VIO	level	to	1.85V
 	ret	=	twl_i2c_write_u8(	TWL4030_MODULE_PM_RECEIVER,	0x1,	TWL4030_VIO_VSEL	);
