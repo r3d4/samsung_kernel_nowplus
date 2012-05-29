@@ -271,16 +271,16 @@ static struct platform_device androidusb_device = {
 
 #ifdef CONFIG_USB_ANDROID_MASS_STORAGE
 static struct usb_mass_storage_platform_data usbms_plat = {
-	.vendor		= "Texas Instruments Inc.",
-	.product	= "OMAP4",
-	.release	= 1,
-	.nluns		= 1,
+	.vendor			= "Samsung Electronics",
+	.product		= CONFIG_SAMSUNG_MODEL_NAME,
+	.release		= 0xffff,
+	.nluns			= 2,
 };
 
 static struct platform_device usb_mass_storage_device = {
-	.name		= "usb_mass_storage",
-	.id		= -1,
-	.dev		= {
+	.name	= "usb_mass_storage",
+	.id	= -1,
+	.dev	= {
 		.platform_data = &usbms_plat,
 	},
 };

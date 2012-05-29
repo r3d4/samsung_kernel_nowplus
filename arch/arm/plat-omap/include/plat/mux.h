@@ -33,13 +33,6 @@
 #ifndef __ASM_ARCH_MUX_H
 #define __ASM_ARCH_MUX_H
 
-// /* Impossible HW revisions to avoid warnings */
-// #ifndef CONFIG_SAMSUNG_EMU_HW_REV
-// #define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
-// #endif
-// #ifndef CONFIG_SAMSUNG_REL_HW_REV
-// #define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
-// #endif
 
 #if ( defined( CONFIG_MACH_SAMSUNG_NOWPLUS ) )
 #include "mux_nowplus.h"

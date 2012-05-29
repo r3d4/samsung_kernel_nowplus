@@ -807,6 +807,14 @@ composite_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *ctrl)
 	u16				w_length = le16_to_cpu(ctrl->wLength);
 	struct usb_function		*f = NULL;
 	u8				endp;
+	unsigned long			flags;
+
+    spin_lock_irqsave(&cdev->lock, flags);
+	if (!cdev->connected) {
+		cdev->connected = 1;
+		schedule_work(&cdev->switch_work);
+	}
+	spin_unlock_irqrestore(&cdev->lock, flags);
 
 	/* partial re-init of the response message; the function or the
 	 * gadget might need to intercept e.g. a control-OUT completion
@@ -1036,6 +1044,7 @@ static void composite_disconnect(struct usb_gadget *gadget)
 		}
 	} else {
 		skip_condition = 0;
+        cdev->connected = 0;
 		schedule_work(&cdev->switch_work);
 		INFO(cdev, "3**********composite_disconnect -> switch_work\n");
 	}
@@ -1106,8 +1115,8 @@ composite_unbind(struct usb_gadget *gadget)
 		kfree(cdev->req->buf);
 		usb_ep_free_request(gadget->ep0, cdev->req);
 	}
-
-	switch_dev_unregister(&cdev->sdev);
+	switch_dev_unregister(&cdev->sw_connected);
+	switch_dev_unregister(&cdev->sw_config);
 	kfree(cdev);
 	set_gadget_data(gadget, NULL);
 	device_remove_file(&gadget->dev, &dev_attr_suspended);
@@ -1142,15 +1151,26 @@ composite_switch_work(struct work_struct *data)
 	struct usb_composite_dev	*cdev =
 		container_of(data, struct usb_composite_dev, switch_work);
 	struct usb_configuration *config = cdev->config;
+	int connected;
+	unsigned long flags;
 
 	INFO(cdev,"composite_switch_work: config=0x%p\n", (void*)config);
 
-	if (config) {
-		INFO(cdev, "switch_uevent 1: old = %d, new = %d\n", cdev->sdev.state, config->bConfigurationValue);
-		switch_set_state(&cdev->sdev, config->bConfigurationValue);
+    spin_lock_irqsave(&cdev->lock, flags);
+	if (cdev->connected != cdev->sw_connected.state) {
+		connected = cdev->connected;
+		spin_unlock_irqrestore(&cdev->lock, flags);
+		switch_set_state(&cdev->sw_connected, connected);
 	} else {
-		INFO(cdev, "switch_uevent 2: old = %d, new = 0\n", cdev->sdev.state);
-		switch_set_state(&cdev->sdev, 0);
+		spin_unlock_irqrestore(&cdev->lock, flags);
+	}
+
+	if (config) {
+		INFO(cdev, "switch_uevent 1: old = %d, new = %d\n", cdev->sw_config.state, config->bConfigurationValue);
+		switch_set_state(&cdev->sw_config, config->bConfigurationValue);
+	} else {
+		INFO(cdev, "switch_uevent 2: old = %d, new = 0\n", cdev->sw_config.state);
+		switch_set_state(&cdev->sw_config, 0);
 	}
 }
 
@@ -1204,9 +1224,14 @@ static int composite_bind(struct usb_gadget *gadget)
 	status = composite->bind(cdev);
 	if (status < 0)
 		goto fail;
-
-	cdev->sdev.name = "usb_configuration";
-	status = switch_dev_register(&cdev->sdev);
+        
+	cdev->sw_connected.name = "usb_connected";
+	status = switch_dev_register(&cdev->sw_connected);
+	if (status < 0)
+		goto fail;
+        
+	cdev->sw_config.name = "usb_configuration";
+	status = switch_dev_register(&cdev->sw_config);
 	if (status < 0)
 		goto fail;
 	INIT_WORK(&cdev->switch_work, composite_switch_work);

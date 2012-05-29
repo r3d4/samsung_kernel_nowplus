@@ -819,8 +819,7 @@ static	inline	void	__init	nowplus_init_battery(void)
 	//	samsung_charger_resources[1].start	=	IH_USBIC_BASE	+	1;		//	is	charger	connected	?
 
     
-   
-  
+#if 0
 	if (gpio_request(OMAP_GPIO_USBSW_NINT, "usb switch irq") < 0) {
 		printk(KERN_ERR "Failed to request GPIO%d for usb switch IRQ\n",
 		       OMAP_GPIO_USBSW_NINT);
@@ -854,6 +853,7 @@ static	inline	void	__init	nowplus_init_battery(void)
 	else {
 		samsung_charger_resources[3].start = gpio_to_irq(OMAP_GPIO_CHG_EN);
 	}
+#endif
 }
 
 static	inline	void	__init	nowplus_init_ear_key(void)
@@ -1296,7 +1296,7 @@ static	int	nowplus_charger_enable(void)	{
 
 	if(	sec_switch_get_cable_status()	)
 	{
-		gpio_direction_output(OMAP_GPIO_CHG_EN,	0);
+		gpio_set_value(OMAP_GPIO_CHG_EN,	0);
 		set_irq_type	(OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N),	IRQ_TYPE_EDGE_RISING);
 		return	1;
 	}
@@ -1307,7 +1307,7 @@ static	int	nowplus_charger_enable(void)	{
 static	void	nowplus_charger_disable(void)
 {
 	set_irq_type(OMAP_GPIO_IRQ(OMAP_GPIO_CHG_ING_N),	IRQ_TYPE_NONE);
-	gpio_direction_output(OMAP_GPIO_CHG_EN,	1);
+	gpio_set_value(OMAP_GPIO_CHG_EN,	1);
 }
 
 static	int	nowplus_charger_done(void)
@@ -1519,7 +1519,7 @@ new layout:
 #define MTD_START_OFFSET    (0x012c0000+MTD_SPLASH_SIZE)   
 #define MTD_MAX_SIZE        (0x1dfc0000-MTD_SPLASH_SIZE)  
 
-
+#ifdef CONFIG_MTD_PARTITIONS
 //for safety
 int check_mtd(struct mtd_partition *partitions , int cnt)
 {
@@ -1577,21 +1577,27 @@ static struct mtd_partition onenand_partitions[] = {
     },
 
 };
-
+#endif
 static struct omap_onenand_platform_data board_onenand_data = {
 	.cs		= 0,
 	//.gpio_irq	= OMAP_GPIO_AP_NAND_INT,
     .dma_channel = -1,  /* disable DMA in OMAP OneNAND driver */
+#ifdef CONFIG_MTD_PARTITIONS
 	.parts		= onenand_partitions,
 	.nr_parts	= ARRAY_SIZE(onenand_partitions),
+#endif
 	.flags		= ONENAND_SYNC_READWRITE,
 };
 
 static void __init board_onenand_init(void)
 {
+#ifdef CONFIG_MTD_PARTITIONS
 // only register if size and offset is correct
     if(check_mtd(onenand_partitions, ARRAY_SIZE(onenand_partitions)))
         gpmc_onenand_init(&board_onenand_data);
+#else
+    gpmc_onenand_init(&board_onenand_data);
+#endif
 }
 
 #else
@@ -2146,7 +2152,7 @@ static	const	struct	usbhs_omap_platform_data	usbhs_pdata	__initconst	=	{
 
 void	__init	nowplus_peripherals_init(void)
 {
-	/*	For	Display	*/
+    nowplus_i2c_init();
 
 	board_onenand_init();
 	synaptics_dev_init();
@@ -2156,10 +2162,21 @@ void	__init	nowplus_peripherals_init(void)
 	mod_clock_correction();
 #endif
 	enable_board_wakeup_source();
+
+    nowplus_ramconsole_init();
+	nowplus_init_power_key();
+	nowplus_init_ear_key();
+	nowplus_init_battery();
+	nowplus_init_platform();
+	nowplus_init_lcd();
+	nowplus_init_PL();
+	nowplus_init_fmradio();
+	nowplus_init_camera();
+	nowplus_init_wlan();
 	
+    /*	For	Display	*/
+    spi_register_board_info(nowplus_spi_board_info,	ARRAY_SIZE(nowplus_spi_board_info));
 	omap_display_init(&nowplus_dss_data);
-	spi_register_board_info(nowplus_spi_board_info,	ARRAY_SIZE(nowplus_spi_board_info));
-    nowplus_i2c_init();
 }
 
 
@@ -2233,17 +2250,6 @@ static	void	__init	nowplus_init(void)
 #ifdef	CONFIG_OMAP_SMARTREFLEX_CLASS3
 	sr_class3_init();
 #endif
-
-	nowplus_ramconsole_init();
-	nowplus_init_power_key();
-	nowplus_init_ear_key();
-	nowplus_init_battery();
-	nowplus_init_platform();
-	nowplus_init_lcd();
-	nowplus_init_PL();
-	nowplus_init_fmradio();
-	nowplus_init_camera();
-	nowplus_init_wlan();
 		
 #ifdef	CONFIG_PM
 #ifdef	CONFIG_TWL4030_CORE
@@ -2254,13 +2260,13 @@ static	void	__init	nowplus_init(void)
 #endif
 }
 
-#if	0
+
 static	void	__init	bootloader_reserve_sdram(void)
 {
 	u32	paddr;
 	u32	size	=	0x80000;
 
-	paddr	=	0x8D000000;
+	paddr	=	0x8FB80000; //0x8fc00000; //fb addr set by Samsung SBL
 
 	paddr	-=	size;
 
@@ -2268,16 +2274,14 @@ static	void	__init	bootloader_reserve_sdram(void)
 		pr_err("FB:	failed	to	reserve	VRAM\n");
 	}
 }
-#endif
+
 
 static	void	__init	nowplus_map_io(void)
 {
 	omap2_set_globals_343x();
 	omap34xx_map_common_io();
 	omap2_ramconsole_reserve_sdram();
-	#if	0
-	bootloader_reserve_sdram();
-	#endif
+	//bootloader_reserve_sdram();
 }
 
 static	void	__init	nowplus_fixup(struct	machine_desc	*desc,

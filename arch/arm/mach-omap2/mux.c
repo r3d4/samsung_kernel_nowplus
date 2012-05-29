@@ -41,17 +41,7 @@
 #include <linux/interrupt.h>
 #include "mux.h"
 
-// /* Impossible HW revisions to avoid warnings */
-// #ifndef CONFIG_SAMSUNG_EMU_HW_REV
-// #define CONFIG_SAMSUNG_EMU_HW_REV	0xFFFF
-// #endif
-// #ifndef CONFIG_SAMSUNG_REL_HW_REV
-// #define CONFIG_SAMSUNG_REL_HW_REV	0xFFFF
-// #endif
-
-// #if ( defined( CONFIG_MACH_SAMSUNG_NOWPLUS ) )
-// #include <plat/mux_nowplus.h>
-// #endif
+#define DEBUG
 
 #define OMAP_MUX_BASE_OFFSET		0x30	/* Offset from CTRL_BASE */
 #define OMAP_MUX_BASE_SZ		0x5ca
@@ -178,7 +168,7 @@ static int __init _omap_mux_init_signal(struct omap_mux_partition *partition,
 
 		/* First check for full name in mode0.muxmode format */
 		if (mode0_len && strncmp(muxname, m0_entry, mode0_len))
-			continue;
+			continue;       
 
 		/* Then check for muxmode only */
 		for (i = 0; i < OMAP_MUX_NR_MODES; i++) {
@@ -214,7 +204,7 @@ static int __init _omap_mux_init_signal(struct omap_mux_partition *partition,
 		return -EINVAL;
 	}
 
-	pr_err("%s: Could not set signal %s\n", __func__, muxname);
+    pr_err("%s: Could not set signal %s, not found\n", __func__, muxname);
 
 	return -ENODEV;
 }
@@ -914,7 +904,10 @@ int __init omap_mux_init(const char * name, u32 flags,
 		mux_partitions_cnt, partition->name, partition->flags);
 
 	omap_mux_init_package(superset, package_subset, package_balls);
-#if 0 // Archer integration - Corrupts mux pad making power key, and head set detection fail
+#if 1
+/* had to disable usb_ehci, conflicts with gpio_24 & gpio_27
+   USB host interface use same pins like power button and ear key switch
+*/
 	omap_mux_init_list(partition, superset);
 #endif
 	omap_mux_init_signals(partition, board_mux);
