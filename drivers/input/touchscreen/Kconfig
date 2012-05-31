@@ -308,7 +308,7 @@ config TOUCHSCREEN_SYNAPTICS_I2C_RMI
 	depends on I2C
 	help
 	  This enables support for Synaptics RMI over I2C based touchscreens.
-	  
+
 config TOUCHSCREEN_SYNAPTICS_I2C_RMI4
 	tristate "Synaptics i2c rmi4 touchscreen"
 	depends on I2C
@@ -318,6 +318,20 @@ config TOUCHSCREEN_SYNAPTICS_I2C_RMI4
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called synaptics_rmi4_ts.
+
+config TOUCHSCREEN_SYNAPTICS_RMI4
+    tristate "Synaptics i2c replaced touchscreen for i8320"
+    depends on I2C
+    help
+        This enables support for Synaptics RMI over I2C based touchscreens.
+        Altenative driver to Synaptics i2c rmi4 touchscreen
+
+config TOUCHSCREEN_NOWPLUS
+	tristate "C-Type Touchscreen support for i8320"
+	depends on I2C
+	help
+	  Say Y here for if you are using the touchscreen features of MCS-5000.
+
 
 config TOUCHSCREEN_TOUCHRIGHT
 	tristate "Touchright serial touchscreen"

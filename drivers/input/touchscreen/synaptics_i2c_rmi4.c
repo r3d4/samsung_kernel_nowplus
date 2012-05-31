@@ -32,12 +32,13 @@
 #include <linux/interrupt.h>
 #include <linux/regulator/consumer.h>
 #include <linux/input/synaptics_i2c_rmi4.h>
+#include <linux/delay.h> //elpass 20120422
 
 /* TODO: for multiple device support will need a per-device mutex */
 #define DRIVER_NAME "synaptics_rmi4_i2c"
 
 #define MAX_ERROR_REPORT	6
-#define MAX_PRESSURE                (1)
+#define MAX_PRESSURE        (1)
 #define MAX_TOOL_WIDTH      (15)
 #define MAX_TOUCH_MAJOR     (255)
 #define MAX_TOUCH_MINOR     (15)
@@ -75,6 +76,7 @@
 #define SYNAPTICS_RMI4_TOUCHPAD_FUNC_NUM	(0x11)
 #define SYNAPTICS_RMI4_DEVICE_CONTROL_FUNC_NUM	(0x01)
 
+//extern int nowplus_enable_touch_pins(int enable);  //elpass 20120530 for k35
 /**
  * struct synaptics_rmi4_fn_desc - contains the funtion descriptor information
  * @query_base_addr: base address for query
@@ -163,6 +165,7 @@ struct synaptics_rmi4_device_info {
  * @fn01_ctrl_base_addr: control base address for fn01
  * @fn01_query_base_addr: query base address for fn01
  * @fn01_data_base_addr: data base address for fn01
+ * @fn01_cmd_base_addr: command base address for fn01   ///elpass 20120422
  * @sensor_max_x: sensor maximum x value
  * @sensor_max_y: sensor maximum y value
  * @regulator: pointer to the regulator structure
@@ -183,6 +186,7 @@ struct synaptics_rmi4_data {
 	unsigned short		fn01_ctrl_base_addr;
 	unsigned short		fn01_query_base_addr;
 	unsigned short		fn01_data_base_addr;
+	unsigned short		fn01_cmd_base_addr;  ///elpass 20120422
 	int			sensor_max_x;
 	int			sensor_max_y;
 	struct regulator	*regulator;
@@ -394,15 +398,15 @@ static int synpatics_rmi4_touchpad_report(struct synaptics_rmi4_data *pdata,
 				z[touch_count]	=
 						(data[4]);
 
-				if (pdata->board->x_flip)
+			if (pdata->board->x_flip)
 					x[touch_count] =
 						pdata->sensor_max_x -
 								x[touch_count];
-				if (pdata->board->y_flip)
+/*elpass 20120416	if (pdata->board->y_flip)
 					y[touch_count] =
 						pdata->sensor_max_y -
 								y[touch_count];
-			}
+*/			}
 			/* number of active touch points */
 			touch_count++;
 		}
@@ -411,16 +415,26 @@ static int synpatics_rmi4_touchpad_report(struct synaptics_rmi4_data *pdata,
 	/* report to input subsystem */
 	if (touch_count) {
 		for (finger = 0; finger < touch_count; finger++) {
-			input_report_abs(pdata->input_dev, ABS_MT_TOUCH_MAJOR,
+///elpass 20120422
+			if((x[finger]==0 || x[finger]==480) && y[finger]<28) {  //&& (wx[finger] | wy[finger])==0 && z[finger] <30) {
+///elpass 20120424	printk(KERN_INFO "SynapticsDev Report:finger%d--X:%d;Y:%d;WX:%d;WY:%d;Z:%d \n",(int)finger,(int)x[finger],(int)y[finger],(int)wx[finger],(int)wy[finger],(int)z[finger]); 
+				retval = synaptics_rmi4_i2c_byte_write(pdata, pdata->fn01_cmd_base_addr, (0x01));
+				if (retval < 0)	printk(KERN_ERR "SynapticsDev:Write Reset data Error! %d \n",(int)retval);
+				touch_count=touch_count-1;
+				mdelay(20);
+			}else {
+				input_report_abs(pdata->input_dev, ABS_MT_TOUCH_MAJOR,
 						z[finger]);
-			input_report_abs(pdata->input_dev, ABS_MT_WIDTH_MAJOR,
+				input_report_abs(pdata->input_dev, ABS_MT_WIDTH_MAJOR,
 						max(wx[finger] , wy[finger]));
-			input_report_abs(pdata->input_dev, ABS_MT_POSITION_X,
+				input_report_abs(pdata->input_dev, ABS_MT_POSITION_X,
 								x[finger]);
-			input_report_abs(pdata->input_dev, ABS_MT_POSITION_Y,
+				input_report_abs(pdata->input_dev, ABS_MT_POSITION_Y,
 								y[finger]);
-			
+			}
 			input_mt_sync(pdata->input_dev);
+			if (x[0]==x[1] && y[1]<28)
+				break;
 		}
 	} else
 		input_mt_sync(pdata->input_dev);
@@ -767,6 +781,8 @@ static int synaptics_rmi4_i2c_query_device(struct synaptics_rmi4_data *pdata)
 						rmi_fd.ctrl_base_addr;
 				pdata->fn01_data_base_addr =
 						rmi_fd.data_base_addr;
+/*elpass 20120422*/			pdata->fn01_cmd_base_addr =
+						rmi_fd.cmd_base_addr;
 				break;
 			case SYNAPTICS_RMI4_TOUCHPAD_FUNC_NUM:
 				if (rmi_fd.intr_src_count) {
@@ -953,8 +969,10 @@ static int __devinit synaptics_rmi4_probe
 			goto err_regulator;
 		}
 		regulator_enable(rmi4_data->regulator);
-	}
 
+	}
+//    nowplus_enable_touch_pins(1);  //elpass 20120530 for k35
+    
 	init_waitqueue_head(&rmi4_data->wait);
 	/*
 	 * Copy i2c_client pointer into RTID's i2c_client pointer for
@@ -1045,6 +1063,7 @@ err_query_dev:
 		regulator_disable(rmi4_data->regulator);
 		regulator_put(rmi4_data->regulator);
 	}
+//    nowplus_enable_touch_pins(0); //elpass 20120530 for k35
 err_regulator:
 	input_free_device(rmi4_data->input_dev);
 	rmi4_data->input_dev = NULL;
@@ -1092,25 +1111,35 @@ static int synaptics_rmi4_suspend(struct i2c_client *client, pm_message_t mesg)
 {
 	/* Touch sleep mode */
 	int retval;
-	unsigned char intr_status;
+	unsigned char status;
 	struct synaptics_rmi4_data *rmi4_data = i2c_get_clientdata(client);
 	const struct synaptics_rmi4_platform_data *pdata = rmi4_data->board;
 	rmi4_data->touch_stopped = true;
 	disable_irq(pdata->irq_number);
-
+#if 0
 	retval = synaptics_rmi4_i2c_block_read(rmi4_data,
 				rmi4_data->fn01_data_base_addr + 1,
 				&intr_status,
 				rmi4_data->number_of_interrupt_register);
 	if (retval < 0)
 		return retval;
-#if 0
-	retval = synaptics_rmi4_i2c_byte_write(rmi4_data,
-					rmi4_data->fn01_ctrl_base_addr + 1,
-					(intr_status & ~TOUCHPAD_CTRL_INTR));
+#else
+    retval = synaptics_rmi4_i2c_block_read(rmi4_data,
+				rmi4_data->fn01_ctrl_base_addr,
+				&status,
+				sizeof(status));
 	if (retval < 0)
 		return retval;
-#endif		
+#endif
+    status &=	0xf8;	// and 1111 1000 - clear 0~2
+	status |= 0x01;		// or 0000 0001
+	retval = synaptics_rmi4_i2c_byte_write(rmi4_data,
+					rmi4_data->fn01_ctrl_base_addr,
+					(status));
+	if (retval < 0)
+		return retval;
+				
+//    nowplus_enable_touch_pins(0); //elpass 20120530 for k35
 	if (pdata->regulator_en)
 		regulator_disable(rmi4_data->regulator);
 	return 0;
@@ -1127,29 +1156,41 @@ static int synaptics_rmi4_suspend(struct i2c_client *client, pm_message_t mesg)
 static int synaptics_rmi4_resume(struct i2c_client *client)
 {
 	int retval;
-	unsigned char intr_status;
+	unsigned char status;
 	struct synaptics_rmi4_data *rmi4_data = i2c_get_clientdata(client);
 	const struct synaptics_rmi4_platform_data *pdata = rmi4_data->board;
 
 	if (pdata->regulator_en)
 		regulator_enable(rmi4_data->regulator);
+		
+//	nowplus_enable_touch_pins(1); //elpass 20120530 for k35
 
 	enable_irq(pdata->irq_number);
 	rmi4_data->touch_stopped = false;
-
+#if 0
 	retval = synaptics_rmi4_i2c_block_read(rmi4_data,
 				rmi4_data->fn01_data_base_addr + 1,
 				&intr_status,
 				rmi4_data->number_of_interrupt_register);
 	if (retval < 0)
 		return retval;
-#if 0
-	retval = synaptics_rmi4_i2c_byte_write(rmi4_data,
-					rmi4_data->fn01_ctrl_base_addr + 1,
-					(intr_status | TOUCHPAD_CTRL_INTR));
+#else
+    retval = synaptics_rmi4_i2c_block_read(rmi4_data,
+				rmi4_data->fn01_ctrl_base_addr,
+				&status,
+				sizeof(status));
 	if (retval < 0)
 		return retval;
-#endif		
+		
+#endif
+    status &=	0xfc;	// and 1111 1100
+	status |= 0x04;		// or 0000 0100
+	retval = synaptics_rmi4_i2c_byte_write(rmi4_data,
+					rmi4_data->fn01_ctrl_base_addr,
+					(status));
+	if (retval < 0)
+		return retval;
+
 	return 0;
 }
 
