@@ -2260,7 +2260,7 @@ static	void	__init	nowplus_init(void)
 #endif
 }
 
-
+#if 0
 static	void	__init	bootloader_reserve_sdram(void)
 {
 	u32	paddr;
@@ -2274,7 +2274,7 @@ static	void	__init	bootloader_reserve_sdram(void)
 		pr_err("FB:	failed	to	reserve	VRAM\n");
 	}
 }
-
+#endif
 
 static	void	__init	nowplus_map_io(void)
 {
