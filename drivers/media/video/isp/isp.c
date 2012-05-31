@@ -516,12 +516,8 @@ static void isp_enable_interrupts(struct device *dev)
 		| IRQ0ENABLE_HS_VS_IRQ
 		| isp->interrupts;
 
-	if (isp_complete_reset) {
-		isp_reg_writel(dev, -1, OMAP3_ISP_IOMEM_MAIN, ISP_IRQ0STATUS);
-		isp_complete_reset = 0;
-	}
 
-	isp_reg_or(dev, OMAP3_ISP_IOMEM_MAIN, ISP_IRQ0ENABLE, irq0enable);
+
 
 	if (CCDC_PREV_CAPTURE(isp))
 	{
@@ -534,6 +530,11 @@ static void isp_enable_interrupts(struct device *dev)
 		irq0enable |= IRQ0ENABLE_PRV_DONE_IRQ | IRQ0ENABLE_RSZ_DONE_IRQ;
 	}
 #endif	
+	//if (isp_complete_reset) {
+		isp_reg_writel(dev, -1, OMAP3_ISP_IOMEM_MAIN, ISP_IRQ0STATUS);
+		isp_complete_reset = 0;
+	//}
+	isp_reg_or(dev, OMAP3_ISP_IOMEM_MAIN, ISP_IRQ0ENABLE, irq0enable);
 
 	return;
 }

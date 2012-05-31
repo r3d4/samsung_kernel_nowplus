@@ -1022,7 +1022,7 @@ int ispccdc_try_pipeline(struct isp_ccdc_device *isp_ccdc,
 	pipe->ccdc_out_w_img = pipe->ccdc_out_w;
 	/* Round up to nearest 32 pixels. */
 	/* removed align this is not valid*/
-//	pipe->ccdc_out_w = ALIGN(pipe->ccdc_out_w, PHY_ADDRESS_ALIGN);
+	pipe->ccdc_out_w = ALIGN(pipe->ccdc_out_w, PHY_ADDRESS_ALIGN);
 
 	isp_ccdc->lsc_request_enable = isp_ccdc->lsc_request_user;
 
