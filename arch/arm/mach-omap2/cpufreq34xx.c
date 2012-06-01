@@ -42,11 +42,11 @@ static unsigned long omap3_l3_get_rate(struct device *dev);
 struct clk *dpll1_clk, *dpll2_clk, *dpll3_clk;
 
 static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
-#if 0
+#if 1
 	/* MPU OPP1 */
 	OMAP_OPP_DEF("mpu", true, 125000000, 975000),
 	/* MPU OPP2 */
-	OMAP_OPP_DEF("mpu", true, 250000000, 1000000),
+	OMAP_OPP_DEF("mpu", true, 250000000, 1075000),
 	/* MPU OPP3 */
 	OMAP_OPP_DEF("mpu", true, 500000000, 1200000),
 	/* MPU OPP4 */
@@ -63,7 +63,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	 */
 	OMAP_OPP_DEF("l3_main", false, 41500000, 975000),
 	/* L3 OPP2 */
-	OMAP_OPP_DEF("l3_main", true, 83000000, 1000000),
+	OMAP_OPP_DEF("l3_main", false, 83000000, 1050000),
 	/* L3 OPP3 */
 	OMAP_OPP_DEF("l3_main", true, 166000000, 1150000),
 
@@ -71,7 +71,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* DSP OPP1 */
 	OMAP_OPP_DEF("iva", true, 90000000, 975000),
 	/* DSP OPP2 */
-	OMAP_OPP_DEF("iva", true, 180000000, 1000000),
+	OMAP_OPP_DEF("iva", true, 180000000, 1075000),
 	/* DSP OPP3 */
 	OMAP_OPP_DEF("iva", true, 360000000, 1200000),
 	/* DSP OPP4 */

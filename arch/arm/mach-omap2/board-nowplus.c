@@ -527,15 +527,15 @@ static	struct	platform_device	nowplus_dss_device	=	{
 
 #ifdef	CONFIG_PM
 static	struct	omap_volt_vc_data	vc_config	=	{
-#if 0
+#if 1
 	/* MPU / IVA / ARM */
 	.vdd0_on	= 1200000, /* 1.2v */
-	.vdd0_onlp	= 1000000, /* 1.0v */
+	.vdd0_onlp	= 975000, /* 1.0v */
 	.vdd0_ret	=  975000, /* 0.975v */
 	.vdd0_off	=  600000, /* 0.6v */
 	/* CORE */
 	.vdd1_on	= 1150000, /* 1.15v */
-	.vdd1_onlp	= 1000000, /* 1.0v */
+	.vdd1_onlp	= 975000, /* 1.0v */
 	.vdd1_ret	=  975000, /* 0.975v */
 	.vdd1_off	=  600000, /* 0.6v */
 #else //Samsung
