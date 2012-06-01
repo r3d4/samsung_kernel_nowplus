@@ -516,13 +516,13 @@ static	struct	omap_dss_board_info	nowplus_dss_data	=	{
 	.default_device	=	&nowplus_lcd_device,
 };
 
-static	struct	platform_device	nowplus_dss_device	=	{
-	.name	=	"omapdss",
-	.id		=	-1,
-	.dev	=	{
-		.platform_data	=	&nowplus_dss_data,
-	},
-};
+// static	struct	platform_device	nowplus_dss_device	=	{
+	// .name	=	"omapdss",
+	// .id		=	-1,
+	// .dev	=	{
+		// .platform_data	=	&nowplus_dss_data,
+	// },
+// };
 
 
 #ifdef	CONFIG_PM
@@ -865,12 +865,12 @@ static	inline	void	__init	nowplus_init_ear_key(void)
 	}
 	gpio_direction_input(OMAP_GPIO_EAR_KEY);
 }
-
+#if 0 // nowplus doesnt use TV-OUT DAC
 static	struct	regulator_consumer_supply	nowplus_vdda_dac_supply	=	{
 	.supply		=	"vdda_dac",
 	.dev		=	&nowplus_dss_device.dev,
 };
-
+#endif
 static	struct	regulator_consumer_supply	nowplus_vmmc1_supply	=	{
 	.supply			=	"vmmc",
 };
@@ -902,11 +902,13 @@ static	struct	regulator_consumer_supply	nowplus_vpll2_supply	=	{
 static	struct	regulator_consumer_supply	nowplus_vsim_supply	=	{
 	.supply			=	"vmmc_aux",
 };
-
+#if 0 // nowplus doesnt use TV-OUT DAC
+/* VDAC for DSS driving S-Video (8 mA unloaded, max 65 mA) */
 static	struct	regulator_init_data	nowplus_vdac	=	{
 	.constraints	=	{
 		.min_uV					=	1800000,
 		.max_uV					=	1800000,
+        .boot_on		        =	true,       //enabled by u-boot
 		.valid_modes_mask		=	REGULATOR_MODE_NORMAL
 					|	REGULATOR_MODE_STANDBY,
 		.valid_ops_mask			=	REGULATOR_CHANGE_MODE
@@ -915,7 +917,7 @@ static	struct	regulator_init_data	nowplus_vdac	=	{
 	.num_consumer_supplies	=	1,
 	.consumer_supplies		=	&nowplus_vdda_dac_supply,
 };
-
+#endif
 /*	VMMC1	for	MMC1	card	*/
 static	struct	regulator_init_data	nowplus_vmmc1	=	{
 	.constraints	=	{
@@ -980,6 +982,7 @@ static	struct	regulator_init_data	nowplus_vaux2	=	{
 };
 
 /*	VAUX3	for	display	*/
+// TL2796 IOVCC - IO Supply Voltage
 static	struct	regulator_init_data	nowplus_vaux3	=	{
 	.constraints	=	{
 		.min_uV			=	1800000,
@@ -995,6 +998,7 @@ static	struct	regulator_init_data	nowplus_vaux3	=	{
 };
 
 /*	VAUX4	for	display	*/
+// TL2796 VCI - Internal power for RAM (Analog)
 static	struct	regulator_init_data	nowplus_vaux4	=	{
 	.constraints	=	{
 		.min_uV			=	2800000,
@@ -1014,7 +1018,6 @@ static	struct	regulator_init_data	nowplus_vpll2	=	{
 	.constraints	=	{
 		.min_uV			=	1800000,
 		.max_uV			=	1800000,
-		.apply_uV		=	true,
 		.boot_on		=	true,
 		.valid_modes_mask	=	REGULATOR_MODE_NORMAL
 					|	REGULATOR_MODE_STANDBY,
@@ -1269,7 +1272,7 @@ static	struct	twl4030_platform_data	__initdata	nowplus_twl_data	__initdata	=	{
 	.vmmc2		=	&nowplus_vmmc2,
 #endif
 	.vsim		=	&nowplus_vsim,
-	.vdac		=	&nowplus_vdac,
+//	.vdac		=	&nowplus_vdac,
 	.vaux1		=	&nowplus_vaux1,
 	.vaux2		=	&nowplus_vaux2,
 	.vaux3		=	&nowplus_vaux3,
