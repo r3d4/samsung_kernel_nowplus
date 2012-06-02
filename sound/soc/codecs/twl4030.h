@@ -296,6 +296,7 @@ typedef enum{
 	VOICE_CALL,
 	VOICE_MEMO,
 	VOIP_CALL,
+	FM_RADIO,
 	IDLE_MODE,
 	MIC_MUTE,   // hskwon-ss-db05, to support mic mute/unmute for CTS test
     VR_MODE,

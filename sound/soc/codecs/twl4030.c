@@ -243,16 +243,19 @@ int twl4030_call_device = 0;
 int twl4030_playback_device = 0;
 bool twl4030_codec_suspended = false;
 int twl4030_voip_device = 0;
+int twl4030_fm_device = 0;
 int twl4030_recording_device = 0;
 bool twl4030_vr_mode = false;
 int twl4030_mic_mute_enable = 0;
+bool twl4030_fm_radio_mute_enable = false;
 
-
-static const char *audio_path[]     = {"Playback Path", "Voice Call Path", "Memo Path", "VOIP Call Path","Idle Mode","Mic Mute","VR Mode"};
+static const char *audio_path[]     = {"Playback Path", "Voice Call Path", "Memo Path", "VOIP Call Path", "FM Radio Path", "Idle Mode","Mic Mute","VR Mode", "Loopback Path"};   // hskwon-ss-db05, to support mic mute/unmute for CTS test
 static const char *playback_path[]  = {"off","RCV","SPK","HP","SPK_HP"};
 static const char *voicecall_path[] = {"off","RCV","SPK","HP","BT"};
-static const char *voicememo_path[] = {"off","MAIN","SUB"}; 
+static const char *voicememo_path[] = {"off","MAIN","SUB"};
 static const char *voip_path[]      = {"off","RCV","SPK","HP"};
+static const char *fmradio_path[]   = {"off","SPK","HP"};
+static const char *loopback_path[]=      {"off","RCV","SPK", "HP"};
 static const char *idle_mode[]      = {"on","off"};
 static const char *mic_mute[]       = {"off", "on"};   // hskwon-ss-db05, to support mic mute/unmute for CTS test
 static const char *vr_mode[]        = {"off", "on"};
@@ -539,7 +542,7 @@ twl4030_codec_setting voipcall_rcv[]={
   {0x07, 0x0a},  //TWL4030_REG_AVADC_CTL
   {0x08, 0x00},  //TWL4030_REG_ADCMICSEL
 
-  {0x0c, 0x08},  //TWL4030_REG_AVTXL2PGA 
+  {0x0c, 0x08},  //TWL4030_REG_AVTXL2PGA
   {0x21, 0x34}   //TWL4030_REG_EAR_CTL
 };
 
@@ -565,7 +568,7 @@ twl4030_codec_setting voipcall_spk[] ={
   {0x06, 0x00},  //TWL4030_REG_ANAMICR
   {0x07, 0x0a},  //TWL4030_REG_AVADC_CTL
   {0x08, 0x00},  //TWL4030_REG_ADCMICSEL
-  {0x48, 0x2d},  //TWL4030_REG_ANAMIC_GAIN    
+  {0x48, 0x2d},  //TWL4030_REG_ANAMIC_GAIN
 
   {0x1b, 0x0B},
   {0x1c, 0x0B},
@@ -644,6 +647,89 @@ twl4030_codec_setting voipcall_hp4p[]= {
   {0x0c, 0x06},
 };
 // hskwon-ss-cl31, added for FMC(VoIP) call path
+twl4030_codec_setting fmradio_off[] ={
+  {0x01, 0x92},  //TWL4030_REG_CODEC_MODE
+  //{0x3a, 0x16},  //TWL4030_REG_APLL_CTL
+
+  //{0x04, 0x00},  //TWL4030_REG_MICBIAS_CTL
+  {0x05,0x14},		//KHoAudioANAMICL mic ampL enable, AUXL enable
+  {0x06,0x14},		//KHoAudioANAMICR mic ampR enable, AUXR enable
+  {0x07,0x00},		//KHoAudioAVADC_CTL
+  {0x08, 0x00},		//TWL4030_REG_ADCMICSEL
+  //{0x02,0x00},		//KHoAudioOPTION
+  {0x3e,0x20},		//KHoAudioMISC_SET_1
+ // {0x17, 0x0c},  // not used in galax a
+  {0x13, 0x7f},  //TWL4030_REG_ARXL2PGA
+  {0x12, 0x7f},  //TWL4030_REG_ARXR2PGA
+
+  //reset other path
+  {0x21, 0x00},  //TWL4030_REG_EAR_CTL
+  {0x3f, 0x00},  //TWL4030_REG_PCMBTMUX
+
+  {0x1c, 0x07},  //TWL4030_REG_ARXR2_APGA_CTL
+  {0x1b, 0x07},  //TWL4030_REG_ARXL2_APGA_CTL
+
+};
+
+twl4030_codec_setting fmradio_spk[] ={
+  {0x01, 0x92},  //TWL4030_REG_CODEC_MODE
+  //{0x3a, 0x16},  //TWL4030_REG_APLL_CTL
+
+  //{0x04, 0x00},  //TWL4030_REG_MICBIAS_CTL
+  {0x05,0x14},		//KHoAudioANAMICL mic ampL enable, AUXL enable
+  {0x06,0x14},		//KHoAudioANAMICR mic ampR enable, AUXR enable
+  {0x07,0x00},		//KHoAudioAVADC_CTL
+  {0x08, 0x00},		//TWL4030_REG_ADCMICSEL
+  //{0x02,0x00},		//KHoAudioOPTION
+  {0x3e,0x20},		//KHoAudioMISC_SET_1
+ // {0x17, 0x0c},  // not used in galax a
+  {0x13, (0x2 << 6) | 0x3f},  //TWL4030_REG_ARXL2PGA
+  {0x12, (0x2 << 6) | 0x3f},  //TWL4030_REG_ARXR2PGA
+
+  //reset other path
+  {0x21, 0x00},  //TWL4030_REG_EAR_CTL
+  {0x3f, 0x00},  //TWL4030_REG_PCMBTMUX
+
+  {0x1c, (0x9 << 3)| 0x07},  //TWL4030_REG_ARXR2_APGA_CTL
+  {0x1b, (0x9 << 3)| 0x07},  //TWL4030_REG_ARXL2_APGA_CTL
+
+  {0x26, (0x3<<4)|0x7},  //TWL4030_PREDR_CTL
+  {0x25, (0x3<<4)|0x7},   //TWL4030_PREDL_CTL
+
+  {0x48, (0x4 << 3) | 0x4},   // ANAMIC_GAIN (L[0:2], R[3:5])
+
+
+};
+
+twl4030_codec_setting fmradio_hp[]= {
+  {0x01, 0x92},  //TWL4030_REG_CODEC_MODE
+  //{0x3a, 0x16},  //TWL4030_REG_APLL_CTL
+  //{0x04, 0x00},  //TWL4030_REG_MICBIAS_CTL
+
+  {0x05,0x14},	//KHoAudioANAMICL mic ampL enable, AUXL enable
+  {0x06,0x14},		//KHoAudioANAMICR mic ampR enable, AUXR enable
+  {0x07,0x00},		//KHoAudioAVADC_CTL
+  {0x08, 0x00},  //TWL4030_REG_ADCMICSEL
+  //{0x02,0x00},		//KHoAudioOPTION
+  {0x3e,0x20},		//KHoAudioMISC_SET_1
+ // {0x17, 0x0c},  // not used in galax a
+
+  {0x13, 0x7f},  //TWL4030_REG_ARXL2PGA
+  {0x12, 0x7f},  //TWL4030_REG_ARXR2PGA
+
+  //reset other path
+  {0x21, 0x00},  //TWL4030_REG_EAR_CTL
+  {0x3f, 0x00},  //TWL4030_REG_PCMBTMUX
+
+  {0x1c, 0x07},  //TWL4030_REG_ARXR2_APGA_CTL
+  {0x1b, 0x07},  //TWL4030_REG_ARXL2_APGA_CTL
+
+  {0x22, 0x24},  //TWL4030_REG_HS_SEL
+  {0x24, 0x41},  //TWL4030_REG_HS_POPN_SET
+  {0x24, 0x42}, //TWL4030_REG_HS_POPN_SET
+
+  {0x48, (0x1<<3)|0x1},   // ANAMIC_GAIN (L[0:2], R[3:5])
+};
 
 twl4030_codec_setting volume_off[]={
   {0x44, 0x00},  //TWL4030_REG_VDL_APGA_CTL
@@ -772,17 +858,17 @@ static void codec_control_work_handler(struct work_struct *work )
 
 	switch(twl4030_call_device)
 	{
-		  case OFF: 
+		  case OFF:
               break;
 
 		  case RCV:
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x35, 0x21);
-              break;         
+              break;
 
 		  case SPK:
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x28, 0x26);
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x24, 0x25);
-			  break;            
+			  break;
 
 		  case HP3P:
 		  case HP4P:
@@ -791,16 +877,16 @@ static void codec_control_work_handler(struct work_struct *work )
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x6f, 0x13);
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x1b, 0x1b);
               twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE, 0x1b, 0x1c);
-              break;                                 
+              break;
 
 		  case BT:
               //PMBR1
               twl_i2c_write_u8(TWL4030_MODULE_INTBR, 0x40, 0x0d);
-              break;                    
+              break;
 
 		  default:
               P("!!!!codec_control_work_handle setting failr!!!\n");
-              break;        
+              break;
 	}
 
 	wake_unlock( &T2_wakelock ); 	
@@ -862,7 +948,7 @@ static inline void twl4030_write_reg_cache(struct snd_soc_codec *codec,
          u8 read_val = 0x00;
 	
 	twl_i2c_write_u8(TWL4030_MODULE_AUDIO_VOICE,   value, reg);
-         //printk("twl4030_write reg = 0x%x value = 0x%x \n", reg, value);       
+         //printk("twl4030_write reg = 0x%x value = 0x%x \n", reg, value);
 		
          /* modify by swin.kim to trace T2 Register setting */
          twl_i2c_read_u8(TWL4030_MODULE_AUDIO_VOICE, &read_val, reg);
@@ -907,7 +993,7 @@ static void twl4030_codec_enable(struct snd_soc_codec *codec, int enable)
 	if (enable)
 	{
 		mode |= TWL4030_CODECPDZ;
-		cancel_delayed_work( &codec_down_work );	   
+		cancel_delayed_work( &codec_down_work );
 	}
 	else
 	{
@@ -915,13 +1001,13 @@ static void twl4030_codec_enable(struct snd_soc_codec *codec, int enable)
          {
               for(i=0;i<ARRAY_SIZE(volume_off);i++)
               {
-                   twl4030_write(codec, volume_off[i].reg,volume_off[i].value);                        
+                   twl4030_write(codec, volume_off[i].reg,volume_off[i].value);
               }
-        
+
               //schedule_delayed_work( &codec_down_work, 100 );
               mode &= ~TWL4030_CODECPDZ;
               twl4030_write(codec, TWL4030_REG_CODEC_MODE, mode);
-              
+
               return;
          }
          else
@@ -1058,7 +1144,7 @@ static void twl4030_codec_mute(struct snd_soc_codec *codec, int mute)
 	 if (mute == twl4030->codec_muted)
 	     return;
 
-     if (mute) 
+     if (mute)
      {
           /* Bypass the reg_cache and mute the volumes
           * Headset mute is done in it's own event handler
@@ -1111,7 +1197,7 @@ static void twl4030_power_down(struct snd_soc_codec *codec)
 {
     P("");
 	/* power down */
-    printk("twl4030_write twl4030_power_down \n");       
+    printk("twl4030_write twl4030_power_down \n");
 	twl4030_codec_enable(codec, 0);
 }
 
@@ -1384,12 +1470,12 @@ static void handsfree_ramp(struct snd_soc_codec *codec, int reg, int ramp)
 	unsigned char hs_ctl;
 
     P("reg : ox%x, ramp : %d", reg, ramp);
-   
+
 	hs_ctl = twl4030_read_reg_cache(codec, reg);
 
     P(" twl4030 : handsfree_ramp  \n");
-   
-	if (ramp) 
+
+	if (ramp)
 	{
 		/* HF ramp-up */
 		hs_ctl |= TWL4030_HF_CTL_REF_EN;
@@ -1401,7 +1487,7 @@ static void handsfree_ramp(struct snd_soc_codec *codec, int reg, int ramp)
 		hs_ctl |= TWL4030_HF_CTL_LOOP_EN;
 		hs_ctl |= TWL4030_HF_CTL_HB_EN;
 		twl4030_write(codec, reg, hs_ctl);
-	} 
+	}
 	else
 	{
 		/* HF ramp-down */
@@ -1436,7 +1522,7 @@ static int handsfreerpga_event(struct snd_soc_dapm_widget *w,
 		struct snd_kcontrol *kcontrol, int event)
 {
     P("event : %d", event);
-     
+
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
 		handsfree_ramp(w->codec, TWL4030_REG_HFR_CTL, 1);
@@ -1504,7 +1590,7 @@ static void headset_ramp(struct snd_soc_codec *codec, int ramp)
 				    8388608, 16777216, 33554432, 67108864};
 
     P("ramp : %d", ramp);
-   
+
 	hs_gain = twl4030_read_reg_cache(codec, TWL4030_REG_HS_GAIN_SET);
 	hs_pop = twl4030_read_reg_cache(codec, TWL4030_REG_HS_POPN_SET);
 
@@ -1569,7 +1655,7 @@ static int headsetlpga_event(struct snd_soc_dapm_widget *w,
 
     event=SND_SOC_DAPM_POST_PMU;
 
-    switch (event) 
+    switch (event)
     {
 	case SND_SOC_DAPM_POST_PMU:
 		/* Do the ramp-up only once */
@@ -1595,7 +1681,7 @@ static int headsetrpga_event(struct snd_soc_dapm_widget *w,
     P(" twl4030 : headsetrpga_event \n");
     event= SND_SOC_DAPM_POST_PMU;
 
-    switch (event) 
+    switch (event)
     {
 	case SND_SOC_DAPM_POST_PMU:
 		/* Do the ramp-up only once */
@@ -1922,7 +2008,7 @@ static int twl4030_set_playback_path(struct snd_kcontrol *kcontrol, struct snd_c
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	unsigned int i=0;
 
-	printk("twl4030_set_playback_path value = %ld device= %d mode = %d codec_mode = %d \n",ucontrol->value.integer.value[0], twl4030_playback_device, twl4030_mode, codec_mode);  
+	printk("twl4030_set_playback_path value = %ld device= %d mode = %d codec_mode = %d \n",ucontrol->value.integer.value[0], twl4030_playback_device, twl4030_mode, codec_mode);
 
 	twl4030_playback_device = ucontrol->value.integer.value[0];
 	twl4030_call_device = 0;
@@ -1985,7 +2071,7 @@ static int twl4030_set_voicecall_path(struct snd_kcontrol *kcontrol, struct snd_
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	unsigned int i=0;
 
-	printk("twl4030_set_voicecall_path1 value = %d call_device = %d \n", (int)ucontrol->value.integer.value[0], twl4030_call_device);  
+	printk("twl4030_set_voicecall_path1 value = %d call_device = %d \n", (int)ucontrol->value.integer.value[0], twl4030_call_device);
 
 	if(twl4030_call_device == ucontrol->value.integer.value[0]) //DB24 sec_lilkan
 	{
@@ -2013,7 +2099,7 @@ static int twl4030_set_voicecall_path(struct snd_kcontrol *kcontrol, struct snd_
 			twl4030_write(codec, voicecall_rcv[i].reg,voicecall_rcv[i].value);
 		}
 
-		gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
+		// gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
 
 		//update cache reg
         //twl4030_write_reg_cache(codec, 0x21, 0x35);
@@ -2027,11 +2113,11 @@ static int twl4030_set_voicecall_path(struct snd_kcontrol *kcontrol, struct snd_
 			  twl4030_write(codec, voicecall_spk[i].reg,voicecall_spk[i].value);
 		}
 
-		gpio_set_value(OMAP_GPIO_MIC_SEL, 1);   
+		// gpio_set_value(OMAP_GPIO_MIC_SEL, 1);
 
 		//update cache reg
         //twl4030_write_reg_cache(codec, 0x26, 0x28);
-        //twl4030_write_reg_cache(codec, 0x25, 0x24);             
+        //twl4030_write_reg_cache(codec, 0x25, 0x24);
 
         break;
 
@@ -2087,10 +2173,102 @@ static int twl4030_set_voicecall_path(struct snd_kcontrol *kcontrol, struct snd_
 
 }
 
+static int twl4030_set_fmradio_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol,unsigned int codec_mode)
+{
+    struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
+    int iOutDevice = ucontrol->value.integer.value[0];
+
+	if((twl4030_fm_device == iOutDevice)) //DB24 sec_lilkan
+	{
+		printk("twl4030_set_fmradio_path same device d=%d mute = %d \n",twl4030_fm_device, twl4030_fm_radio_mute_enable);
+		return 0;
+	}
+
+    printk("twl4030_set_fmradio_path value = %d output_device = %d, mute = %d \n",
+		iOutDevice, twl4030_fm_device, twl4030_fm_radio_mute_enable);
+ /*limo: headphone
+		{.flag = 0,.reg = ARXR2PGA_COARSE_GAIN,.gain = 1},
+		{.flag = 0,.reg = ARXR2PGA_FINE_GAIN,.gain = 55},
+		{.flag = 0,.reg = ARXL2PGA_COARSE_GAIN,.gain = 1},
+		{.flag = 0,.reg = ARXL2PGA_FINE_GAIN,.gain = 55},
+		{.flag = 1,.reg = ARXL2_GAIN,.gain = 11},
+		{.flag = 1,.reg = ARXR2_GAIN,.gain = 11},
+		{.flag = 1,.reg = PREDL_GAIN,.gain = 2},
+		{.flag = 1,.reg = PREDR_GAIN,.gain = 2},
+		{.flag = 0,.reg = HSL_GAIN,.gain = 3},
+		{.flag = 0,.reg = HSR_GAIN,.gain = 3},
+		{.flag = 1,.reg = MICAMPL_GAIN,.gain = 1},
+		{.flag = 1,.reg = MICAMPR_GAIN,.gain = 1},
+		{.flag = 0,.reg = ATXL1PGA_GAIN,.gain = 9},
+		{.flag = 0,.reg = ATXR1PGA_GAIN,.gain = 9},
+		{.flag = 0,.reg = VRXPGA_GAIN,.gain = 48},
+		{.flag = 0,.reg = VDL_GAIN_SET,.gain = 6},
+		{.flag = 0,.reg = VRX2ARXPGA_GAIN,.gain = 0},
+		{.flag = 0,.reg = EAR_GAIN,.gain = 2},
+		{.flag = 0,.reg = BTTXPGA_GAIN,.gain = 5},
+		{.flag = 0,.reg = BTRXPGA_GAIN,.gain = 10},
+		{.flag = 0,.reg = ARX2VTXPGA_GAIN,.gain = 36},
+*/
+
+    twl4030_fm_device = iOutDevice;
+	twl4030_playback_device = 0;
+	twl4030_call_device = 0;
+	twl4030_recording_device = 0;
+
+	twl4030_write(codec, 0x01,0x93);
+    twl4030_write(codec, 0x05,0x14); //AUXL input enabled, Left microphone amplifier enabled
+
+	twl4030_write(codec, 0x05,0x14); //AUXL input enabled, Left microphone amplifier enabled
+	twl4030_write(codec, 0x06,0x14); //AUXR input enabled, Right microphone amplifier enabled
+    twl4030_write(codec, 0x07,0x00); //Audio/voice ADC power down
+	twl4030_write(codec, 0x08,0x00); //DIGMIC power down
+	if(!twl4030_fm_radio_mute_enable)
+		twl4030_write(codec, 0x3e,0x20); //Analog FM radio loop enable
+	twl4030_write(codec, 0x13,(0<<6)|0x35 /*0x7f*/);  // Audio RXL2 gain: 12dB
+	twl4030_write(codec, 0x12,(0<<6)|0x35 /*0x7f*/);  // Audio RXR2 gain: 12dB
+	twl4030_write(codec, 0x17, 0x0c); // ADACR2_EN, ADACL2_EN enable
+	twl4030_write(codec, 0x21,0x00);  // Earphone amplifier disable
+	twl4030_write(codec, 0x3f,0x00);  // PCM/BT mux reset
+
+	switch(iOutDevice)
+	{
+        case 0: //OFF
+        break;
+
+		case 1://SPK:   //1
+            twl4030_write(codec, 0x48, (0x0<<3) | 0x00);    // 0dB, Gain control of the microphone amplifier (use for AUX_IN also)
+
+            twl4030_write(codec, 0x1c, (9<<3)|0x7 /*0x07*/);  // Audio RXR2: aGain ..dB, Digital-to-analog path enable, FM loop path enable
+            twl4030_write(codec, 0x1b, (9<<3)|0x7 /*0x07*/);  // Audio RXL2: aGain ..dB, Digital-to-analog path enable, FM loop path enable
+
+			twl4030_write(codec, 0x26, (3<<4)|0x8 /*0x28*/);  // Predriver class D output right, Audio L2, ..dB
+			twl4030_write(codec, 0x25, (3<<4)|0x4 /*0x24*/);  // Predriver class D output left, Audio L2, ..dB
+		break;
+
+		case 2://HP:		//2
+            twl4030_write(codec, 0x48, (0x1<<3) | 0x01);    // 6dB, Gain control of the microphone amplifier (use for AUX_IN also)
+
+        	twl4030_write(codec, 0x1c, (0xb<<3)|0x7 /*0x07*/);  // Audio RXR2: aGain ..dB, Digital-to-analog path enable, FM loop path enable
+            twl4030_write(codec, 0x1b, (0xb<<3)|0x7 /*0x07*/);  // Audio RXL2: aGain ..dB, Digital-to-analog path enable, FM loop path enable
+
+			twl4030_write(codec, 0x22,0x24);   //Headset output L+R: Audio L2
+            twl4030_write(codec, 0x23,0x0a);   //Headset gain 0dB
+			twl4030_write(codec, 0x24,0x41);   //HS pop-noise: VMID buffer enable, Ramp down
+			twl4030_write(codec, 0x24,0x42);   //HS pop-noise: VMID buffer enable, Ramp up
+		break;
+		default:
+			printk("!!!!fmradio path setting failed!!!\n");
+	}
+
+
+    return 0;
+}
+
 static int twl4030_set_voicememo_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol,unsigned int codec_mode)
 {
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	twl4030_call_device = 0;
+	twl4030_fm_device = 0;
 
 	twl4030_recording_device =ucontrol->value.integer.value[0] ;
 	printk("twl4030_set_voicememo_path value = %ld \n",ucontrol->value.integer.value[0]);
@@ -2167,7 +2345,7 @@ static int twl4030_set_voicememo_path(struct snd_kcontrol *kcontrol, struct snd_
 	            twl4030_write(codec, 0x26, 0x00);
 	        }
 
-			gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
+			// gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
 
 			break;
 
@@ -2231,7 +2409,7 @@ static int twl4030_set_voipcall_path(struct snd_kcontrol *kcontrol, struct snd_c
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	unsigned int i=0;
 
-	printk("twl4030_set_voipcall_path1 value = %d call_device = %d \n",(int)ucontrol->value.integer.value[0], twl4030_voip_device);  
+	printk("twl4030_set_voipcall_path1 value = %d call_device = %d \n",(int)ucontrol->value.integer.value[0], twl4030_voip_device);
 
 	twl4030_voip_device = ucontrol->value.integer.value[0];
 	twl4030_call_device = 0;
@@ -2253,7 +2431,7 @@ static int twl4030_set_voipcall_path(struct snd_kcontrol *kcontrol, struct snd_c
 				twl4030_write(codec, voipcall_rcv[i].reg,voipcall_rcv[i].value);
 			}
 
-			gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
+			// gpio_set_value(OMAP_GPIO_MIC_SEL, 0);
 
 			break;
 
@@ -2263,7 +2441,7 @@ static int twl4030_set_voipcall_path(struct snd_kcontrol *kcontrol, struct snd_c
 				twl4030_write(codec, voipcall_spk[i].reg,voipcall_spk[i].value);
 			}
 
-			gpio_set_value(OMAP_GPIO_MIC_SEL, 1);   
+			// gpio_set_value(OMAP_GPIO_MIC_SEL, 1);
 
 			break;
 
@@ -2299,7 +2477,7 @@ static int twl4030_set_idle_mode(struct snd_kcontrol *kcontrol, struct snd_ctl_e
 {
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 
-	printk("twl4030_set_idle_mode value = %ld \n",ucontrol->value.integer.value[0]);  
+	printk("twl4030_set_idle_mode value = %ld \n",ucontrol->value.integer.value[0]);
 
 	if(ucontrol->value.integer.value[0])  //off
 	{
@@ -2307,6 +2485,7 @@ static int twl4030_set_idle_mode(struct snd_kcontrol *kcontrol, struct snd_ctl_e
 		twl4030_call_device = 0;
 		twl4030_voip_device = 0; // hskwon-ss-cl31, added for FMC(VoIP) call path	
 		twl4030_recording_device = 0;
+		twl4030_fm_device = 0;
 		twl4030_vr_mode = false;
 		twl4030_power_down(codec);
 	}
@@ -2321,7 +2500,7 @@ static int twl4030_set_mic_mute(struct snd_kcontrol *kcontrol, struct snd_ctl_el
 {
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 
-	P("twl4030_set_mic_mute value = %ld \n",ucontrol->value.integer.value[0]);  
+	P("twl4030_set_mic_mute value = %ld \n",ucontrol->value.integer.value[0]);
 
 	if(ucontrol->value.integer.value[0])    // on, mute
 	{
@@ -2340,7 +2519,7 @@ static int twl4030_set_vr_mode(struct snd_kcontrol *kcontrol, struct snd_ctl_ele
 {
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 
-	P("twl4030_set_vr_mode value = %ld \n",ucontrol->value.integer.value[0]);  
+	P("twl4030_set_vr_mode value = %ld \n",ucontrol->value.integer.value[0]);
 
 	if(ucontrol->value.integer.value[0])    // on, mute
 	{
@@ -2380,23 +2559,25 @@ static int twl4030_get_status(struct snd_kcontrol *kcontrol, struct snd_ctl_elem
 	if(twl4030_playback_device)
 		codec_mode = PLAY_BACK;
 	else if(twl4030_call_device)
-		codec_mode = VOICE_CALL;    
+		codec_mode = VOICE_CALL;
 	else if(twl4030_recording_device)
-		codec_mode = VOICE_MEMO;    	
+		codec_mode = VOICE_MEMO;
 	else if(twl4030_voip_device)
-		codec_mode = VOIP_CALL;    	
+		codec_mode = VOIP_CALL;
+    else if(twl4030_fm_device)
+		codec_mode = FM_RADIO;
 	else
 		codec_mode = IDLE_MODE;
 
 	P("twl4030_get_status codec_mode = %d !!!\n", codec_mode);
 	ucontrol->value.integer.value[0] =codec_mode+1;
-    
+
     return 0;
 }
 
 static int twl4030_set_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
+//	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 
 	int i =0;
 
@@ -2429,6 +2610,12 @@ static int twl4030_set_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_v
 					twl4030_set_voipcall_path(kcontrol, ucontrol, i);	// hskwon-ss-cl31, added for FMC(VoIP) call path
 					return 0;
 
+                case FM_RADIO:
+				    twl4030_unset_remap();
+					twl4030_set_fmradio_path(kcontrol, ucontrol,i);
+					twl4030_set_remap();
+					return 0;
+
 				case IDLE_MODE:
 					twl4030_set_idle_mode(kcontrol, ucontrol,i);
 					return 0;
@@ -2454,15 +2641,42 @@ static int twl4030_set_path(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_v
 	return 0;
 }
 
+static int twl4030_get_fm_radio_mute_enable(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	return twl4030_fm_radio_mute_enable;
+}
+
+static int twl4030_set_fm_radio_mute_enable(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
+
+	if(twl4030_fm_radio_mute_enable == ucontrol->value.integer.value[0])
+	{
+		P("twl4030_fm_radio_mute_enable is same\n");
+		return 0;
+	}
+
+    printk("twl4030_set_fm_radio_mute_enable %ld\n", ucontrol->value.integer.value[0]);
+
+	twl4030_fm_radio_mute_enable = ucontrol->value.integer.value[0];
+	twl4030_write(codec, 0x3e, twl4030_fm_radio_mute_enable?0x00:0x20);
+
+	return 0;
+}
+
 static const struct soc_enum path_control_enum[]=
 {
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(playback_path),playback_path),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(voicecall_path),voicecall_path),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(voicememo_path),voicememo_path),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(voip_path),voip_path),
+    SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(fmradio_path),fmradio_path),	
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(idle_mode),idle_mode),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(mic_mute),mic_mute), // hskwon-ss-db05, to support mic mute/unmute for CTS test
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(vr_mode),vr_mode),
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(loopback_path),loopback_path),
 };
 
 static const struct snd_kcontrol_new twl4030_snd_controls[] = {
@@ -2492,7 +2706,7 @@ static const struct snd_kcontrol_new twl4030_snd_controls[] = {
 	SOC_DOUBLE_R_TLV("DAC2 Analog Playback Volume",
 		TWL4030_REG_ARXL2_APGA_CTL, TWL4030_REG_ARXR2_APGA_CTL,
 		3, 0x12, 1, analog_tlv),
-  
+
 	SOC_DOUBLE_R("DAC1 Analog Playback Switch",
 		TWL4030_REG_ARXL1_APGA_CTL, TWL4030_REG_ARXR1_APGA_CTL,
 		1, 1, 0),
@@ -2559,19 +2773,26 @@ static const struct snd_kcontrol_new twl4030_snd_controls[] = {
 	SOC_ENUM_EXT("VOIP Call Path", path_control_enum[3],
 			twl4030_get_path,twl4030_set_path),
 
+    /* FM Radio Path setting */
+	SOC_ENUM_EXT("FM Radio Path", path_control_enum[4],
+		twl4030_get_path,twl4030_set_path),
+
 	/* Idle Mode setting */
-	SOC_ENUM_EXT("Idle Mode", path_control_enum[4],
+	SOC_ENUM_EXT("Idle Mode", path_control_enum[5],
 			twl4030_get_status,twl4030_set_path),
 
 	/* Mic Mute setting, hskwon-ss-db05, to support mic mute/unmute for CTS test */
-	SOC_ENUM_EXT("Mic Mute", path_control_enum[5],
+	SOC_ENUM_EXT("Mic Mute", path_control_enum[6],
 			twl4030_get_path,twl4030_set_path),
 
-	SOC_ENUM_EXT("VR Mode", path_control_enum[6],
-			twl4030_get_path,twl4030_set_path)
+	SOC_ENUM_EXT("VR Mode", path_control_enum[7],
+			twl4030_get_path,twl4030_set_path),
+				
+    SOC_ENUM_EXT("FM Radio Mute Enable", path_control_enum[6],
+        twl4030_get_fm_radio_mute_enable, twl4030_set_fm_radio_mute_enable),
 
 };
-
+#if 0
 /* add non dapm controls */
 static int twl4030_add_controls(struct snd_soc_codec *codec)
 {
@@ -2579,15 +2800,14 @@ static int twl4030_add_controls(struct snd_soc_codec *codec)
 
   for (i = 0; i < ARRAY_SIZE(twl4030_snd_controls); i++) {
     err = snd_ctl_add(codec->card,
-    snd_soc_cnew(&twl4030_snd_controls[i],
-    codec, NULL));
+    snd_soc_cnew(&twl4030_snd_controls[i], codec, NULL));
     if (err < 0)
       return err;
   }
 
   return 0;
 }
-
+#endif
 static const struct snd_soc_dapm_widget twl4030_dapm_widgets[] = {
 	/* Left channel inputs */
 	SND_SOC_DAPM_INPUT("MAINMIC"),
@@ -2962,13 +3182,13 @@ static int twl4030_set_bias_level(struct snd_soc_codec *codec,
 		break;
 
 	case SND_SOC_BIAS_PREPARE:
-        #if 0        
+        #if 0
 		twl4030_power_up(codec);
 		if (twl4030->bypass_state)
 			twl4030_codec_mute(codec, 0);
 		else
 			twl4030_codec_mute(codec, 1);
-        #endif        
+        #endif
 		break;
 
 	case SND_SOC_BIAS_STANDBY:
@@ -3314,7 +3534,7 @@ static int twl4030_set_tristate(struct snd_soc_dai *dai, int tristate)
 	u8 reg = twl4030_read_reg_cache(codec, TWL4030_REG_AUDIO_IF);
 
     P("tristate : %d", tristate);
-   
+
 	if (tristate)
 		reg |= TWL4030_AIF_TRI_EN;
 	else
@@ -3331,7 +3551,7 @@ static void twl4030_voice_enable(struct snd_soc_codec *codec, int direction,
 	u8 reg, mask;
 
     P("enable : %d", enable);
-   
+
 	reg = twl4030_read_reg_cache(codec, TWL4030_REG_OPTION);
 
 	if (direction == SNDRV_PCM_STREAM_PLAYBACK)
@@ -3345,7 +3565,7 @@ static void twl4030_voice_enable(struct snd_soc_codec *codec, int direction,
 		reg &= ~mask;
 
     P(" reg = 0x%x ",reg);
-   
+
 	twl4030_write(codec, TWL4030_REG_OPTION, reg);
 }
 
@@ -3358,7 +3578,7 @@ static int twl4030_voice_startup(struct snd_pcm_substream *substream,
 	u8 mode;
 
     P("");
-   
+
 	/* If the system master clock is not 26MHz, the voice PCM interface is
 	 * not avilable.
 	 */
@@ -3529,9 +3749,9 @@ static int twl4030_clock_startup(struct snd_pcm_substream *substream,
      struct snd_soc_device *socdev = rtd->socdev;
      struct snd_soc_codec *codec = socdev->card->codec;
      struct twl4030_priv *twl4030 = codec->private_data;
-   
+
      P("");
-   
+
      return twl4030_new_substream(twl4030, substream, 1);
 }
 
@@ -3543,30 +3763,30 @@ static int twl4030_clock_hw_params(struct snd_pcm_substream *substream,
      struct snd_soc_codec *codec = socdev->card->codec;
      struct twl4030_priv *twl4030 = codec->private_data;
      int rval;
-   
+
      P("");
-   
+
      mutex_lock(&twl4030->mutex);
-   
+
      rval = twl4030_set_rate(codec, params);
-   
+
      /* See if we are a multiple of the current FS. If so, then still OK. */
      if (rval) {
        int divisor = twl4030_get_clock_divisor(codec, params);
        int clock = params_rate(&twl4030->params) * 256;
        int remainder = clock % params_rate(params);
-   
+
        if (remainder == 0 && divisor <= 256)
          rval = 0;
      }
-   
+
      /* If any other streams are currently open, and one of them
      * is setting the hw parameters right now (since we are here), set
      * constraints to the other stream(s) to match the current one. */
      twl4030_constraints(twl4030);
-   
+
      mutex_unlock(&twl4030->mutex);
-   
+
      return rval;
 }
 
@@ -3576,7 +3796,7 @@ static int twl4030_clock_set_dai_fmt(struct snd_soc_dai *codec_dai,
      struct snd_soc_codec *codec = codec_dai->codec;
 
      P("");
-   
+
      return twl4030_set_ext_clock(codec, 1);
 }
 #endif
@@ -3587,14 +3807,14 @@ static int twl4030_voice_set_tristate(struct snd_soc_dai *dai, int tristate)
 	u8 reg = twl4030_read_reg_cache(codec, TWL4030_REG_VOICE_IF);
 
     P("");
-   
+
 	if (tristate)
 		reg |= TWL4030_VIF_TRI_EN;
 	else
 		reg &= ~TWL4030_VIF_TRI_EN;
 
     P(" reg = 0x%x ",reg);
-   
+
 	return twl4030_write(codec, TWL4030_REG_VOICE_IF, reg);
 }
 
@@ -3709,7 +3929,7 @@ static int twl4030_soc_resume(struct snd_soc_codec *codec)
 	if((twl4030_mode !=VOICE_CALL)&&(twl4030_mode !=VOICE_MEMO)&&(twl4030_mode !=VOIP_CALL))
 	{
 		 twl4030_codec_suspended = false;
-	 
+
 		 twl4030_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
 		 twl4030_set_bias_level(codec, codec->dapm->suspend_bias_level);
 	}
@@ -3778,7 +3998,7 @@ struct snd_soc_codec_driver soc_codec_dev_twl4030 = {
 static int __devinit twl4030_codec_probe(struct platform_device *pdev)
 {
 	struct twl4030_codec_audio_data *pdata = pdev->dev.platform_data;
- 
+
 	if (!pdata) {
 		dev_err(&pdev->dev, "platform_data is missing\n");
 		return -EINVAL;
@@ -3810,7 +4030,7 @@ static struct platform_driver twl4030_codec_driver = {
 
 static int __init twl4030_modinit(void)
 {
- 
+
 	return platform_driver_register(&twl4030_codec_driver);
 }
 module_init(twl4030_modinit);
