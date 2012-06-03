@@ -2161,7 +2161,8 @@ void	__init	nowplus_peripherals_init(void)
 	synaptics_dev_init();
 	omap_serial_init(omap_serial_platform_data);
 	usb_musb_init(&musb_board_data);
-#ifdef	CONFIG_VIDEO_OMAP3
+#if defined(CONFIG_VIDEO_OMAP3) || \
+	defined(CONFIG_VIDEO_OMAP3_MODULE)
 	mod_clock_correction();
 #endif
 	enable_board_wakeup_source();

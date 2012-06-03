@@ -53,6 +53,8 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	OMAP_OPP_DEF("mpu", true, 550000000, 1270000),
 	/* MPU OPP5 */
 	OMAP_OPP_DEF("mpu", true, 600000000, 1350000),
+    /* MPU OPP6 */
+    OMAP_OPP_DEF("mpu", false, 800000000, 1375000),
 	/*
 	 * L3 OPP1 - 41.5 MHz is disabled because: The voltage for that OPP is
 	 * almost the same than the one at 83MHz thus providing very little
@@ -67,7 +69,6 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* L3 OPP3 */
 	OMAP_OPP_DEF("l3_main", true, 166000000, 1150000),
 
-
 	/* DSP OPP1 */
 	OMAP_OPP_DEF("iva", true, 90000000, 975000),
 	/* DSP OPP2 */
@@ -78,6 +79,9 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	OMAP_OPP_DEF("iva", true, 400000000, 1270000),
 	/* DSP OPP5 */
 	OMAP_OPP_DEF("iva", true, 430000000, 1350000),
+	/* DSP OPP6 */
+	OMAP_OPP_DEF("iva", false, 520000000, 1450000),
+
 #else //Samsung
 	/* MPU OPP1 */
 	OMAP_OPP_DEF("mpu", true, 125000000, 1100000),
@@ -90,7 +94,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* MPU OPP5 */
 	OMAP_OPP_DEF("mpu", true, 600000000, 1437500),
 	/* MPU OPP6 */
-	//OMAP_OPP_DEF("mpu", true, 720000000, 1450000),
+	OMAP_OPP_DEF("mpu", true, 720000000, 1450000),
 	/*
 	 * L3 OPP1 - 41.5 MHz is disabled because: The voltage for that OPP is
 	 * almost the same than the one at 83MHz thus providing very little
@@ -117,7 +121,7 @@ static struct omap_opp_def __initdata omap34xx_opp_def_list[] = {
 	/* DSP OPP5 */
 	OMAP_OPP_DEF("iva", true, 430000000, 1437500),
 	/* DSP OPP6 */
-	//OMAP_OPP_DEF("iva", true, 520000000, 1450000),
+	OMAP_OPP_DEF("iva", true, 520000000, 1450000),
 #endif
 };
 static u32 omap34xx_opp_def_size = ARRAY_SIZE(omap34xx_opp_def_list);

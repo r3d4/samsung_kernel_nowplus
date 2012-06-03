@@ -80,7 +80,7 @@ obj-$(CONFIG_VIDEO_MT9V011) += mt9v011.o
 obj-$(CONFIG_VIDEO_LV8093) += lv8093.o
 
 obj-y += isp/
-obj-$(CONFIG_VIDEO_OMAP3) += omap34xxcam.o
+obj-$(CONFIG_VIDEO_OMAP3_CAM) += omap34xxcam.o
 
 obj-$(CONFIG_VIDEO_CAM_PMIC)     += cam_pmic.o
 obj-$(CONFIG_VIDEO_CAM_CE147)    += ce147_platform.o ce147.o

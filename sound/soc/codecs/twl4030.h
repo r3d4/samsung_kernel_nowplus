@@ -286,7 +286,6 @@ typedef enum{
 typedef enum{
 	MIC_OFF=0,  
 	MAIN_MIC,
-	SUB_MIC,
 	HP_MIC,
 	BT_MIC,
 }capture_device;

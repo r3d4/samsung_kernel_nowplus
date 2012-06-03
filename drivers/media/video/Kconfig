@@ -351,7 +351,7 @@ config VIDEO_CAM_CE147
 		  
 config VIDEO_CAM_M4MO
 	tristate "CAM M4MO"
-	depends on I2C && VIDEO_V4L2
+	depends on I2C && VIDEO_V4L2 && VIDEO_OMAP3_CAM
 	---help---
 	  This is a Video4Linux2 sensor-level driver for the
 	  Fujitsy M4MO camera.  It is to work with the TI OMAP3
@@ -359,7 +359,7 @@ config VIDEO_CAM_M4MO
 		  
 config VIDEO_CAM_S5KA3DFX
 	tristate "CAM S5KA3DFX"
-	depends on I2C && VIDEO_V4L2
+	depends on I2C && VIDEO_V4L2 && VIDEO_OMAP3_CAM
 	---help---
 	  This is a Video4Linux2 sensor-level driver for the
 	  S5KA3DFX camera.  It is to work with the TI OMAP3
@@ -898,7 +898,13 @@ config VIDEO_OMAP3
 	depends on VIDEO_V4L2 && ARCH_OMAP3430
 	---help---
 	  Driver for an OMAP 3 camera controller.
-
+      
+config VIDEO_OMAP3_CAM
+    tristate "OMAP 34xxcam Camera support"
+	depends on VIDEO_OMAP3
+	---help---
+	  Driver for an OMAP 3 camera.
+      
 source "drivers/media/video/isp/Kconfig"
 
 config SOC_CAMERA

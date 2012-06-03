@@ -252,7 +252,7 @@ bool twl4030_fm_radio_mute_enable = false;
 static const char *audio_path[]     = {"Playback Path", "Voice Call Path", "Memo Path", "VOIP Call Path", "FM Radio Path", "Idle Mode","Mic Mute","VR Mode", "Loopback Path"};   // hskwon-ss-db05, to support mic mute/unmute for CTS test
 static const char *playback_path[]  = {"off","RCV","SPK","HP","SPK_HP"};
 static const char *voicecall_path[] = {"off","RCV","SPK","HP","BT"};
-static const char *voicememo_path[] = {"off","MAIN","SUB"};
+static const char *voicememo_path[] = {"off","MAIN","HP"};
 static const char *voip_path[]      = {"off","RCV","SPK","HP"};
 static const char *fmradio_path[]   = {"off","SPK","HP"};
 static const char *loopback_path[]=      {"off","RCV","SPK", "HP"};
@@ -2012,6 +2012,7 @@ static int twl4030_set_playback_path(struct snd_kcontrol *kcontrol, struct snd_c
 
 	twl4030_playback_device = ucontrol->value.integer.value[0];
 	twl4030_call_device = 0;
+    twl4030_fm_device = 0;
 
 	twl4030_unset_remap();
 
@@ -3909,11 +3910,13 @@ static int twl4030_soc_suspend(struct snd_soc_codec *codec, pm_message_t state)
 
 	P("");
 	
-	if((twl4030_mode !=VOICE_CALL)&&(twl4030_mode !=VOICE_MEMO)&&(twl4030_mode !=VOIP_CALL))
+	if((twl4030_mode !=VOICE_CALL)&&(twl4030_mode !=VOICE_MEMO)
+        &&(twl4030_mode !=VOIP_CALL)&&(twl4030_mode !=FM_RADIO))
 	{
 		 twl4030_playback_device = 0; //device off
 		 twl4030_call_device = 0;
 		 twl4030_voip_device = 0;
+         twl4030_fm_device = 0;
 		 twl4030_codec_suspended = true;
 		 twl4030_set_bias_level(codec, SND_SOC_BIAS_OFF);
 	}
@@ -3954,12 +3957,12 @@ static int twl4030_soc_probe(struct snd_soc_codec *codec)
 	codec->dapm->bias_level = SND_SOC_BIAS_OFF;
 	codec->idle_bias_off = 1;
 
-	if (gpio_request(OMAP_GPIO_MIC_SEL, "MIC_SEL"))
-	{
-		printk(KERN_ERR "Filed to request OMAP_GPIO_MIC_SEL!\n");
-	}
+	// if (gpio_request(OMAP_GPIO_MIC_SEL, "MIC_SEL"))
+	// {
+		// printk(KERN_ERR "Filed to request OMAP_GPIO_MIC_SEL!\n");
+	// }
 
-	gpio_direction_output(OMAP_GPIO_MIC_SEL, 0);
+	// gpio_direction_output(OMAP_GPIO_MIC_SEL, 0);
 
     INIT_DELAYED_WORK( &codec_control_work, codec_control_work_handler );
     INIT_DELAYED_WORK( &codec_down_work, codec_down_work_handler );
