@@ -205,7 +205,8 @@ obj-$(CONFIG_MACH_OMAP3517EVM)		+= board-am3517evm.o
 obj-$(CONFIG_MACH_SBC3530)		+= board-omap3stalker.o \
 					   hsmmc.o
 obj-$(CONFIG_MACH_SAMSUNG_NOWPLUS)	 += board-nowplus.o \
-										 board-nowplus-mux.o \
+										board-nowplus-mux.o \
+										board-nowplus-wifi.o \
 										hsmmc.o sec_switch.o
 obj-$(CONFIG_MACH_SAMSUNG_ARCHER)		 += board-archer.o \
 										hsmmc.o sec_switch.o

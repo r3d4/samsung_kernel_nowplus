@@ -88,14 +88,11 @@ config L2CACHE_OMAP3_DISABLE
 
 config WIFI_CONTROL_FUNC
         bool "Enable WiFi control function abstraction"
-        depends on CONFIG_ARCH_OMAP3 || MACH_OMAP_4430SDP
-        select WIRELESS_EXT
-        select WEXT_CORE
-        select WEXT_PROC
-        select WEXT_PRIV
-        default Y
+        depends on ARCH_OMAP3 
+        default N
         help
            Enables Power/Reset/Carddetect function abstraction
+
 config TIWLAN_SDIO
         bool "TI WLAN Enhanced SDIO Contoller support"
         depends on MMC_OMAP || MMC_OMAP_MODULE || MMC_OMAP_HS || MMC_OMAP_HS_MODULE

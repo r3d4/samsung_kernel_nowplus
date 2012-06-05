@@ -159,6 +159,9 @@ extern int set_wakeup_gpio( unsigned int gpio[], int cnt );
 #include	<linux/wl127x-rfkill.h>
 #endif
 
+#ifdef CONFIG_WIFI_CONTROL_FUNC
+extern struct platform_device nowplus_wifi_device;
+#endif
 
 int	usbsel	=	1;
 EXPORT_SYMBOL(usbsel);
@@ -319,6 +322,7 @@ static	struct	resource	nowplus_power_key_resource	=	{
 	.end	=	OMAP_GPIO_IRQ(OMAP_GPIO_KEY_PWRON),
 	.flags	=	IORESOURCE_IRQ	|	IORESOURCE_IRQ_HIGHLEVEL,
 };
+
 
 static	struct	platform_device	nowplus_power_key_device	=	{
 	.name			=	"power_key_device",
@@ -759,6 +763,9 @@ static	struct	platform_device	*nowplus_devices[]	__initdata	=	{
 	&sec_device_switch,
 #ifdef	CONFIG_RTC_DRV_VIRTUAL
 	&samsung_virtual_rtc_device,
+#endif
+#ifdef CONFIG_WIFI_CONTROL_FUNC
+    &nowplus_wifi_device,
 #endif
 };
 
@@ -1672,31 +1679,28 @@ static	struct	omap_uart_port_info	omap_serial_platform_data[]	=	{
 
 static	void	nowplus_init_wlan(void)
 {
-		int	ret	=	0;
+    int	ret	=	0;
 
 #if	1//TI	HS.Yoon	20100827	for	enabling	WLAN_IRQ	wakeup
-	omap_writel(omap_readl(0x480025E8)|0x410C0000,	0x480025E8);
-	omap_writew(0x10C,	0x48002194);
+    omap_writel(omap_readl(0x480025E8)|0x410C0000,	0x480025E8);
+    omap_writew(0x10C,	0x48002194);
 #endif
-		ret	=	gpio_request(OMAP_GPIO_WLAN_IRQ,	"wifi_irq");
-		if	(ret	<	0)	{
-				printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
-						OMAP_GPIO_WLAN_IRQ);
-				return;
-		}
-		ret	=	gpio_request(OMAP_GPIO_WLAN_EN,	"wifi_pmena");
-		if	(ret	<	0)	{
-				printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
-						OMAP_GPIO_WLAN_EN);
-				gpio_free(OMAP_GPIO_WLAN_EN);
-				return;
-		}
-		gpio_direction_input(OMAP_GPIO_WLAN_IRQ);
-		gpio_direction_output(OMAP_GPIO_WLAN_EN,	0);
+    ret	=	gpio_request(OMAP_GPIO_WLAN_IRQ,	"wifi_irq");
+    if	(ret	<	0)	{
+        printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
+        OMAP_GPIO_WLAN_IRQ);
+        return;
+    }
+    ret	=	gpio_request(OMAP_GPIO_WLAN_EN,	"wifi_pmena");
+    if	(ret	<	0)	{
+        printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
+        OMAP_GPIO_WLAN_EN);
+        gpio_free(OMAP_GPIO_WLAN_EN);
+        return;
+    }
+    gpio_direction_input(OMAP_GPIO_WLAN_IRQ);
+    gpio_direction_output(OMAP_GPIO_WLAN_EN,	0);
 
-#ifdef	__TRISCOPE__
-		gpio_set_value(OMAP_GPIO_WLAN_EN,	1);
-#endif
 }
 
 static	void	nowplus_init_camera(void)
