@@ -6,9 +6,6 @@
 #ifndef ASM_MACH_PARAM_H
 #define ASM_MACH_PARAM_H
 
-#if defined(CONFIG_SAMSUNG_ARCHER_TARGET_SK)
-#define _FMC_DM_
-#endif
 
 #define SPP(volume)		(vs[volume].nSctsPerPg)
 #define PARAM_LEN		(128 * 1024) 
@@ -77,8 +74,5 @@ extern void (*sec_get_param_value)(int idx, void *value);
 #define USB_SEL_MASK	(1 << 0)
 #define UART_SEL_MASK	(1 << 1)
 
-#ifdef _FMC_DM_
-#define USB_LOCK_MASK   (1 << 2)
-#endif
 
 #endif	/* ASM_MACH_PARAM_H */

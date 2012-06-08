@@ -33,6 +33,57 @@ static int nowplus_wifi_cd;		/* WIFI virtual 'card detect' status */
 static void (*wifi_status_cb)(int card_present, void *dev_id);
 static void *wifi_status_cb_devid;
 
+/*
+
+static struct omap_board_mux rx51_mmc2_on_mux[] = {
+    OMAP3_MUX(MCSPI1_CS2, OMAP34XX_MUX_MODE3 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // CLK
+    OMAP3_MUX(MCSPI1_CS1, OMAP34XX_MUX_MODE3 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // CMD
+    OMAP3_MUX(ETK_D3,     OMAP34XX_MUX_MODE2 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // DAT0
+    OMAP3_MUX(ETK_D4,     OMAP34XX_MUX_MODE2 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // DAT1
+    OMAP3_MUX(ETK_D5,     OMAP34XX_MUX_MODE2 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // DAT2
+    OMAP3_MUX(ETK_D6,     OMAP34XX_MUX_MODE2 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP),      // DAT3
+    OMAP3_MUX(ETK_D7,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),    // IRQ
+	OMAP3_MUX(MCBSP_CLKS, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT       | OMAP34XX_PIN_OFF_OUTPUT_LOW),        // EN
+	{ .reg_offset = OMAP_MUX_TERMINATOR },
+};
+
+static struct omap_board_mux rx51_mmc2_off_mux[] = {
+    OMAP3_MUX(MCSPI1_CS2, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // CLK
+    OMAP3_MUX(MCSPI1_CS1, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // CMD
+    OMAP3_MUX(ETK_D3,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // DAT0
+    OMAP3_MUX(ETK_D4,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // DAT1
+    OMAP3_MUX(ETK_D5,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // DAT2
+    OMAP3_MUX(ETK_D6,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // DAT3
+    OMAP3_MUX(ETK_D7,     OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN | OMAP34XX_PIN_OFF_INPUT_PULLDOWN),  // IRQ
+	OMAP3_MUX(MCBSP_CLKS, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_OUTPUT         | OMAP34XX_PIN_OFF_OUTPUT_LOW),      // EN
+	{ .reg_offset = OMAP_MUX_TERMINATOR },
+};
+
+void nowplus_enable_wlan_pins(int on)
+{
+   if(on){
+	   omap_writel(omap_readl(OMAP2_CONTROL_PBIAS) & ~(1 << 8), OMAP2_CONTROL_PBIAS);
+	   omap_writel(omap_readl(OMAP2_CONTROL_PBIAS) | (1 << 9), OMAP2_CONTROL_PBIAS);
+	   resource_request(rhandlevsim_wifi, T2_VSIM_1V80);
+	   mdelay(10);
+
+	   omap_mux_write_array(nowplus_wlan_on_mux);
+
+	   omap_set_gpio_direction(OMAP3430_GPIO_WLAN_EN, GPIO_DIR_OUTPUT);
+	   omap_set_gpio_direction(OMAP3430_GPIO_WLAN_IRQ, GPIO_DIR_INPUT);
+	   omap_set_gpio_dataout(OMAP3430_GPIO_WLAN_EN, GPIO_LEVEL_LOW);
+   }else{
+	   omap_mux_write_array(nowplus_wlan_off_mux);
+
+	   omap_set_gpio_direction(OMAP3430_GPIO_WLAN_EN, GPIO_DIR_OUTPUT);
+	   omap_set_gpio_dataout(OMAP3430_GPIO_WLAN_EN, GPIO_LEVEL_LOW);
+	   if(rhandlevsim_wifi!=NULL)resource_release(rhandlevsim_wifi); 
+   }
+	return;
+}
+EXPORT_SYMBOL(enable_wlan_pins);
+*/
+
 int omap_wifi_status_register(void (*callback)(int card_present,
 						void *dev_id), void *dev_id)
 {
@@ -115,7 +166,7 @@ struct platform_device nowplus_wifi_device = {
 };
 #endif
 
-static int __init nowplus_wifi_init(void)
+int __init nowplus_wifi_init(void)
 {
 	int ret;
 
@@ -141,11 +192,11 @@ static int __init nowplus_wifi_init(void)
 	}
 	gpio_direction_input(OMAP_GPIO_WLAN_IRQ);
     gpio_direction_output(OMAP_GPIO_WLAN_EN, 0);
-#ifdef CONFIG_WIFI_CONTROL_FUNC
-	ret = platform_device_register(&nowplus_wifi_device);
-#endif
+// #ifdef CONFIG_WIFI_CONTROL_FUNC
+	// ret = platform_device_register(&nowplus_wifi_device);
+// #endif
 out:
-	return ret;
+	return 0;
 }
 
 //device_initcall(nowplus_wifi_init);

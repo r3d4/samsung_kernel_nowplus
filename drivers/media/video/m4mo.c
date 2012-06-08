@@ -62,6 +62,7 @@ static int m4mo_set_focus_mode(s32 value);
 static int m4mo_start_capture(void);
 static int m4mo_set_jpeg_quality(s32 value);
 static int m4mo_set_thumbnail_size(s32 value);
+static int m4mo_set_aewb(s32 value);
 
 /* Wait Queue For Fujitsu ISP Interrupt */
 static DECLARE_WAIT_QUEUE_HEAD(cam_wait);
@@ -1253,7 +1254,7 @@ static int  m4mo_set_preview(void)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_PREVIEW;   
     
-    //m4mo_set_mode(M4MO_PARMSET_MODE );
+    m4mo_set_mode(M4MO_PARMSET_MODE );
  
      
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
@@ -1263,6 +1264,12 @@ static int  m4mo_set_preview(void)
     
 //    m4mo_set_mode(M4MO_MONITOR_MODE );
 
+    /* Lens focus setting */
+      //m4mo_set_scene(sensor->scene);
+    m4mo_set_aewb(M4MO_AE_UNLOCK_AWB_UNLOCK);
+      
+    m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL);
+    
 return 0;
 }
 
@@ -1307,7 +1314,7 @@ static int  m4mo_set_capture(int pixelformat)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_CAPTURE;   
     
-    //m4mo_set_mode(M4MO_PARMSET_MODE );
+    m4mo_set_mode(M4MO_PARMSET_MODE );
 
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
     m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
@@ -3485,14 +3492,7 @@ dprintk(CAM_DBG, M4MO_MOD_NAME "    SYNC_DETECT = %d\n", reg>>14&0x3);
     dprintk(CAM_INF, M4MO_MOD_NAME "ioctl_streamon is called (%x)\n",sensor->capture_mode);
     
     if(sensor->state != M4MO_STATE_CAPTURE)
-    {
-        if(sensor->mode == M4MO_MODE_CAMCORDER)    
-        {
-            /* Lens focus setting */
-            if(m4mo_set_focus_mode(M4MO_AF_MODE_NORMAL))
-            goto streamon_fail;       
-        }
-        
+    {       
         dprintk(CAM_DBG, M4MO_MOD_NAME "start preview....................\n");
         main_cap_started = 0 ; //sasken
         if(m4mo_start_preview())

@@ -145,6 +145,7 @@ u32	hw_revision;
 EXPORT_SYMBOL(hw_revision);
 
 extern int set_wakeup_gpio( unsigned int gpio[], int cnt );
+extern int __init nowplus_wifi_init(void);
 
 #define	ENABLE_EMMC
 
@@ -174,9 +175,7 @@ extern	int	omap34xx_pad_set_config_lcd(u16	pad_pin,u16	pad_val);
 
 static	int	sec_switch_status	=	0;
 static	int	sec_switch_inited	=	0;
-#ifdef	_FMC_DM_
-static	int	usb_access_lock;
-#endif
+
 
 #if	defined(CONFIG_USB_SWITCH_FSA9480)
 static	bool	fsa9480_jig_status	=	0;
@@ -185,6 +184,23 @@ static	enum	cable_type_t	set_cable_status;
 extern	void	twl4030_phy_enable(void);
 extern	void	twl4030_phy_disable(void);
 #endif
+
+static struct cpuidle_params omap3_cpuidle_params_table[] = {
+	/* C1 */
+	{1, 2, 2, 5},
+	/* C2 */
+	{1, 10, 10, 30},
+	/* C3 */
+	{1, 50, 50, 300},
+	/* C4 */
+	{1, 1500, 1800, 4000},
+	/* C5 */
+	{1, 2500, 7500, 12000},
+	/* C6 */
+	{1, 3000, 8500, 15000},
+	/* C7 */
+	{1, 10000, 30000, 300000},
+};
 
 int	nowplus_enable_touch_pins(int	enable)	{
 	printk("[TOUCH]	%s	touch	pins\n",	enable?"enable":"disable");
@@ -669,12 +685,6 @@ void	sec_switch_set_switch_status(int	val)
 #if	defined(CONFIG_USB_SWITCH_FSA9480)
 	if(!sec_switch_inited)	{
 		fsa9480_enable_irq();
-
-#ifdef	_FMC_DM_
-		if	(sec_switch_status	&	USB_LOCK_MASK)
-			usb_access_lock	=	1;
-#endif
-
 		/*
 			*	TI	CSR	OMAPS00222879:	"MP3	playback	current	consumption	is	very	high"
 			*	This	a	workaround	to	reduce	the	mp3	power	consumption	when	the	system
@@ -682,11 +692,7 @@ void	sec_switch_set_switch_status(int	val)
 			*/
 		twl4030_phy_enable();
 
-#ifdef	_FMC_DM_
-		if(usb_access_lock	||	(set_cable_status	!=	CABLE_TYPE_USB))
-#else
 		if(set_cable_status	!=	CABLE_TYPE_USB)
-#endif
 			twl4030_phy_disable();
 	}
 #endif
@@ -1202,7 +1208,7 @@ static struct twl4030_resconfig twl4030_rconfig[] = {
     TWL4030_RESCONFIG(RES_VINTDIG,  DEV_GRP_P1,     -1, -1, RES_STATE_SLEEP ),
     TWL4030_RESCONFIG(RES_VAUX1,    -1,             -1, -1, RES_STATE_OFF   ),
 // touch has pullups to VIO, only disable VAUX2 if VIO is off
-    TWL4030_RESCONFIG(RES_VAUX2,    -1,             -1, -1, RES_STATE_ACTIVE ),
+    TWL4030_RESCONFIG(RES_VAUX2,    DEV_GRP_P1,     -1, -1, RES_STATE_SLEEP ),
     TWL4030_RESCONFIG(RES_VAUX3,    -1,             -1, -1, RES_STATE_OFF   ),
     TWL4030_RESCONFIG(RES_VAUX4,    -1,             -1, -1, RES_STATE_OFF   ),
     TWL4030_RESCONFIG(RES_VMMC1,    -1,             -1, -1, RES_STATE_OFF   ),
@@ -1339,11 +1345,7 @@ static	struct	max17040_platform_data	nowplus_max17040_data	=	{
 static	void	fsa9480_usb_cb(bool	attached)
 {
 	if(sec_switch_inited) {
-#ifdef	_FMC_DM_
-		if	(attached	&&	!usb_access_lock)
-#else
 		if	(attached)
-#endif
 				twl4030_phy_enable();
 			else
 				twl4030_phy_disable();
@@ -1676,32 +1678,6 @@ static	struct	omap_uart_port_info	omap_serial_platform_data[]	=	{
 	}
 };
 
-
-static	void	nowplus_init_wlan(void)
-{
-    int	ret	=	0;
-
-#if	1//TI	HS.Yoon	20100827	for	enabling	WLAN_IRQ	wakeup
-    omap_writel(omap_readl(0x480025E8)|0x410C0000,	0x480025E8);
-    omap_writew(0x10C,	0x48002194);
-#endif
-    ret	=	gpio_request(OMAP_GPIO_WLAN_IRQ,	"wifi_irq");
-    if	(ret	<	0)	{
-        printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
-        OMAP_GPIO_WLAN_IRQ);
-        return;
-    }
-    ret	=	gpio_request(OMAP_GPIO_WLAN_EN,	"wifi_pmena");
-    if	(ret	<	0)	{
-        printk(KERN_ERR	"%s:	can't	reserve	GPIO:	%d\n",	__func__,
-        OMAP_GPIO_WLAN_EN);
-        gpio_free(OMAP_GPIO_WLAN_EN);
-        return;
-    }
-    gpio_direction_input(OMAP_GPIO_WLAN_IRQ);
-    gpio_direction_output(OMAP_GPIO_WLAN_EN,	0);
-
-}
 
 static	void	nowplus_init_camera(void)
 {
@@ -2180,7 +2156,7 @@ void	__init	nowplus_peripherals_init(void)
 	nowplus_init_PL();
 	nowplus_init_fmradio();
 	nowplus_init_camera();
-	nowplus_init_wlan();
+	nowplus_wifi_init();
 	
     /*	For	Display	*/
     spi_register_board_info(nowplus_spi_board_info,	ARRAY_SIZE(nowplus_spi_board_info));
@@ -2192,6 +2168,7 @@ static	void	__init	nowplus_init_irq(void)
 {
 	omap_board_config	=	nowplus_config;
 	omap_board_config_size	=	ARRAY_SIZE(nowplus_config);
+    omap3_pm_init_cpuidle(omap3_cpuidle_params_table);
 	omap2_init_common_hw(nowplus_sdrc_params,	NULL);
 	omap2_gp_clockevent_set_gptimer(1);
 	omap_init_irq();

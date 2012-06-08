@@ -332,7 +332,7 @@ static struct clk dpll1_ck = {
 	.name		= "dpll1_ck",
 	.ops		= &clkops_null,
 	.parent		= &sys_ck,
-	//.init		= &omap3_dpll_init,
+	.init  		= &omap3_dpll_init,
 	.dpll_data	= &dpll1_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -406,7 +406,7 @@ static struct clk dpll2_ck = {
 	.name		= "dpll2_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	//.init		= &omap3_dpll_init,
+	.init  		= &omap3_dpll_init,
 	.dpll_data	= &dpll2_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -467,7 +467,7 @@ static struct clk dpll3_ck = {
 	.name		= "dpll3_ck",
 	.ops		= &clkops_null,
 	.parent		= &sys_ck,
-	//.init		= &omap3_dpll_init,
+	.init  		= &omap3_dpll_init,
 	.dpll_data	= &dpll3_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.clkdm_name	= "dpll3_clkdm",
@@ -617,7 +617,7 @@ static struct clk dpll4_ck = {
 	.name		= "dpll4_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	//.init		= &omap3_dpll_init,
+	.init  		= &omap3_dpll_init,
 	.dpll_data	= &dpll4_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_dpll4_set_rate,
@@ -954,7 +954,7 @@ static struct clk dpll5_ck = {
 	.name		= "dpll5_ck",
 	.ops		= &clkops_omap3_noncore_dpll_ops,
 	.parent		= &sys_ck,
-	//.init		= &omap3_dpll_init,
+	.init  		= &omap3_dpll_init,
 	.dpll_data	= &dpll5_dd,
 	.round_rate	= &omap2_dpll_round_rate,
 	.set_rate	= &omap3_noncore_dpll_set_rate,
@@ -2263,6 +2263,16 @@ static struct clk cam_mclk = {
 	.recalc		= &followparent_recalc,
 };
 
+static struct clk cam_fck = {
+    .name           = "cam_fck",
+    .ops            = &clkops_omap2_dflt,
+    .parent         = &l3_ick,
+    .enable_reg     = OMAP_CM_REGADDR(OMAP3430_CAM_MOD, CM_FCLKEN),
+    .enable_bit     = OMAP3430_EN_CAM_SHIFT,
+    .clkdm_name     = "cam_clkdm",
+    .recalc         = &followparent_recalc,
+};
+
 static struct clk cam_ick = {
 	/* Handles both L3 and L4 clocks */
 	.name		= "cam_ick",
@@ -3371,6 +3381,7 @@ static struct omap_clk omap3xxx_clks[] = {
 	CLK("dss",	"ick",		&dss_ick_3430es1,	CK_3430ES1),
 	CLK("dss",	"ick",		&dss_ick_3430es2,	CK_3430ES2 | CK_AM35XX),
 	CLK(NULL,	"cam_mclk",	&cam_mclk,	CK_343X),
+    CLK(NULL,   "cam_fck",  &cam_fck,   CK_343X),
 	CLK(NULL,	"cam_ick",	&cam_ick,	CK_343X),
 	CLK(NULL,	"csi2_96m_fck",	&csi2_96m_fck,	CK_343X),
 	CLK(NULL,	"usbhost_120m_fck", &usbhost_120m_fck, CK_3430ES2 | CK_AM35XX),

@@ -59,9 +59,6 @@ struct sec_switch_wq {
 	struct list_head entry;
 };
 
-#ifdef _FMC_DM_
-extern struct class *sec_class;
-#endif
 
 static int sec_switch_started;
 
@@ -115,8 +112,8 @@ static ssize_t usb_sel_store(struct device *dev, struct device_attribute *attr, 
 
 	printk("\n");
 
-	if (sec_get_param_value)
-		sec_get_param_value(__SWITCH_SEL, &(secsw->switch_sel));
+	// if (sec_get_param_value)
+		// sec_get_param_value(__SWITCH_SEL, &(secsw->switch_sel));
 
 	if(strncmp(buf, "PDA", 3) == 0 || strncmp(buf, "pda", 3) == 0) {
 		usb_switch_mode(secsw, SWITCH_PDA);
@@ -128,8 +125,8 @@ static ssize_t usb_sel_store(struct device *dev, struct device_attribute *attr, 
 		secsw->switch_sel &= ~USB_SEL_MASK;
 	}
 
-	if (sec_set_param_value)
-		sec_set_param_value(__SWITCH_SEL, &(secsw->switch_sel));
+	// if (sec_set_param_value)
+		// sec_set_param_value(__SWITCH_SEL, &(secsw->switch_sel));
 
 	// update shared variable.
 	if(secsw->pdata && secsw->pdata->set_switch_status)
@@ -156,10 +153,10 @@ static ssize_t uart_switch_store(struct device *dev, struct device_attribute *at
 	struct sec_switch_struct *secsw = dev_get_drvdata(dev);
 	int console_mode;
 	
-	if (sec_get_param_value) {
-		sec_get_param_value(__SWITCH_SEL, &(secsw->switch_sel));
-		sec_get_param_value(__CONSOLE_MODE, &console_mode);
-	}
+	// if (sec_get_param_value) {
+		// sec_get_param_value(__SWITCH_SEL, &(secsw->switch_sel));
+		// sec_get_param_value(__CONSOLE_MODE, &console_mode);
+	// }
 
 	if (strncmp(buf, "PDA", 3) == 0 || strncmp(buf, "pda", 3) == 0) {
 		gpio_set_value(GPIO_UART_SEL, 0);
@@ -177,10 +174,10 @@ static ssize_t uart_switch_store(struct device *dev, struct device_attribute *at
 		printk("[UART Switch] Path : MODEM\n");	
 	}
 
-	if (sec_set_param_value) {
-		sec_set_param_value(__SWITCH_SEL, &(secsw->switch_sel));
-		sec_set_param_value(__CONSOLE_MODE, &console_mode);
-	}
+	// if (sec_set_param_value) {
+		// sec_set_param_value(__SWITCH_SEL, &(secsw->switch_sel));
+		// sec_set_param_value(__CONSOLE_MODE, &console_mode);
+	// }
 
 	// update shared variable.
 	if(secsw->pdata && secsw->pdata->set_switch_status)
@@ -233,86 +230,6 @@ static ssize_t disable_vbus_store(struct device *dev, struct device_attribute *a
 static DEVICE_ATTR(disable_vbus, 0664, disable_vbus_show, disable_vbus_store);
 
 
-#ifdef _FMC_DM_
-/* for sysfs control (/sys/class/sec/switch/.usb_lock/enable) */
-static ssize_t enable_show
-(
-	struct device *dev,
-	struct device_attribute *attr,
-	char *buf
-)
-{
-	struct sec_switch_struct *secsw = dev_get_drvdata(dev);
-	int usb_access_lock;
-
-	usb_access_lock = ((secsw->switch_sel & USB_LOCK_MASK) ? 1 : 0);
-
-	if(usb_access_lock) {
-		return snprintf(buf, PAGE_SIZE, "USB_LOCK");
-	} else {
-		return snprintf(buf, PAGE_SIZE, "USB_UNLOCK");
-	}
-}
-
-static ssize_t enable_store
-(
-	struct device *dev,
-	struct device_attribute *attr,
-	const char *buf,
-	size_t size
-)
-{
-	struct sec_switch_struct *secsw = dev_get_drvdata(dev);
-	int value;
-	int usb_access_lock;
-	int cable_state = CABLE_TYPE_NONE;
-
-	if (sscanf(buf, "%d", &value) != 1) {
-		printk(KERN_ERR "enable_store: Invalid value\n");
-		return -EINVAL;
-	}
-
-	if((value < 0) || (value > 1)) {
-		printk(KERN_ERR "enable_store: Invalid value\n");
-		return -EINVAL;
-	}
-
-	if (sec_get_param_value)
-		sec_get_param_value(__SWITCH_SEL, &(secsw->switch_sel));
-
-	usb_access_lock = ((secsw->switch_sel & USB_LOCK_MASK) ? 1 : 0);
-
-	if(value != usb_access_lock) {
-		if(secsw->pdata && secsw->pdata->get_cable_status)
-			cable_state = secsw->pdata->get_cable_status();
-
-		secsw->switch_sel &= ~USB_LOCK_MASK;
-
-		if(value == 1) {
-			secsw->switch_sel |= USB_LOCK_MASK;
-			if(cable_state == CABLE_TYPE_USB)
-				twl4030_phy_disable();
-		} else {
-			if(cable_state == CABLE_TYPE_USB)
-				twl4030_phy_enable();
-		}
-
-		if (sec_set_param_value) {
-			sec_set_param_value(__SWITCH_SEL, &(secsw->switch_sel));
-		}
-
-		// update shared variable.
-		if(secsw->pdata && secsw->pdata->set_switch_status)
-			secsw->pdata->set_switch_status(secsw->switch_sel);
-	}
-
-	return size;
-}
-
-static DEVICE_ATTR(enable, 0664, enable_show, enable_store);
-#endif
-
-
 static void sec_switch_init_work(struct work_struct *work)
 {
 	struct delayed_work *dw = container_of(work, struct delayed_work, work);
@@ -322,11 +239,11 @@ static void sec_switch_init_work(struct work_struct *work)
 	int uart_sel = 0;
 	int ret = 0;
 
-	if (sec_get_param_value) {
-		sec_get_param_value(__SWITCH_SEL, &switchsel);
-		secsw->switch_sel = switchsel;
-		cancel_delayed_work(&wq->work_q);
-	} else {
+	// if (sec_get_param_value) {
+		// sec_get_param_value(__SWITCH_SEL, &switchsel);
+		// secsw->switch_sel = switchsel;
+		// cancel_delayed_work(&wq->work_q);
+	// } else {
 		if(!sec_switch_started) {
 			sec_switch_started = 1;
 			schedule_delayed_work(&wq->work_q, msecs_to_jiffies(3000));
@@ -334,7 +251,7 @@ static void sec_switch_init_work(struct work_struct *work)
 			schedule_delayed_work(&wq->work_q, msecs_to_jiffies(100));
 		}
 		return;
-	}
+	// }
 
 	if(secsw->pdata && secsw->pdata->get_regulator) {
 		ret = secsw->pdata->get_regulator();
@@ -374,9 +291,6 @@ static int sec_switch_probe(struct platform_device *pdev)
 	struct sec_switch_struct *secsw;
 	struct sec_switch_platform_data *pdata = pdev->dev.platform_data;
 	struct sec_switch_wq *wq;
-#ifdef _FMC_DM_
-	struct device *usb_lock;
-#endif
 
 	if (!pdata) {
 		pr_err("%s : pdata is NULL.\n", __func__);
@@ -420,20 +334,6 @@ static int sec_switch_probe(struct platform_device *pdev)
 
 	if (device_create_file(switch_dev, &dev_attr_disable_vbus) < 0)
 		pr_err("Failed to create device file(%s)!\n", dev_attr_disable_vbus.attr.name);
-
-#ifdef _FMC_DM_
-	usb_lock = device_create(sec_class, switch_dev, MKDEV(0, 0), NULL, ".usb_lock");
-	if (IS_ERR(usb_lock)) {
-		pr_err("Failed to create device(usb_lock)!\n");
-	} else {
-		dev_set_drvdata(usb_lock, secsw);
-
-		if (device_create_file(usb_lock, &dev_attr_enable) < 0) {
-			pr_err("Failed to create device file(%s)!\n", dev_attr_enable.attr.name);
-			device_destroy((struct class *)usb_lock, MKDEV(0, 0));
-		}
-	}
-#endif
 
 	// run work queue
 	wq = kmalloc(sizeof(struct sec_switch_wq), GFP_ATOMIC);

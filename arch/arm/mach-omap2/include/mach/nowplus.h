@@ -3,9 +3,6 @@
 
 //#include "mux-omap3.h"
 
-#define PARAM_MAGIC			0x72726624
-#define PARAM_VERSION		0x11	/* Rev 1.1 */
-#define PARAM_STRING_SIZE	1024	/* 1024 Characters */
 /* Check for carrier configuration flag */
 
 /*

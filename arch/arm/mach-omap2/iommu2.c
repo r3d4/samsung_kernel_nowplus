@@ -21,6 +21,7 @@
 #include <plat/iommu.h>
 #include <plat/omap_device.h>
 
+#define DEBUG 1
 /*
  * omap2 architecture specific register bit definitions
  */
@@ -105,7 +106,10 @@ static int omap2_iommu_enable(struct iommu *obj)
 
 	ret = omap_device_enable(obj->pdev);
 	if (ret)
+    {
+        printk("%s: error omap_device_enable\n",__func__);
 		return ret;
+    }
 
 	iommu_write_reg(obj, MMU_SYS_SOFTRESET, MMU_SYSCONFIG);
 

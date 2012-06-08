@@ -406,7 +406,6 @@ void __init omap2_hsmmc_init(struct omap2_hsmmc_info *controllers)
 		case 2:
 			if (c->ext_clock)
 				c->transceiver = 1;
-			mmc->slots[0].before_set_reg = hsmmc23_before_set_reg;
 			if (c->transceiver && (c->caps & MMC_CAP_8_BIT_DATA)) {
 				c->caps &= ~MMC_CAP_8_BIT_DATA;
 				c->caps |= MMC_CAP_4_BIT_DATA;
