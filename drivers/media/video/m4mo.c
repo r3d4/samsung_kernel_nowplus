@@ -76,7 +76,6 @@ static u8* cam_fw_name              = "RS_M4Mo_RD.bin";;
 static int cam_fw_major_version     = 0xFB;;
 static int cam_fw_minor_version     = 0xAA;
 int camfw_update                    = 0;
-static int af_used 					= 0;	//1 if AF was use at some time
 
 static u32 m4mo_curr_state          = M4MO_STATE_INVALID;
 static u32 m4mo_pre_state           = M4MO_STATE_INVALID;
@@ -1969,8 +1968,7 @@ static int m4mo_set_aewb(s32 value)
 	struct m4mo_sensor *sensor = &m4mo;
 	struct i2c_client *client = sensor->i2c_client;
 
-	if(sensor->aewb == value)
-		return 0;
+    dprintk(CAM_INF, M4MO_MOD_NAME "%s called..., value=%d\n", __func__, value);
 
 	switch(value)
 	{
@@ -2316,9 +2314,35 @@ static int m4mo_set_auto_focus(s32 value)
 	switch(value) 
 	{
 		case M4MO_AF_START :
-			af_used = 1;
             dprintk(CAM_DBG, M4MO_MOD_NAME "AF start.\n");
-            
+
+            /* Wait till the staus is changed to monitor mode */
+			if(sensor->face_detection == M4MO_FACE_DETECTION_ON)
+				ret = m4mo_i2c_verify(client, 0x00, 0x0C, 0x04);
+			else
+				ret = m4mo_i2c_verify(client, 0x00, 0x0C, 0x02);
+
+            if(ret)
+			{
+                dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait changing to monitor status!\n");
+                return ret;
+			}
+            // /* AE/AWB Unlock */
+            // m4mo_write_category_parm(client, M4MO_8BIT, 0x03, 0x00, 0x00);
+			// m4mo_write_category_parm(client, M4MO_8BIT, 0x06, 0x00, 0x00);
+            // msleep(10);
+            /* AE/AWB Lock */
+            // if(sensor->mode == M4MO_MODE_CAMERA)
+            // {
+                // m4mo_write_category_parm(client, M4MO_8BIT, 0x03, 0x00, 0x01);
+                // m4mo_write_category_parm(client, M4MO_8BIT, 0x06, 0x00, 0x01);
+            // }
+            // else
+            // {
+                // m4mo_write_category_parm(client, M4MO_8BIT, 0x03, 0x00, 0x00);
+                // m4mo_write_category_parm(client, M4MO_8BIT, 0x06, 0x00, 0x00);
+            // }
+
 			/*AF VCM Driver Standby Mode OFF */
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x01); 
 			/* AF operation start */
@@ -2326,8 +2350,8 @@ static int m4mo_set_auto_focus(s32 value)
 
 			sensor->af_mode = M4MO_AF_START;
 			break;
+
 		case M4MO_AF_STOP :
-			af_used = 0;
             dprintk(CAM_DBG, M4MO_MOD_NAME "AF stop.\n");
             
 			/* Release Auto Focus */
@@ -2365,16 +2389,16 @@ static int m4mo_set_auto_focus(s32 value)
 				return ret;
 			}
 
-			if(sensor->focus_mode == M4MO_AF_MODE_MACRO)
-				m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x10, 0x01); // Set Base Position
-
 			/* AF VCM Driver Standby Mode ON */
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x00, 0x00); 
 
-			sensor->af_mode = M4MO_AF_STOP;
+            /* AE/AWB Unlock */
+            m4mo_write_category_parm(client, M4MO_8BIT, 0x03, 0x00, 0x00);
+			m4mo_write_category_parm(client, M4MO_8BIT, 0x06, 0x00, 0x00);
 
-			dprintk(CAM_DBG, M4MO_MOD_NAME "AF stop.\n");
+			sensor->af_mode = M4MO_AF_STOP;
 			break;
+
 		case M4MO_AF_RELEASE :
 			/* Release Auto Focus */
 			m4mo_write_category_parm(client, M4MO_8BIT, 0x0A, 0x02, 0x00); 
@@ -2392,10 +2416,9 @@ static int m4mo_set_auto_focus(s32 value)
 			{
 			ret = m4mo_i2c_verify(client, 0x00, 0x0C, 0x02);
 			if(ret)  
-			{
+
 				dprintk(CAM_DBG, M4MO_MOD_NAME "Failed to wait changing to monitor status!\n");
 				return ret;
-			}
 			}
 
 			sensor->af_mode = M4MO_AF_RELEASE;

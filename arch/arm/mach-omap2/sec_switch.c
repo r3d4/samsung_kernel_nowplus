@@ -63,7 +63,7 @@ struct sec_switch_wq {
 static int sec_switch_started;
 
 extern struct device *switch_dev;
-static int switchsel;
+static int switchsel = USB_SEL_MASK | UART_SEL_MASK;
 // Get SWITCH_SEL param value from kernel CMDLINE parameter.
 __module_param_call("", switchsel, param_set_int, param_get_int, &switchsel, 0, 0444);
 MODULE_PARM_DESC(switchsel, "Switch select parameter value.");
@@ -238,21 +238,24 @@ static void sec_switch_init_work(struct work_struct *work)
 	int usb_sel = 0;
 	int uart_sel = 0;
 	int ret = 0;
-
-	// if (sec_get_param_value) {
-		// sec_get_param_value(__SWITCH_SEL, &switchsel);
-		// secsw->switch_sel = switchsel;
-		// cancel_delayed_work(&wq->work_q);
-	// } else {
-		if(!sec_switch_started) {
-			sec_switch_started = 1;
-			schedule_delayed_work(&wq->work_q, msecs_to_jiffies(3000));
-		} else {
-			schedule_delayed_work(&wq->work_q, msecs_to_jiffies(100));
-		}
-		return;
-	// }
-
+#if 0
+    if (sec_get_param_value) {
+        sec_get_param_value(__SWITCH_SEL, &switchsel);
+        secsw->switch_sel = switchsel;
+        cancel_delayed_work(&wq->work_q);
+    } else {
+        if(!sec_switch_started) {
+            sec_switch_started = 1;
+            schedule_delayed_work(&wq->work_q, msecs_to_jiffies(3000));
+        } else {
+            schedule_delayed_work(&wq->work_q, msecs_to_jiffies(100));
+        }
+        return;
+    }
+#else
+	 secsw->switch_sel = switchsel;
+	 cancel_delayed_work(&wq->work_q);
+#endif
 	if(secsw->pdata && secsw->pdata->get_regulator) {
 		ret = secsw->pdata->get_regulator();
 		if(ret != 0) {
@@ -341,7 +344,7 @@ static int sec_switch_probe(struct platform_device *pdev)
 		wq->sdata = secsw;
 		sec_switch_started = 0;
 		INIT_DELAYED_WORK(&wq->work_q, sec_switch_init_work);
-		schedule_delayed_work(&wq->work_q, msecs_to_jiffies(100));
+		schedule_delayed_work(&wq->work_q, msecs_to_jiffies(3000));
 	}
 	else
 		return -ENOMEM;

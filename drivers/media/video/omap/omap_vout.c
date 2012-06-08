@@ -3267,7 +3267,8 @@ streamon_err1:
 	}
 streamon_err:
 	mutex_unlock(&vout->lock);
-	printk("%s: streamone err ret = %d\n",__func__,ret);
+    if (ret)
+        printk("%s: streamone err ret = %d\n",__func__,ret);
 	return ret;
 }
 
