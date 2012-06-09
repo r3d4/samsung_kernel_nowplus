@@ -33,9 +33,6 @@
 #include <mach/hardware.h>
 #include <plat/mux.h>
 
-#if defined(CONFIG_SEC_HEADSET_CLASS_FOR_OMS)
-#include "./accessory.h"
-#endif
 #include "switch_omap_gpio.h"
 //#define CONFIG_DEBUG_SEC_HEADSET
 
@@ -51,7 +48,7 @@
 #define SEND_END_ENABLE_TIME 		get_jiffies_64() + (HZ*2)// 1000ms * 2 = 2sec
 
 struct gpio_switch_data	*data = NULL;
-static unsigned short int headset_status;
+static unsigned short int headset_status = HEADSET_DISCONNET;
 static struct timer_list headset_detect_timer;
 static unsigned int headset_detect_timer_token;
 
@@ -61,63 +58,21 @@ static struct wake_lock headset_wake_lock;
 #define VINTANA2_DEV_GRP   0x43
 #define VINTANA2_DEDICATED 0x46
 #define VSEL_VINTANA2_2V75 0x01
-
 #define VUSB1V8_DEV_GRP     0x74
 #define VUSB3V1_DEV_GRP     0x77
 #define CARKIT_ANA_CTRL     0xBB
 #define SEL_MADC_MCPC       0x08
+
 //#define USE_REGULATOR
 
-struct switch_device_info
-{
-        struct device *dev;
 
 #ifdef USE_REGULATOR
-        struct regulator *usb1v5;
-        struct regulator *usb1v8;
-        struct regulator *usb3v1;
+struct regulator *usb3v1;
+struct regulator *vintana2;
 #endif
 
-};
 
 static struct device *this_dev;
-
-
-
-#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-#define DETECTING		(1 << 2)
-
-static int micco_headset_get_property(struct accessory *acy,
-				  enum accessory_property pacy,
-				  union accessory_propval *val)
-{
-	val->intval = headset_status;
-
-	switch (pacy) {
-	case ACCESSORY_PROP_ONLINE:
-		if ( val->intval & DETECTING ) 
-			val->intval = 0;
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static enum accessory_property micco_headset_props[] = {
-	ACCESSORY_PROP_ONLINE,
-};
-static struct accessory micco_headset_accessory = {
-	.name = "headset",
-	.type = ACCESSORY_TYPE_HEADSET,
-	.properties = micco_headset_props,
-	.num_properties = ARRAY_SIZE(micco_headset_props),
-	.get_property = micco_headset_get_property,
-	.put_property = NULL,
-
-};
-#endif
 
 
 #ifdef CONFIG_INPUT_ZEUS_EAR_KEY
@@ -144,18 +99,31 @@ short int get_headset_status(void)
 }
 EXPORT_SYMBOL(get_headset_status);
 
-static void release_headset_event(unsigned long arg)
-{
-	printk("[Headset]Headset attached\n");
-	headset_status = 1;
-	switch_set_state(&data->sdev, 1);
-}
-static DECLARE_DELAYED_WORK(release_headset_event_work, release_headset_event);
 
 static int get_t2adc_data( int ch )
 {
     int ret = 0;
     struct twl4030_madc_request req;
+    u8 vsel, devgrp, mcpc;
+#ifdef USE_REGULATOR
+	// twl_i2c_read_u8(TWL4030_MODULE_PM_RECEIVER, &vsel, VINTANA2_DEDICATED);
+    // twl_i2c_read_u8(TWL4030_MODULE_PM_RECEIVER, &devgrp, VINTANA2_DEV_GRP);
+    // // set VINTANA2 to 2.75V
+    // twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, VSEL_VINTANA2_2V75, VINTANA2_DEDICATED );
+    // twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, DEV_GRP_P1<<5, VINTANA2_DEV_GRP );
+
+    wake_lock(&headset_wake_lock); // disallow to enter deep sleep keeping usb voltage
+
+    if ( regulator_enable( vintana2 ) )
+        printk("Regulator 3v1 error!!\n");
+        
+    if ( regulator_enable( usb3v1 ) )
+        printk("Regulator 3v1 error!!\n");
+#endif  
+    // enable mux ADCIN3 to ADCIN6 to ADC (othwerise tied to GND)
+    //twl_i2c_read_u8(TWL4030_MODULE_USB, &mcpc, CARKIT_ANA_CTRL);
+    twl_i2c_write_u8(TWL4030_MODULE_USB, SEL_MADC_MCPC, CARKIT_ANA_CTRL);
+    mdelay(5);
     
     req.channels = ( 1 << ch );
     req.do_avg = 0;
@@ -165,7 +133,16 @@ static int get_t2adc_data( int ch )
     twl4030_madc_conversion( &req );
 
     ret = req.rbuf[ch];
-	//printk("adc value is : %d", ret);
+
+    //twl_i2c_write_u8(TWL4030_MODULE_USB, mcpc, CARKIT_ANA_CTRL);
+#ifdef USE_REGULATOR
+     regulator_disable( usb3v1 );
+     regulator_disable( vintana2 );
+    // // reset VINTANA2 to 2.75V 
+    // twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, vsel, VINTANA2_DEDICATED );
+    // twl_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, devgrp, VINTANA2_DEV_GRP );
+#endif
+    wake_unlock(&headset_wake_lock);
 
     return ret;
 }
@@ -176,51 +153,14 @@ static void ear_adc_caculrator(unsigned long arg)
 	int adc = 0;
 	int state = 0;
 	
-	state = gpio_get_value(EAR_DET_GPIO) ^ EAR_DETECT_INVERT_ENABLE;	
+	state = gpio_get_value(data->gpio) ^ EAR_DETECT_INVERT_ENABLE;	
 
 	gpio_direction_output(EAR_MIC_BIAS_GPIO, 1);
 	msleep(50);
 	
 	if (state)
 	{
-	#ifdef USE_REGULATOR
-		struct switch_device_info *di;
-		struct platform_device *pdev;
-		
-		pdev = to_platform_device(this_dev);
-		di = platform_get_drvdata( pdev );
-		twl4030_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, VSEL_VINTANA2_2V75, VINTANA2_DEDICATED );
-		twl4030_i2c_write_u8( TWL4030_MODULE_PM_RECEIVER, 0x20, VINTANA2_DEV_GRP );
-
-		//wake_lock(&headset_wake_lock); // disallow to enter deep sleep keeping usb voltage
-
-		ret = regulator_enable( di->usb3v1 );
-		if ( ret )
-			printk("Regulator 3v1 error!!\n");
-
-		ret = regulator_enable( di->usb1v8 );
-		if ( ret )
-			printk("Regulator 1v8 error!!\n");
-
-		ret = regulator_enable( di->usb1v5 );
-		if ( ret )
-			printk("Regulator 1v5 error!!\n");
-
-		mdelay(5);
-
-		//twl4030_i2c_read_u8(TWL4030_MODULE_USB, &ana_val, CARKIT_ANA_CTRL);
-		twl4030_i2c_write_u8(TWL4030_MODULE_USB, SEL_MADC_MCPC, CARKIT_ANA_CTRL);
-	#endif
-
 		adc = get_t2adc_data(3);
-
-	#ifdef USE_REGULATOR
-		regulator_disable( di->usb1v5 );
-        regulator_disable( di->usb1v8 );
-        regulator_disable( di->usb3v1 );
-	#endif
-
-		//wake_unlock(&headset_wake_lock);
 
 		if(adc >= 100)
 		{
@@ -231,9 +171,6 @@ static void ear_adc_caculrator(unsigned long arg)
 			#endif
 			headset_status = HEADSET_4POLE_WITH_MIC;
 		
-			#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-			accessory_changed(&micco_headset_accessory);
-			#endif
 			printk("[Headset] 4pole ear-mic adc is %d\n", adc);
 			#ifdef CONFIG_INPUT_ZEUS_EAR_KEY
 			ear_key_enable_irq();
@@ -245,11 +182,6 @@ static void ear_adc_caculrator(unsigned long arg)
 		{
 			switch_set_state(&data->sdev, HEADSET_3POLE);
 			headset_status = HEADSET_3POLE;
-
-			#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-			accessory_changed(&micco_headset_accessory);
-			//printk("[Headset] force detecting for 4pole\n", adc);
-			#endif
 
 			printk("[Headset] 3pole earphone adc is %d\n", adc);
 			//#ifdef CONFIG_INPUT_ZEUS_EAR_KEY
@@ -263,7 +195,7 @@ static void ear_adc_caculrator(unsigned long arg)
 		{
 			printk(KERN_ALERT "Wrong adc value!! adc is %d\n", adc);
 			gpio_direction_output(EAR_MIC_BIAS_GPIO, 0);
-			headset_status = 0;
+			headset_status = HEADSET_DISCONNET;
 		}
 	}
 	else
@@ -271,9 +203,6 @@ static void ear_adc_caculrator(unsigned long arg)
 		printk("[Headset] Headset detached\n");        	
 		switch_set_state(&data->sdev, state);
 
-		#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-		accessory_changed(&micco_headset_accessory);
-		#endif
 		#ifdef CONFIG_INPUT_ZEUS_EAR_KEY
 		//ear_key_disable_irq();
 		#endif	
@@ -292,7 +221,7 @@ static void headset_detect_timer_handler(unsigned long arg)
 {
 	int state;
 	int count = 0;
-	state = gpio_get_value(EAR_DET_GPIO) ^ EAR_DETECT_INVERT_ENABLE;
+	state = gpio_get_value(data->gpio) ^ EAR_DETECT_INVERT_ENABLE;
 	if(state)
 		count = HEADSET_ATTACH_COUNT;
 	else if(!state)
@@ -359,10 +288,9 @@ static irqreturn_t gpio_irq_handler(int irq, void *dev_id)
 
 	SEC_HEADSET_DBG("");  
 	state = gpio_get_value(data->gpio) ^ EAR_DETECT_INVERT_ENABLE;
-	 if (!state)
+	if (!state)
 	{
 		printk("[Headset] disable earkey\n");        	
-
 		ear_key_disable_irq();
 	}
  	#endif
@@ -406,7 +334,14 @@ static int gpio_switch_probe(struct platform_device *pdev)
 	switch_data = kzalloc(sizeof(struct gpio_switch_data), GFP_KERNEL);
 	if (!switch_data)
 		return -ENOMEM;
-
+#ifdef USE_REGULATOR
+    usb3v1 = regulator_get(this_dev, "usb3v1");
+	if (IS_ERR(usb3v1))
+		return -ENODEV;
+    vintana2 = regulator_get(this_dev, "vintana2");
+	if (IS_ERR(vintana2))
+		return -ENODEV;       
+#endif       
 	switch_data->sdev.name = pdata->name;
 	switch_data->gpio = pdata->gpio;
 	switch_data->name_on = pdata->name_on;
@@ -418,14 +353,6 @@ static int gpio_switch_probe(struct platform_device *pdev)
     ret = switch_dev_register(&switch_data->sdev);
 	if (ret < 0)
 		goto err_switch_dev_register;
-
-	//[2009.12.18 changoh.heo for oms
-	#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-	ret = accessory_register(&pdev->dev, &micco_headset_accessory);
-	if (ret < 0)
-		goto err_switch_dev_register;
-	#endif
-	//]
 
 	ret = gpio_request(switch_data->gpio, pdev->name);
 	if (ret < 0)
@@ -469,11 +396,6 @@ err_set_gpio_input:
 	gpio_free(switch_data->gpio);
 err_request_gpio:
     switch_dev_unregister(&switch_data->sdev);
-	//[2009.12.18 changoh.heo for oms
-	#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-	accessory_unregister(&micco_headset_accessory);
-	#endif
-	//]
 err_switch_dev_register:
 	kfree(switch_data);
 
@@ -487,9 +409,10 @@ static int __devexit gpio_switch_remove(struct platform_device *pdev)
 	cancel_work_sync(&switch_data->work);
 	gpio_free(switch_data->gpio);
     switch_dev_unregister(&switch_data->sdev);
-	#ifdef CONFIG_SEC_HEADSET_CLASS_FOR_OMS
-	accessory_unregister(&micco_headset_accessory);
-	#endif
+#ifdef USE_REGULATOR
+    regulator_put(usb3v1);
+    regulator_put(vintana2)
+#endif
 	kfree(switch_data);
 
 	return 0;

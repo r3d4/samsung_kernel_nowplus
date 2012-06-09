@@ -760,7 +760,7 @@ static	struct	platform_device	*nowplus_devices[]	__initdata	=	{
 	&nowplus_wl127x_device,
 #endif
 	&nowplus_power_key_device,
-	//&nowplus_ear_key_device,
+	&nowplus_ear_key_device,
 	&samsung_battery_device,
 	&samsung_charger_device,
 	&samsung_vibrator_device,	//	cdy_100111	add	vibrator	device

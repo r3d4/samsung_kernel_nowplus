@@ -7,7 +7,7 @@
 
 #define HEADSET_DISCONNET			0
 #define HEADSET_3POLE				2 
-#define HEADSET_4POLE_WITH_MIC	1
+#define HEADSET_4POLE_WITH_MIC	    1
 
 extern short int get_headset_status(void);
 

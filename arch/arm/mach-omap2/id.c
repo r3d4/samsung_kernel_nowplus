@@ -76,12 +76,19 @@ EXPORT_SYMBOL(omap_type);
 /*----------------------------------------------------------------------------*/
 
 #define OMAP_TAP_IDCODE		0x0204
+#define OMAP_TAP_PROD_ID_0  0x0208
+#define OMAP_TAP_PROD_ID_1  0x020c
+#define OMAP_TAP_PROD_ID_2  0x0210
+#define OMAP_TAP_PROD_ID_3  0x0214
 #define OMAP_TAP_DIE_ID_0	0x0218
 #define OMAP_TAP_DIE_ID_1	0x021C
 #define OMAP_TAP_DIE_ID_2	0x0220
 #define OMAP_TAP_DIE_ID_3	0x0224
 
 #define read_tap_reg(reg)	__raw_readl(tap_base  + (reg))
+
+static ssize_t idcode_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf);
+static struct kobj_attribute idcode_attr = __ATTR(idcode, 0444, idcode_show, NULL);
 
 struct omap_id {
 	u16	hawkeye;	/* Silicon type (Hawkeye id) */
@@ -101,6 +108,24 @@ static struct omap_id omap_ids[] __initdata = {
 
 static void __iomem *tap_base;
 static u16 tap_prod_id;
+
+
+static ssize_t idcode_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+     return sprintf(buf, "IDCODE: %08x\nProduction ID: %08x %08x %08x %08x\n"
+                             "Die ID: %08x %08x %08x %08x\n",
+                     read_tap_reg(OMAP_TAP_IDCODE),
+                     read_tap_reg(OMAP_TAP_PROD_ID_0),
+                     read_tap_reg(OMAP_TAP_PROD_ID_1),
+                     read_tap_reg(OMAP_TAP_PROD_ID_2),
+                     read_tap_reg(OMAP_TAP_PROD_ID_3),
+                     read_tap_reg(OMAP_TAP_DIE_ID_0),
+                     read_tap_reg(OMAP_TAP_DIE_ID_1),
+                     read_tap_reg(OMAP_TAP_DIE_ID_2),
+                     read_tap_reg(OMAP_TAP_DIE_ID_3));
+
+}
+
 
 void __init omap24xx_check_revision(void)
 {
@@ -179,7 +204,16 @@ void __init omap3_check_features(void)
 	OMAP3_CHECK_FEATURE(status, ISP);
 	if (cpu_is_omap3630())
 		omap3_features |= OMAP3_HAS_192MHZ_CLK;
+        
+    /*
+    * Does it support 720MHz?
+    */
+    status = ((OMAP3_SKUID_MASK & read_tap_reg(OMAP3_PRODID))
+                    & OMAP3_SKUID_720MHZ) ? 1 : 0 ;
+    if (status)
+            omap3_features |= OMAP3_HAS_720M;
 
+    /*
 	/*
 	 * TODO: Get additional info (where applicable)
 	 *       e.g. Size of L2 cache.
@@ -497,6 +531,7 @@ void __init omap3_cpuinfo(void)
 	OMAP3_SHOW_FEATURE(neon);
 	OMAP3_SHOW_FEATURE(isp);
 	OMAP3_SHOW_FEATURE(192mhz_clk);
+    OMAP3_SHOW_FEATURE(720m);
 
 	printk(")\n");
 }
@@ -574,3 +609,14 @@ void __init omap_l2cache_enable(void)
 	} else
 		printk(KERN_WARNING "L2 CACHE is enabled in bootloader\n");
 }
+
+void __init export_omapid(void)
+{
+     int error;
+
+     error = sysfs_create_file(power_kobj, &idcode_attr.attr);
+     if (error)
+             printk(KERN_ERR "sysfs_create_file failed: %d\n", error);
+}
+
+late_initcall(export_omapid);

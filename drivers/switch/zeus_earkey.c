@@ -29,7 +29,6 @@
 
 #include "switch_omap_gpio.h"
 //#define CONFIG_DEBUG_SEC_HEADSET
-#define OMAP_GPIO_OPEN_EAR_KEY_INT 1
 #ifdef CONFIG_DEBUG_SEC_HEADSET
 #define SEC_HEADSET_DBG(fmt, arg...) printk(KERN_INFO "[JACKKEY] %s" fmt "\r\n", __func__,## arg)
 #else
@@ -101,7 +100,7 @@ void ear_key_enable_irq(void)
 }
 EXPORT_SYMBOL_GPL(ear_key_enable_irq);
 static unsigned int earkey_stats = 0;
-static void release_sysfs_event(unsigned long arg)
+static void release_sysfs_event(struct work_struct *work)
 {
     int i = 0;
     bool result = false;
@@ -144,7 +143,7 @@ static void release_sysfs_event(unsigned long arg)
 static DECLARE_DELAYED_WORK(release_sysfs_event_work, release_sysfs_event);
 
 
-static void check_key_adc(unsigned long arg)
+static void check_key_adc(struct work_struct *work)
 {
 	int adc_val;
 
@@ -152,7 +151,7 @@ static void check_key_adc(unsigned long arg)
 	adc_val = get_adc_data(3);
 	//printk("- Earkey pressed ADC %d\n" , adc_val);
 	
-	if(adc_val <= 150 && adc_val >= 75)
+	if(adc_val <= 150 && adc_val >= 0)
 	{
 		printk("[Earkey]adc is within %d\n", adc_val);
 		check_adc++;
@@ -166,7 +165,7 @@ static void check_key_adc(unsigned long arg)
 }
 static DECLARE_DELAYED_WORK(check_key_adc_work, check_key_adc);
 
-static void fast_check_key_adc(unsigned long arg)
+static void fast_check_key_adc(struct work_struct *work)
 {
 	fast_adc_val = 0;
     fast_adc_avg_val = 0;
@@ -186,7 +185,7 @@ static void fast_check_key_adc(unsigned long arg)
 	
     //gpio_direction_output(EAR_ADC_SEL_GPIO , 1);		
 }
-static DECLARE_DELAYED_WORK(fast_check_key_adc_work, fast_check_key_adc);
+static DECLARE_WORK(fast_check_key_adc_work, fast_check_key_adc);
 
 void release_ear_key(void)
 {
@@ -207,7 +206,7 @@ EXPORT_SYMBOL_GPL(release_ear_key);
 static void send_end_key_event_timer_handler(unsigned long arg)
 {
 	int sendend_state = 0;
-	int adc_val = 0;	
+//	int adc_val = 0;	
   int i = 0;
 
 	SEC_HEADSET_DBG("  ");
@@ -251,21 +250,21 @@ static void send_end_key_event_timer_handler(unsigned long arg)
 	}
 }
 
-static int ear_switch_change(struct work_struct *ignored)
+static void ear_switch_change(struct work_struct *ignored)
 {
 	int ear_state = 0;
 
 	SEC_HEADSET_DBG("");
 	if(!ip_dev){
     		dev_err(ip_dev->dev.parent,"Input Device not allocated\n");
-    		return IRQ_HANDLED;
+    		return;
   	}
   
   	ear_state = gpio_get_value(EAR_KEY_GPIO) ^ EAR_KEY_INVERT_ENABLE;
 	
   	if( ear_state < 0 ){
     	dev_err(ip_dev->dev.parent,"Failed to read GPIO value\n");
-    	return IRQ_HANDLED;
+    	return;
   	}
 
 	del_timer(&send_end_key_event_timer);
@@ -295,7 +294,7 @@ static int ear_switch_change(struct work_struct *ignored)
 		SEC_HEADSET_DBG("SEND/END Button is %s but headset disconnect or irq disable.\n", ear_state?"pressed":"released");
 	}
 
-  return 0;
+  return;
 }
 static DECLARE_WORK(ear_switch_work, ear_switch_change);
 
