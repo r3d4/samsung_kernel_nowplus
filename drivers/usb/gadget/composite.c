@@ -1036,17 +1036,17 @@ static void composite_disconnect(struct usb_gadget *gadget)
 #if defined(CONFIG_MACH_OMAP_SAMSUNG)
 	if (cdev->mute_switch) {
 		if(skip_condition < 1) {
-			INFO(cdev, "1**********skip mute_switch %d\n", skip_condition);
+			//INFO(cdev, "1**********skip mute_switch %d\n", skip_condition);
 			skip_condition++;
 		} else {
-			INFO(cdev, "2**********clean mute_switch\n");
+			//INFO(cdev, "2**********clean mute_switch\n");
 			cdev->mute_switch = 0;
 		}
 	} else {
 		skip_condition = 0;
         cdev->connected = 0;
 		schedule_work(&cdev->switch_work);
-		INFO(cdev, "3**********composite_disconnect -> switch_work\n");
+		//INFO(cdev, "3**********composite_disconnect -> switch_work\n");
 	}
 #else
 	if (cdev->mute_switch)
@@ -1154,7 +1154,7 @@ composite_switch_work(struct work_struct *data)
 	int connected;
 	unsigned long flags;
 
-	INFO(cdev,"composite_switch_work: config=0x%p\n", (void*)config);
+	//INFO(cdev,"composite_switch_work: config=0x%p\n", (void*)config);
 
     spin_lock_irqsave(&cdev->lock, flags);
 	if (cdev->connected != cdev->sw_connected.state) {
@@ -1166,10 +1166,10 @@ composite_switch_work(struct work_struct *data)
 	}
 
 	if (config) {
-		INFO(cdev, "switch_uevent 1: old = %d, new = %d\n", cdev->sw_config.state, config->bConfigurationValue);
+		//INFO(cdev, "switch_uevent 1: old = %d, new = %d\n", cdev->sw_config.state, config->bConfigurationValue);
 		switch_set_state(&cdev->sw_config, config->bConfigurationValue);
 	} else {
-		INFO(cdev, "switch_uevent 2: old = %d, new = 0\n", cdev->sw_config.state);
+		//INFO(cdev, "switch_uevent 2: old = %d, new = 0\n", cdev->sw_config.state);
 		switch_set_state(&cdev->sw_config, 0);
 	}
 }
