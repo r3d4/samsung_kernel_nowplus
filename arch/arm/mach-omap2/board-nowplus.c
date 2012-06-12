@@ -220,8 +220,8 @@ void set_ps_hold(int state)
     else
         omap34xx_pad_set_config_lcd(PAD_OFFS_ETK_D11, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN| OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
 #else
-    printk("[%s] set GPIO %d\n", state);
-    gpio_set_value(OMAP_GPIO_PS_HOLD_PU, __func__, state);
+    printk("[%s] set GPIO %d\n", __func__, state);
+    gpio_set_value(OMAP_GPIO_PS_HOLD_PU, state);
 #endif       
 }
 EXPORT_SYMBOL(set_ps_hold);
