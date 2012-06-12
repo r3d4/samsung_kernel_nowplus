@@ -125,6 +125,22 @@ int cam_pmic_write_reg(u8 reg, u8 val)
 }
 EXPORT_SYMBOL(cam_pmic_write_reg);
 
+static __init int set_defaults()
+{ 
+    int ret=0;
+    printk("cam_pmic: init default voltages\n");
+    // init default voltages (taken from service manual)
+    ret += cam_pmic_write_reg(LDO1_SETTINGS,  (LDO1_T_DEFAULT<<5)  | LDO1_V_2V8);
+    ret += cam_pmic_write_reg(LDO2_SETTINGS,  (LDO2_T_DEFAULT<<5)  | LDO2_V_2V8);
+    ret += cam_pmic_write_reg(LDO3_SETTINGS,  (0x5<<5)             | LDO3_V_1V8);
+    ret += cam_pmic_write_reg(LDO4_SETTINGS,  (LDO1_T_DEFAULT<<5)  | LDO4_V_1V8);
+    ret += cam_pmic_write_reg(LDO5_SETTINGS,  (LDO5_T_DEFAULT<<5)  | LDO5_V_2V8);
+    ret += cam_pmic_write_reg(BUCK_SETTINGS1, (BUCK_T1_DEFAULT<<5) | BUCK_V1_1V2);
+   
+    ret += cam_pmic_write_reg(ENABLE_BITS,    DVS_V1 | ENABLE_ALL);
+
+    return ret;
+}
 /**
  * cam_pmic_probe - sensor driver i2c probe handler
  * @client: i2c driver client device structure
@@ -135,18 +151,23 @@ EXPORT_SYMBOL(cam_pmic_write_reg);
 static int
 cam_pmic_probe(struct i2c_client *client, const struct i2c_device_id *device)
 {   
-  dprintk(CAM_INF, "cam_pmic_probe is called...\n");
+    int ret=0;
+    dprintk(CAM_INF, "cam_pmic_probe is called...\n");
 
-  if (i2c_get_clientdata(client))
-  {
-    printk("can't get i2c client data!!\n");
-    return -EBUSY;
-  }
+    if (i2c_get_clientdata(client))
+    {
+        printk("can't get i2c client data!!\n");
+        return -EBUSY;
+    }
 
-  pmic.i2c_client = client;
-  i2c_set_clientdata(client, &pmic);
+    pmic.i2c_client = client;
+    i2c_set_clientdata(client, &pmic);
 
-  return 0;
+    ret = set_defaults();
+    if (ret)
+        printk("cam_pmic_write_reg failed !!!\n");
+        
+    return ret;
 }
 
 /**
