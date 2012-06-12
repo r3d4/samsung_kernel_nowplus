@@ -44,6 +44,7 @@ EXPORT_SYMBOL(__do_forced_modemoff);
 extern void tl2796_lcd_poweroff(void);
 extern void omap_watchdog_reset(void);
 extern int sec_switch_get_cable_status(void);
+extern void set_ps_hold(int state);
 
 static void twl4030_poweroff(void)
 {
@@ -123,7 +124,7 @@ static void nowplus_poweroff(void)
 		printk("Power Off !\n\n");
 		while(1)
 		{
-			gpio_set_value(OMAP_GPIO_PS_HOLD_PU, 0);
+			set_ps_hold(0);
 
 			if (0 /*is_powerbutton_pressed*/)
 				printk("Power button is pressed\n\n");

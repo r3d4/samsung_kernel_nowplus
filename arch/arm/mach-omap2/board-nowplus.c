@@ -88,6 +88,8 @@
 #define CAM_PMIC_DRIVER_NAME        "cam_pmic"
 #define CAM_PMIC_I2C_ADDR           0x7D
 
+#define EAR_ADC_OFF                 1   // STG5123 S1 enabled
+#define EAR_ADC_ON                  0   // STG5123 S2 enabled
 
 #define TWL4030_RESCONFIG(res,grp,typ1,typ2,state) \
 { \
@@ -201,16 +203,39 @@ static struct cpuidle_params omap3_cpuidle_params_table[] = {
 	/* C7 */
 	{1, 10000, 30000, 300000},
 };
+#define PAD_OFFS_I2C3_SCL   0x01C2 
+#define PAD_OFFS_I2C3_SDA   0x01C4 
+#define PAD_OFFS_ETK_D11    0x05f2
+#define PAD_OFFS_UART3_RX   0x019e
+#define PAD_OFFS_UART3_TX   0x01a0
+
+#define PS_HOLD_USE_PULL        //set output value via pullup/-down
+
+void set_ps_hold(int state)
+{
+#ifdef PS_HOLD_USE_PULL
+    printk("[%s] enable PS_HOLD %s \n",	__func__, state?"pullup":"pulldown");
+    if (state)
+        omap34xx_pad_set_config_lcd(PAD_OFFS_ETK_D11, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLUP | OMAP34XX_PIN_OFF_INPUT_PULLUP);
+    else
+        omap34xx_pad_set_config_lcd(PAD_OFFS_ETK_D11, OMAP34XX_MUX_MODE4 | OMAP34XX_PIN_INPUT_PULLDOWN| OMAP34XX_PIN_OFF_INPUT_PULLDOWN);
+#else
+    printk("[%s] set GPIO %d\n", state);
+    gpio_set_value(OMAP_GPIO_PS_HOLD_PU, __func__, state);
+#endif       
+}
+EXPORT_SYMBOL(set_ps_hold);
+
 
 int	nowplus_enable_touch_pins(int	enable)	{
 	printk("[TOUCH]	%s	touch	pins\n",	enable?"enable":"disable");
 	if	(enable)	{
-		omap34xx_pad_set_config_lcd(0x01C2,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
-		omap34xx_pad_set_config_lcd(0x01C4,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_I2C3_SCL,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_I2C3_SDA,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
 	}
 	else	{
-		omap34xx_pad_set_config_lcd(0x01C2,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
-		omap34xx_pad_set_config_lcd(0x01C4,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_I2C3_SCL,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_I2C3_SDA,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_OUTPUT_LOW);
 	}
 	mdelay(50);
 	return	0;
@@ -220,12 +245,12 @@ EXPORT_SYMBOL(nowplus_enable_touch_pins);
 int	nowplus_enable_uart_pins(int	enable)	{
 	printk("[UART]	%s	uart	pins\n",	enable?"enable":"disable");
 	if	(enable)	{
-		omap34xx_pad_set_config_lcd(0x16e	+	0x30,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_INPUT);
-		omap34xx_pad_set_config_lcd(0x170	+	0x30,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_INPUT);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_UART3_RX,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_INPUT_PULLUP	|	OMAP34XX_PIN_OFF_INPUT);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_UART3_TX,	OMAP34XX_MUX_MODE0	|	OMAP34XX_PIN_OUTPUT	|	OMAP34XX_PIN_OFF_INPUT);
 	}
 	else	{
-		omap34xx_pad_set_config_lcd(0x16e	+	0x30,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT	|	OMAP34XX_PIN_OFF_INPUT	);
-		omap34xx_pad_set_config_lcd(0x170	+	0x30,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT	|	OMAP34XX_PIN_OFF_INPUT);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_UART3_RX,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT	|	OMAP34XX_PIN_OFF_INPUT	);
+		omap34xx_pad_set_config_lcd(PAD_OFFS_UART3_TX,	OMAP34XX_MUX_MODE4	|	OMAP34XX_PIN_INPUT	|	OMAP34XX_PIN_OFF_INPUT);
 	}
 	mdelay(50);
 	return	0;
@@ -348,7 +373,7 @@ static	struct	platform_device	nowplus_power_key_device	=	{
 };
 
 static	struct	resource	nowplus_ear_key_resource	=	{
-				.start	=	0,
+				.start	=	OMAP_GPIO_IRQ(OMAP_GPIO_EAR_KEY),
 				.end	=	0,
 				.flags	=	IORESOURCE_IRQ	|	IORESOURCE_IRQ_HIGHLEVEL,
 };
@@ -869,15 +894,7 @@ static	inline	void	__init	nowplus_init_battery(void)
 #endif
 }
 
-static	inline	void	__init	nowplus_init_ear_key(void)
-{
-	nowplus_ear_key_resource.start	=	OMAP_GPIO_IRQ(OMAP_GPIO_EAR_KEY);
-	if(gpio_request(OMAP_GPIO_EAR_KEY,	"ear_key_irq")	<	0	){
-	printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	for	POWER	KEY	IRQ	\n",OMAP_GPIO_EAR_KEY);
-	return;
-	}
-	gpio_direction_input(OMAP_GPIO_EAR_KEY);
-}
+
 #if 0 // nowplus doesnt use TV-OUT DAC
 static	struct	regulator_consumer_supply	nowplus_vdda_dac_supply	=	{
 	.supply		=	"vdda_dac",
@@ -1200,8 +1217,9 @@ static struct twl4030_resconfig twl4030_rconfig[] = {
     TWL4030_RESCONFIG(RES_VDD1,     DEV_GRP_P1,     -1, -1, RES_STATE_OFF   ),
     TWL4030_RESCONFIG(RES_VDD2,     DEV_GRP_P1,     -1, -1, RES_STATE_OFF   ),
     TWL4030_RESCONFIG(RES_CLKEN,    DEV_GRP_P3,     -1, -1, RES_STATE_OFF   ),
-    TWL4030_RESCONFIG(RES_VIO,      DEV_GRP_ALL,    -1, -1, RES_STATE_SLEEP ),
+    TWL4030_RESCONFIG(RES_VIO,      DEV_GRP_ALL,    -1, -1, RES_STATE_ACTIVE ),
     TWL4030_RESCONFIG(RES_REGEN,    DEV_GRP_NULL,   -1, -1, RES_STATE_OFF   ),
+    TWL4030_RESCONFIG(RES_SYSEN,    DEV_GRP_ALL,    -1, -1, RES_STATE_ACTIVE),
 //	[	-	In	order	to	prevent	damage	to	the	PMIC(TWL4030	or	5030),
 //		VINTANA1	should	maintain	active	state	even	though	the	system	is	in	offmode.
     TWL4030_RESCONFIG(RES_VINTANA1, DEV_GRP_P1,     -1, -1, RES_STATE_ACTIVE),
@@ -1883,21 +1901,33 @@ static	inline	void	__init	nowplus_init_PL(void)
 
 static	inline	void	__init	nowplus_init_earphone(void)
 {
-	if(gpio_request(OMAP_GPIO_DET_3_5,	"OMAP_GPIO_DET_3_5")	<	0	){
-	printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_DET_3_5);
-	return;
-	}
-	gpio_direction_input(OMAP_GPIO_DET_3_5);
+    
+    if(gpio_request(OMAP_GPIO_EAR_KEY, "OMAP_GPIO_EAR_KEY") < 0){
+        printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d for OMAP_GPIO_EAR_KEY \n", OMAP_GPIO_EAR_KEY);
+        return;
+    }
+    gpio_direction_input(OMAP_GPIO_EAR_KEY);
+    
+    if(gpio_request(OMAP_GPIO_DET_3_5,	"OMAP_GPIO_DET_3_5")	<	0	){
+        printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_DET_3_5);
+        return;
+    }
+    gpio_direction_input(OMAP_GPIO_DET_3_5);
 
+    if(gpio_request(OMAP_GPIO_EAR_ADC_SEL, "OMAP_GPIO_EAR_ADC_SEL") < 0){
+        printk(KERN_ERR "\n FAILED TO REQUEST GPIO %d for OMAP_GPIO_EAR_ADC_SEL \n", OMAP_GPIO_EAR_ADC_SEL);
+        return;
+    }
+    gpio_direction_output(OMAP_GPIO_EAR_ADC_SEL, EAR_ADC_ON);
+    
+    if(gpio_request(OMAP_GPIO_EAR_MIC_LDO_EN,	"OMAP_GPIO_EAR_MIC_LDO_EN")	<	0	){
+        printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_EAR_MIC_LDO_EN);
+        return;
+    }
+    gpio_direction_output(OMAP_GPIO_EAR_MIC_LDO_EN,0);
 
-	if(gpio_request(OMAP_GPIO_EAR_MIC_LDO_EN,	"OMAP_GPIO_EAR_MIC_LDO_EN")	<	0	){
-	printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_EAR_MIC_LDO_EN);
-	return;
-	}
-	gpio_direction_output(OMAP_GPIO_EAR_MIC_LDO_EN,0);
-
-	gpio_free(	OMAP_GPIO_DET_3_5	);
-	gpio_free(	OMAP_GPIO_EAR_MIC_LDO_EN	);
+    gpio_free(	OMAP_GPIO_DET_3_5	);
+    gpio_free(	OMAP_GPIO_EAR_MIC_LDO_EN	);
 }
 
 static	inline	void	__init	nowplus_init_platform(void)
@@ -1907,8 +1937,12 @@ static	inline	void	__init	nowplus_init_platform(void)
 			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_PS_HOLD_PU);
 			return;
 		}
+#ifdef PS_HOLD_USE_PULL
+	gpio_direction_input(OMAP_GPIO_PS_HOLD_PU);
+#else
 	gpio_direction_output(OMAP_GPIO_PS_HOLD_PU, 1);
-    
+#endif
+
 	/*PDA ACTIVE*/
 	if(gpio_request(OMAP_GPIO_PDA_ACTIVE,	"OMAP_GPIO_PDA_ACTIVE")	<	0	){
 			printk(KERN_ERR	"\n	FAILED	TO	REQUEST	GPIO	%d	\n",OMAP_GPIO_PDA_ACTIVE);
@@ -2149,7 +2183,7 @@ void	__init	nowplus_peripherals_init(void)
 
     nowplus_ramconsole_init();
 	nowplus_init_power_key();
-	nowplus_init_ear_key();
+	nowplus_init_earphone();
 	nowplus_init_battery();
 	nowplus_init_platform();
 	nowplus_init_lcd();
@@ -2203,6 +2237,8 @@ static	void	__init	nowplus_init(void)
     // printk(    "    DISPC_GFX_SIZE: %dx%d\n", omap_readl(0x4805048C)&0xff, (omap_readl(0x4805048C)>>16)&0xff );
     // printk(    "    ---\n");   
     // printk(    "    CM_CLKSEL1_PLL: %dx%d\n", omap_readl(0x48004D40));
+    regval = omap_readl(OMAP343X_SCRATCHPAD + 4);
+    printk(    "BOOT CMD: %c%c%c\n", (regval>>24)&0xff, (regval>>16)&0xff, regval&0xff);
 
     // printk(    " <-- SBL dump ---\n"); 
 
