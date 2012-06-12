@@ -1253,7 +1253,7 @@ static int  m4mo_set_preview(void)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_PREVIEW;   
     
-    m4mo_set_mode(M4MO_PARMSET_MODE );
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
  
      
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
@@ -1313,7 +1313,7 @@ static int  m4mo_set_capture(int pixelformat)
     m4mo_pre_state = m4mo_curr_state;
     m4mo_curr_state = M4MO_STATE_CAPTURE;   
     
-    m4mo_set_mode(M4MO_PARMSET_MODE );
+    //m4mo_set_mode(M4MO_PARMSET_MODE );
 
     /*080917[paladin] Set the fps to the sensor. @LDK@*/
     m4mo_write_category_parm(client, M4MO_8BIT, 0x01, 0x02, sensor->fps);
