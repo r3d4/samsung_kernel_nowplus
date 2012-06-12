@@ -102,6 +102,7 @@
 #define OMAP_GPIO_CAMERA_LEVEL_CTRL 167   //output H //OMAP3430_GPIO_CAMERA_LEVEL_CTRL
 #define OMAP_GPIO_MLCD_RST          170   //r    //output H
 #define OMAP_GPIO_TVOUT_SEL         177
+#define OMAP_GPIO_EAR_ADC_SEL       177
 #define OMAP_GPIO_MSM_RST18_N       178   //r //output H
 
 
